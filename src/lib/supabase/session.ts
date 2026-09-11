@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 import type { Database } from '@/lib/database.types';
-import { supabaseEnv } from './env';
+import { supabaseEnvOrNull } from './env';
 
 const PROTECTED_PREFIXES = ['/sets/nuevo', '/ajustes'];
 
@@ -12,10 +12,17 @@ const PROTECTED_PREFIXES = ['/sets/nuevo', '/ajustes'];
  * en el servidor, porque sólo el dueño puede editar.
  */
 export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request });
-  const { url, key } = supabaseEnv();
+  const response = NextResponse.next({ request });
+  const env = supabaseEnvOrNull();
 
-  const supabase = createServerClient<Database>(url, key, {
+  // Sin configuración de Supabase no hay sesión que refrescar. Dejamos pasar
+  // la petición para que las páginas puedan renderizar el aviso de setup en
+  // lugar de que todo el sitio devuelva un 500.
+  if (!env) return response;
+
+  let sessionResponse = response;
+
+  const supabase = createServerClient<Database>(env.url, env.key, {
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -24,9 +31,9 @@ export async function updateSession(request: NextRequest) {
         for (const { name, value } of cookiesToSet) {
           request.cookies.set(name, value);
         }
-        response = NextResponse.next({ request });
+        sessionResponse = NextResponse.next({ request });
         for (const { name, value, options } of cookiesToSet) {
-          response.cookies.set(name, value, options);
+          sessionResponse.cookies.set(name, value, options);
         }
       },
     },
@@ -39,8 +46,8 @@ export async function updateSession(request: NextRequest) {
   } catch (error) {
     // Si Supabase no responde no bloqueamos la navegación: las páginas
     // protegidas vuelven a comprobar la sesión en el servidor.
-    console.error('[sliderxi] refresco de sesión falló:', error);
-    return response;
+    console.error('[slidersfc] refresco de sesión falló:', error);
+    return sessionResponse;
   }
 
   const { pathname } = request.nextUrl;
@@ -55,5 +62,5 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  return response;
+  return sessionResponse;
 }

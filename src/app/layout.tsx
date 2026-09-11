@@ -1,14 +1,16 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 
+import { SetupNotice } from '@/components/setup-notice';
 import { SiteHeader } from '@/components/site-header';
 import { SITE_BYLINE, SITE_NAME, SITE_TAGLINE } from '@/lib/constants';
+import { publicSiteUrl } from '@/lib/site-url';
 import './globals.css';
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+const siteUrl = publicSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -39,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="flex min-h-full flex-col">
         <SiteHeader />
+        <SetupNotice />
         <main className="flex-1">{children}</main>
         <footer className="mt-20 border-t border-line">
           <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-8 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">

@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { unstable_rethrow } from 'next/navigation';
 import { createServerClient } from '@supabase/ssr';
 
 import type { Database } from '@/lib/database.types';
@@ -40,7 +41,8 @@ export async function getCurrentUser() {
     } = await supabase.auth.getUser();
     return user;
   } catch (error) {
-    console.error('[sliderxi] getCurrentUser falló:', error);
+    unstable_rethrow(error);
+    console.error('[slidersfc] getCurrentUser falló:', error);
     return null;
   }
 }
@@ -63,7 +65,8 @@ export async function getCurrentProfile() {
 
     return data;
   } catch (error) {
-    console.error('[sliderxi] getCurrentProfile falló:', error);
+    unstable_rethrow(error);
+    console.error('[slidersfc] getCurrentProfile falló:', error);
     return null;
   }
 }

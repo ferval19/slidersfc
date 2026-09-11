@@ -1,3 +1,5 @@
+import { unstable_rethrow } from 'next/navigation';
+
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type {
   Game,
@@ -16,14 +18,25 @@ export type SetListItem = SliderSet & {
 
 /**
  * Las lecturas públicas no deben tumbar la página si Supabase no responde
- * (outage, proyecto pausado, variables mal puestas en un deploy nuevo).
- * El feed se queda vacío y se registra el error en el log del servidor.
+ * (outage, proyecto pausado, variables sin rellenar en un deploy nuevo).
+ * La página se queda vacía y el error queda en el log del servidor.
+ *
+ * El cliente se crea DENTRO del try a propósito: crearlo ya lanza si faltan
+ * las variables de entorno.
  */
-async function safeRead<T>(label: string, read: () => Promise<T>, fallback: T): Promise<T> {
+async function safeRead<T>(
+  label: string,
+  read: (supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>) => Promise<T>,
+  fallback: T,
+): Promise<T> {
   try {
-    return await read();
+    const supabase = await createSupabaseServerClient();
+    return await read(supabase);
   } catch (error) {
-    console.error(`[sliderxi] ${label} falló:`, error);
+    // Next usa excepciones para señalar redirect(), notFound() y el paso a
+    // render dinámico. Si nos las tragamos, el framework se rompe en silencio.
+    unstable_rethrow(error);
+    console.error(`[slidersfc] ${label} falló:`, error);
     return fallback;
   }
 }
@@ -38,8 +51,7 @@ const SET_LIST_SELECT = `
 export async function getGames(): Promise<Game[]> {
   return safeRead(
     'getGames',
-    async () => {
-      const supabase = await createSupabaseServerClient();
+    async (supabase) => {
       const { data } = await supabase
         .from('games')
         .select('*')
@@ -53,8 +65,7 @@ export async function getGames(): Promise<Game[]> {
 export async function getGameBySlug(slug: string): Promise<Game | null> {
   return safeRead(
     'getGameBySlug',
-    async () => {
-      const supabase = await createSupabaseServerClient();
+    async (supabase) => {
       const { data } = await supabase.from('games').select('*').eq('slug', slug).maybeSingle();
       return data ?? null;
     },
@@ -63,33 +74,25 @@ export async function getGameBySlug(slug: string): Promise<Game | null> {
 }
 
 /** Feed público. `gameSlug` y `mode` son filtros opcionales. */
-export async function getPublishedSets(options: {
-  gameSlug?: string;
-  mode?: SetMode;
-  limit?: number;
-} = {}): Promise<SetListItem[]> {
-  const supabase = await createSupabaseServerClient();
-
-  let query = supabase
-    .from('slider_sets')
-    .select(SET_LIST_SELECT)
-    .eq('is_published', true)
-    .order('created_at', { ascending: false })
-    .limit(options.limit ?? 30);
-
-  if (options.gameSlug) {
-    const game = await getGameBySlug(options.gameSlug);
-    if (!game) return [];
-    query = query.eq('game_id', game.id);
-  }
-
-  if (options.mode) {
-    query = query.eq('mode', options.mode);
-  }
+export async function getPublishedSets(
+  options: { gameSlug?: string; mode?: SetMode; limit?: number } = {},
+): Promise<SetListItem[]> {
+  const game = options.gameSlug ? await getGameBySlug(options.gameSlug) : null;
+  if (options.gameSlug && !game) return [];
 
   return safeRead(
     'getPublishedSets',
-    async () => {
+    async (supabase) => {
+      let query = supabase
+        .from('slider_sets')
+        .select(SET_LIST_SELECT)
+        .eq('is_published', true)
+        .order('created_at', { ascending: false })
+        .limit(options.limit ?? 30);
+
+      if (game) query = query.eq('game_id', game.id);
+      if (options.mode) query = query.eq('mode', options.mode);
+
       const { data } = await query;
       return (data ?? []) as unknown as SetListItem[];
     },
@@ -99,23 +102,33 @@ export async function getPublishedSets(options: {
 
 /** Sets de un usuario. RLS ya oculta los borradores a terceros. */
 export async function getSetsByOwner(ownerId: string): Promise<SetListItem[]> {
-  const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
-    .from('slider_sets')
-    .select(SET_LIST_SELECT)
-    .eq('owner_id', ownerId)
-    .order('created_at', { ascending: false });
-  return (data ?? []) as unknown as SetListItem[];
+  return safeRead(
+    'getSetsByOwner',
+    async (supabase) => {
+      const { data } = await supabase
+        .from('slider_sets')
+        .select(SET_LIST_SELECT)
+        .eq('owner_id', ownerId)
+        .order('created_at', { ascending: false });
+      return (data ?? []) as unknown as SetListItem[];
+    },
+    [],
+  );
 }
 
 export async function getProfileByUsername(username: string): Promise<Profile | null> {
-  const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('username', username.toLowerCase())
-    .maybeSingle();
-  return data ?? null;
+  return safeRead(
+    'getProfileByUsername',
+    async (supabase) => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('username', username.toLowerCase())
+        .maybeSingle();
+      return data ?? null;
+    },
+    null,
+  );
 }
 
 export type SetDetail = {
@@ -134,67 +147,97 @@ export type SetDetail = {
  * Devuelve null si el set no existe o RLS no deja verlo.
  */
 export async function getSetDetail(setId: string): Promise<SetDetail | null> {
-  const supabase = await createSupabaseServerClient();
+  return safeRead(
+    'getSetDetail',
+    async (supabase) => {
+      const { data: set } = await supabase
+        .from('slider_sets')
+        .select(
+          `*,
+           games ( * ),
+           profiles ( id, username, display_name, avatar_url, twitter_handle )`,
+        )
+        .eq('id', setId)
+        .maybeSingle();
 
-  const { data: set } = await supabase
-    .from('slider_sets')
-    .select(
-      `*,
-       games ( * ),
-       profiles ( id, username, display_name, avatar_url, twitter_handle )`,
-    )
-    .eq('id', setId)
-    .maybeSingle();
+      if (!set) return null;
 
-  if (!set) return null;
+      const row = set as unknown as SliderSet & {
+        games: Game | null;
+        profiles: SetDetail['owner'] | null;
+      };
 
-  const row = set as unknown as SliderSet & {
-    games: Game | null;
-    profiles: SetDetail['owner'] | null;
-  };
+      if (!row.games || !row.profiles) return null;
 
-  if (!row.games || !row.profiles) return null;
+      const [definitionsResult, valuesResult, commentsResult] = await Promise.all([
+        supabase
+          .from('slider_definitions')
+          .select('*')
+          .eq('game_id', row.game_id)
+          .order('sort_order')
+          .order('applies_to'),
+        supabase.from('slider_set_values').select('*').eq('slider_set_id', setId),
+        supabase
+          .from('slider_comments')
+          .select('*, profiles ( username, display_name, avatar_url )')
+          .eq('slider_set_id', setId)
+          .order('created_at', { ascending: true }),
+      ]);
 
-  const [definitionsResult, valuesResult, commentsResult] = await Promise.all([
-    supabase
-      .from('slider_definitions')
-      .select('*')
-      .eq('game_id', row.game_id)
-      .order('sort_order')
-      .order('applies_to'),
-    supabase.from('slider_set_values').select('*').eq('slider_set_id', setId),
-    supabase
-      .from('slider_comments')
-      .select('*, profiles ( username, display_name, avatar_url )')
-      .eq('slider_set_id', setId)
-      .order('created_at', { ascending: true }),
-  ]);
+      const values = new Map<number, number>();
+      for (const value of valuesResult.data ?? []) {
+        values.set(value.slider_definition_id, value.value);
+      }
 
-  const values = new Map<number, number>();
-  for (const value of valuesResult.data ?? []) {
-    values.set(value.slider_definition_id, value.value);
-  }
-
-  return {
-    set: row,
-    game: row.games,
-    owner: row.profiles,
-    definitions: definitionsResult.data ?? [],
-    values,
-    comments: (commentsResult.data ?? []) as unknown as SetDetail['comments'],
-  };
+      return {
+        set: row,
+        game: row.games,
+        owner: row.profiles,
+        definitions: definitionsResult.data ?? [],
+        values,
+        comments: (commentsResult.data ?? []) as unknown as SetDetail['comments'],
+      };
+    },
+    null,
+  );
 }
 
-/** Definiciones de sliders de un juego, para el formulario de creación. */
+/** Definiciones de sliders de un juego. */
 export async function getDefinitionsForGame(gameId: number): Promise<SliderDefinition[]> {
-  const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
-    .from('slider_definitions')
-    .select('*')
-    .eq('game_id', gameId)
-    .order('sort_order')
-    .order('applies_to');
-  return data ?? [];
+  return safeRead(
+    'getDefinitionsForGame',
+    async (supabase) => {
+      const { data } = await supabase
+        .from('slider_definitions')
+        .select('*')
+        .eq('game_id', gameId)
+        .order('sort_order')
+        .order('applies_to');
+      return data ?? [];
+    },
+    [],
+  );
+}
+
+/** Todas las definiciones, agrupadas por game_id, para el formulario. */
+export async function getDefinitionsByGame(): Promise<Record<string, SliderDefinition[]>> {
+  return safeRead(
+    'getDefinitionsByGame',
+    async (supabase) => {
+      const { data } = await supabase
+        .from('slider_definitions')
+        .select('*')
+        .order('sort_order')
+        .order('applies_to');
+
+      const grouped: Record<string, SliderDefinition[]> = {};
+      for (const definition of data ?? []) {
+        (grouped[String(definition.game_id)] ??= []).push(definition);
+      }
+      return grouped;
+    },
+    {},
+  );
 }
 
 /**
@@ -228,20 +271,4 @@ export function groupDefinitions(definitions: SliderDefinition[]) {
   }
 
   return byCategory;
-}
-
-/** Todas las definiciones, agrupadas por game_id, para el formulario. */
-export async function getDefinitionsByGame(): Promise<Record<string, SliderDefinition[]>> {
-  const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
-    .from('slider_definitions')
-    .select('*')
-    .order('sort_order')
-    .order('applies_to');
-
-  const grouped: Record<string, SliderDefinition[]> = {};
-  for (const definition of data ?? []) {
-    (grouped[String(definition.game_id)] ??= []).push(definition);
-  }
-  return grouped;
 }
