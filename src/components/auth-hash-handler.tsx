@@ -71,7 +71,7 @@ export function AuthHashHandler({ next }: { next: string }) {
 
   if (error) {
     return (
-      <div className="card p-6">
+      <div className="panel p-6">
         <p className="eyebrow">No se ha podido entrar</p>
         <p className="mt-3 text-sm text-chalk/90">{error}</p>
         <Link href="/login" className="btn btn-primary mt-5">

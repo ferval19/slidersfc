@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Big_Shoulders, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 
+import { AuthErrorRelay } from '@/components/auth-error-relay';
 import { ChalkFilters } from '@/components/chalk';
 import { SetupNotice } from '@/components/setup-notice';
 import { SiteFooter } from '@/components/site-footer';
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="flex min-h-full flex-col">
         <ChalkFilters />
+        <AuthErrorRelay />
         <SiteHeader />
         <SetupNotice />
         <main className="flex-1">{children}</main>

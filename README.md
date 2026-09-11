@@ -61,7 +61,7 @@ https://<tu-dominio>/auth/confirm
 https://<tu-dominio>/auth/finalizar
 ```
 
-#### Plantilla del email de acceso (recomendado)
+#### Plantilla del email de acceso (importante)
 
 La app acepta las tres formas en las que Supabase puede devolver al usuario
 (`?code=`, `?token_hash=` y `#access_token=`), así que con la plantilla por
@@ -72,13 +72,31 @@ lo pediste en el portátil, falla con *«PKCE code verifier not found»*.
 Para evitarlo, en **Authentication → Emails → Magic Link** cambia el enlace por:
 
 ```html
-<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">
-  Entrar en SlidersFC
-</a>
+<p>
+  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">
+    Entrar en SlidersFC
+  </a>
+</p>
+<p>O escribe este código en la web: <strong>{{ .Token }}</strong></p>
 ```
 
-Con `TokenHash` la verificación no depende de una cookie previa, así que el
-enlace funciona desde cualquier dispositivo.
+Dos cosas cambian con esa plantilla:
+
+- Con `TokenHash` el enlace apunta directo a la app, así que la verificación no
+  depende de una cookie previa y funciona desde cualquier dispositivo. Con la
+  plantilla por defecto (`{{ .ConfirmationURL }}`, flujo PKCE) sólo vale en el
+  navegador que lo pidió.
+- `{{ .Token }}` imprime el código de 6 dígitos, y la pantalla de «te lo hemos
+  enviado» acepta escribirlo a mano. Eso es la salida cuando el enlace no
+  funciona: los escáneres de Gmail y Outlook abren los enlaces de los correos
+  antes que la persona y **consumen el token de un solo uso**, lo que produce
+  un `otp_expired` en el primer clic. Un código escrito a mano no se gasta.
+
+Ojo también con el **Site URL** del proyecto: Supabase entrega ahí los errores
+de acceso, así que si apunta a producción, un fallo probando en local te deja
+en el dominio de producción. La app detecta esos parámetros de error en
+cualquier página y lleva a /login con el motivo (ver
+`src/components/auth-error-relay.tsx`).
 
 ### 5. Arrancar
 
