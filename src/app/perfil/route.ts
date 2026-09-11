@@ -46,7 +46,10 @@ export async function GET() {
 
     // 23505 = unique_violation: el username está cogido, probamos el siguiente.
     if (error.code !== '23505') {
-      redirect(`/login?error=${encodeURIComponent(error.message)}`);
+      console.error('[slidersfc] no se pudo crear el perfil:', error);
+      redirect(
+        `/login?error=${encodeURIComponent('No se ha podido crear tu perfil. Vuelve a intentarlo.')}`,
+      );
     }
   }
 

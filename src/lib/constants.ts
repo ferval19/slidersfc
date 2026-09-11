@@ -37,6 +37,7 @@ export const SCOPE_LABELS: Record<SliderScope, string> = {
 
 export const SCOPE_ORDER: SliderScope[] = ['user', 'cpu', 'cpu_opponent', 'cpu_teammate'];
 
+
 /**
  * El rotulador de cada ámbito. Un entrenador pinta a los suyos de un color y
  * al rival de otro; aquí el color dice de quién es el valor, así que en un set

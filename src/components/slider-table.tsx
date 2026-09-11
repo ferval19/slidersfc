@@ -9,6 +9,16 @@ import { categoryLabel, SCOPE_INK, SCOPE_LABELS } from '@/lib/constants';
 import type { CategoryBlockView, CommentView } from '@/lib/set-view';
 import type { SliderScope } from '@/lib/database.types';
 
+/** Nombre | escala | valores. La cabecera de columnas usa la misma rejilla. */
+const ROW_GRID = 'sm:grid-cols-[minmax(8rem,13rem)_1fr_auto]';
+
+/**
+ * Ancho de cada columna de valores. Lo comparten la cabecera, los números y
+ * el guion de «no aplica», que es lo que hace que todo quede en columna.
+ * Da para «Usuario» y «CPU» en una línea; «CPU compañero» parte en dos.
+ */
+const VALUE_COL = 'w-20';
+
 /**
  * Los valores del set. Cada fila es un slider: nombre, la escala con las
  * muescas de todos los ámbitos, y los números — que son los que abren su hilo
@@ -31,7 +41,26 @@ export function SliderTable({
 
   return (
     <div className="flex flex-col gap-10">
-      <ScaleLegend scopes={scopes} labels={SCOPE_LABELS} />
+      {/* En móvil la rejilla se apila, así que ahí la leyenda va suelta. */}
+      <div className="sm:hidden">
+        <ScaleLegend scopes={scopes} labels={SCOPE_LABELS} />
+      </div>
+
+      {/* En pantalla ancha, cada rótulo va sobre su columna de valores. */}
+      <div className={`hidden items-end pb-1 sm:grid ${ROW_GRID}`}>
+        <span />
+        <span />
+        <div className="flex items-center gap-1.5">
+          {scopes.map((scope) => (
+            <span
+              key={scope}
+              className={`${VALUE_COL} text-center font-mono text-[0.625rem] leading-tight font-semibold tracking-[0.08em] uppercase ${SCOPE_INK[scope].text}`}
+            >
+              {SCOPE_LABELS[scope]}
+            </span>
+          ))}
+        </div>
+      </div>
 
       {blocks.map((block) => {
         const Drawing = CATEGORY_DRAWINGS[block.category as keyof typeof CATEGORY_DRAWINGS];
@@ -41,9 +70,6 @@ export function SliderTable({
             <header className="flex items-center gap-3 border-b border-chalk-line pb-3">
               {Drawing ? <Drawing className="size-7 text-chalk-dim" /> : null}
               <h3 className="display text-2xl">{categoryLabel(block.category)}</h3>
-              <span className="eyebrow ml-auto">
-                {block.rows.length} {block.rows.length === 1 ? 'slider' : 'sliders'}
-              </span>
             </header>
 
             <ul>
@@ -57,7 +83,7 @@ export function SliderTable({
 
                 return (
                   <li key={row.slug} className="border-b border-chalk-line/60 last:border-b-0">
-                    <div className="grid items-center gap-x-5 gap-y-1 py-3 sm:grid-cols-[minmax(8rem,14rem)_1fr_auto]">
+                    <div className={`grid items-center gap-x-5 gap-y-1 py-3 ${ROW_GRID}`}>
                       <span className="text-sm leading-tight font-semibold">{row.name}</span>
 
                       <ScaleTrack min={0} max={100} marks={marks} className="min-w-32" />
@@ -68,7 +94,7 @@ export function SliderTable({
                             return (
                               <span
                                 key={cell.scope}
-                                className="w-12 text-center text-sm text-chalk-dim/40"
+                                className={`${VALUE_COL} text-center text-sm text-chalk-dim/40`}
                                 title={`${SCOPE_LABELS[cell.scope]}: no aplica`}
                               >
                                 —
@@ -86,7 +112,7 @@ export function SliderTable({
                               onClick={() => setOpenId(isOpen ? null : cell.definitionId)}
                               aria-expanded={isOpen}
                               title={`${row.name} · ${SCOPE_LABELS[cell.scope]} — comentarios`}
-                              className={`relative w-12 rounded-[2px] border py-1.5 transition-colors ${ink.text} ${
+                              className={`relative ${VALUE_COL} rounded-[2px] border py-1.5 transition-colors ${ink.text} ${
                                 isOpen
                                   ? `${ink.border} bg-board-deep`
                                   : 'border-transparent hover:border-chalk-line'

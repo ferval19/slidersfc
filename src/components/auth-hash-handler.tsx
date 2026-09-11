@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { authErrorFrom, authErrorMessage } from '@/lib/auth-errors';
 import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 
 /**
@@ -25,7 +26,7 @@ export function AuthHashHandler({ next }: { next: string }) {
       const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
       const accessToken = params.get('access_token');
       const refreshToken = params.get('refresh_token');
-      const hashError = params.get('error_description') ?? params.get('error');
+      const hashError = authErrorFrom(params);
 
       if (hashError) {
         if (!cancelled) setError(hashError);
@@ -49,7 +50,7 @@ export function AuthHashHandler({ next }: { next: string }) {
         });
 
         if (sessionError) {
-          if (!cancelled) setError(sessionError.message);
+          if (!cancelled) setError(authErrorMessage(sessionError));
           return;
         }
 
@@ -57,7 +58,9 @@ export function AuthHashHandler({ next }: { next: string }) {
         router.replace(next);
       } catch (cause) {
         if (!cancelled) {
-          setError(cause instanceof Error ? cause.message : 'No se ha podido iniciar la sesión.');
+          setError(
+            authErrorMessage(cause instanceof Error ? { message: cause.message } : null),
+          );
         }
       }
     };

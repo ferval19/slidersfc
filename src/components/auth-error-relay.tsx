@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 import { authErrorFrom } from '@/lib/auth-errors';
@@ -16,8 +16,13 @@ import { authErrorFrom } from '@/lib/auth-errors';
  */
 export function AuthErrorRelay() {
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
+    // /login ya pinta el mensaje que le llega en ?error=. Sin esto, el relevo
+    // se pisaba su propio parámetro y lo cambiaba por el genérico.
+    if (pathname === '/login') return;
+
     const fromQuery = authErrorFrom(new URLSearchParams(window.location.search));
     const fromHash = authErrorFrom(new URLSearchParams(window.location.hash.replace(/^#/, '')));
     const message = fromQuery ?? fromHash;
@@ -25,7 +30,7 @@ export function AuthErrorRelay() {
     if (!message) return;
 
     router.replace(`/login?error=${encodeURIComponent(message)}`);
-  }, [router]);
+  }, [pathname, router]);
 
   return null;
 }

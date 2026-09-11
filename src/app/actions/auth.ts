@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 
+import { authErrorMessage } from '@/lib/auth-errors';
 import { getSiteOrigin, safeNextPath } from '@/lib/site-url';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
@@ -31,7 +32,7 @@ export async function signInWithEmail(
     },
   });
 
-  if (error) return { error: error.message };
+  if (error) return { error: authErrorMessage(error) };
 
   return { sent: email };
 }
@@ -61,7 +62,7 @@ export async function verifyEmailCode(
 
   // Según si la cuenta ya existía, Supabase espera el tipo `email` o
   // `magiclink`. Probamos los dos antes de dar el error por definitivo.
-  let lastError: string | null = null;
+  let lastError: Parameters<typeof authErrorMessage>[0] = null;
 
   for (const type of ['email', 'magiclink'] as const) {
     const { error } = await supabase.auth.verifyOtp({ email, token, type });
@@ -69,10 +70,10 @@ export async function verifyEmailCode(
       revalidatePath('/', 'layout');
       redirect(next);
     }
-    lastError = error.message;
+    lastError = error;
   }
 
-  return { error: lastError ?? 'El código no es válido o ha caducado.' };
+  return { error: authErrorMessage(lastError) };
 }
 
 export async function signInWithTwitter(formData: FormData) {
@@ -88,7 +89,10 @@ export async function signInWithTwitter(formData: FormData) {
   });
 
   if (error || !data.url) {
-    redirect(`/login?error=${encodeURIComponent(error?.message ?? 'No se ha podido iniciar el login con X.')}`);
+    const message = error
+      ? authErrorMessage(error)
+      : 'No se ha podido iniciar el acceso con X.';
+    redirect(`/login?error=${encodeURIComponent(message)}`);
   }
 
   redirect(data.url);

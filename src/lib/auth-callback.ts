@@ -1,6 +1,7 @@
 import { type EmailOtpType } from '@supabase/supabase-js';
 import { NextResponse, type NextRequest } from 'next/server';
 
+import { authErrorFrom, authErrorMessage } from '@/lib/auth-errors';
 import { safeNextPath } from '@/lib/site-url';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
@@ -25,7 +26,7 @@ export async function handleAuthCallback(request: NextRequest) {
   const fail = (message: string) =>
     NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(message)}`);
 
-  const providerError = searchParams.get('error_description') ?? searchParams.get('error');
+  const providerError = authErrorFrom(searchParams);
   if (providerError) return fail(providerError);
 
   const supabase = await createSupabaseServerClient();
@@ -33,7 +34,7 @@ export async function handleAuthCallback(request: NextRequest) {
   const code = searchParams.get('code');
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (error) return fail(error.message);
+    if (error) return fail(authErrorMessage(error));
     return NextResponse.redirect(`${origin}${next}`);
   }
 
@@ -41,7 +42,7 @@ export async function handleAuthCallback(request: NextRequest) {
   const type = searchParams.get('type') as EmailOtpType | null;
   if (tokenHash && type) {
     const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
-    if (error) return fail(error.message);
+    if (error) return fail(authErrorMessage(error));
     return NextResponse.redirect(`${origin}${next}`);
   }
 
