@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 
+import { setPath } from '@/lib/paths';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export type CommentFormState = { error?: string; ok?: boolean };
@@ -38,31 +39,33 @@ export async function postComment(
   // comentarios que hablaban de valores ya cambiados.
   const { data: set } = await supabase
     .from('slider_sets')
-    .select('version')
+    .select('version, slug, profiles!inner ( username )')
     .eq('id', setId)
     .maybeSingle();
 
   if (!set) return { error: 'Este set ya no existe.' };
+
+  const target = set as unknown as { version: number; slug: string; profiles: { username: string } };
 
   const { error } = await supabase.from('slider_comments').insert({
     slider_set_id: setId,
     slider_definition_id: definitionId,
     author_id: user.id,
     body,
-    set_version: set.version,
+    set_version: target.version,
   });
 
   if (error) return { error: error.message };
 
-  revalidatePath(`/sets/${setId}`);
+  revalidatePath(setPath(target.profiles.username, target.slug));
   return { ok: true };
 }
 
-export async function deleteComment(commentId: string, setId: string) {
+export async function deleteComment(commentId: string, setPathname: string) {
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.from('slider_comments').delete().eq('id', commentId);
 
   if (error) throw new Error(error.message);
 
-  revalidatePath(`/sets/${setId}`);
+  revalidatePath(setPathname);
 }

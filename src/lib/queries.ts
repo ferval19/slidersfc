@@ -140,23 +140,32 @@ export type SetDetail = {
   })[];
 };
 
+const SET_DETAIL_SELECT = `
+  *,
+  games ( * ),
+  profiles!inner ( id, username, display_name, avatar_url, twitter_handle )
+`;
+
 /**
  * Todo lo que necesita la página de detalle de un set, en una sola función.
- * Devuelve null si el set no existe o RLS no deja verlo.
+ * Se puede pedir por id (enlaces antiguos) o por usuario + slug (los de
+ * ahora). Devuelve null si el set no existe o RLS no deja verlo.
  */
-export async function getSetDetail(setId: string): Promise<SetDetail | null> {
+export async function getSetDetail(
+  locator: { id: string } | { username: string; slug: string },
+): Promise<SetDetail | null> {
   return safeRead(
     'getSetDetail',
     async (supabase) => {
-      const { data: set } = await supabase
-        .from('slider_sets')
-        .select(
-          `*,
-           games ( * ),
-           profiles ( id, username, display_name, avatar_url, twitter_handle )`,
-        )
-        .eq('id', setId)
-        .maybeSingle();
+      const query = supabase.from('slider_sets').select(SET_DETAIL_SELECT);
+
+      const { data: set } =
+        'id' in locator
+          ? await query.eq('id', locator.id).maybeSingle()
+          : await query
+              .eq('slug', locator.slug)
+              .eq('profiles.username', locator.username.toLowerCase())
+              .maybeSingle();
 
       if (!set) return null;
 
@@ -166,6 +175,8 @@ export async function getSetDetail(setId: string): Promise<SetDetail | null> {
       };
 
       if (!row.games || !row.profiles) return null;
+
+      const setId = row.id;
 
       const [definitionsResult, valuesResult, commentsResult] = await Promise.all([
         supabase

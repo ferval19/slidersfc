@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { useActionState, useEffect, useRef } from 'react';
 
 import { Avatar } from '@/components/avatar';
@@ -74,6 +75,7 @@ export function CommentComposer({
 }) {
   const [state, formAction, pending] = useActionState(postComment, initialState);
   const formRef = useRef<HTMLFormElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (state.ok) formRef.current?.reset();
@@ -82,7 +84,10 @@ export function CommentComposer({
   if (!canComment) {
     return (
       <p className="text-xs text-chalk-dim">
-        <Link href={`/login?next=/sets/${setId}`} className="font-semibold text-ink-user hover:underline">
+        <Link
+          href={`/login?next=${encodeURIComponent(pathname)}`}
+          className="font-semibold text-ink-user hover:underline"
+        >
           Entra
         </Link>{' '}
         para comentar.

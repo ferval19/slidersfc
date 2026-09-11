@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
+import { setPath } from '@/lib/paths';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { SliderDefinition } from '@/lib/database.types';
 
@@ -113,16 +114,18 @@ export async function createSet(
       description: parsed.description,
       is_published: parsed.publish,
     })
-    .select('id')
+    .select('id, slug, profiles!inner ( username )')
     .single();
 
   if (setError || !set) {
     return { error: setError?.message ?? 'No se ha podido crear el set.' };
   }
 
+  const created = set as unknown as { id: string; slug: string; profiles: { username: string } };
+
   const { error: valuesError } = await supabase.from('slider_set_values').insert(
     [...parsed.values].map(([slider_definition_id, value]) => ({
-      slider_set_id: set.id,
+      slider_set_id: created.id,
       slider_definition_id,
       value,
     })),
@@ -130,12 +133,14 @@ export async function createSet(
 
   if (valuesError) {
     // Sin valores el set no sirve de nada: lo deshacemos para no dejar basura.
-    await supabase.from('slider_sets').delete().eq('id', set.id);
+    await supabase.from('slider_sets').delete().eq('id', created.id);
     return { error: valuesError.message };
   }
 
+  const path = setPath(created.profiles.username, created.slug);
   revalidatePath('/');
-  redirect(`/sets/${set.id}`);
+  revalidatePath(path);
+  redirect(path);
 }
 
 export async function updateSet(
@@ -155,11 +160,13 @@ export async function updateSet(
 
   const { data: existing } = await supabase
     .from('slider_sets')
-    .select('id, owner_id, game_id, version, is_published')
+    .select('id, owner_id, game_id, version, is_published, slug, profiles!inner ( username )')
     .eq('id', setId)
     .maybeSingle();
 
   if (!existing) return { error: 'Este set ya no existe.' };
+
+  const target = existing as unknown as typeof existing & { slug: string; profiles: { username: string } };
   if (existing.owner_id !== user.id) return { error: 'Sólo el autor puede editar este set.' };
   if (existing.game_id !== parsed.gameId) {
     return { error: 'No se puede cambiar el juego de un set ya creado.' };
@@ -213,35 +220,36 @@ export async function updateSet(
     if (valuesError) return { error: valuesError.message };
   }
 
-  revalidatePath(`/sets/${setId}`);
+  const path = setPath(target.profiles.username, target.slug);
+  revalidatePath(path);
   revalidatePath('/');
-  redirect(`/sets/${setId}`);
+  redirect(path);
+}
+
+async function setPublished(setId: string, isPublished: boolean) {
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from('slider_sets')
+    .update({ is_published: isPublished })
+    .eq('id', setId)
+    .select('slug, profiles!inner ( username )')
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  const updated = data as unknown as { slug: string; profiles: { username: string } };
+
+  revalidatePath(setPath(updated.profiles.username, updated.slug));
+  revalidatePath('/');
 }
 
 export async function publishSet(setId: string) {
-  const supabase = await createSupabaseServerClient();
-  const { error } = await supabase
-    .from('slider_sets')
-    .update({ is_published: true })
-    .eq('id', setId);
-
-  if (error) throw new Error(error.message);
-
-  revalidatePath(`/sets/${setId}`);
-  revalidatePath('/');
+  await setPublished(setId, true);
 }
 
 export async function unpublishSet(setId: string) {
-  const supabase = await createSupabaseServerClient();
-  const { error } = await supabase
-    .from('slider_sets')
-    .update({ is_published: false })
-    .eq('id', setId);
-
-  if (error) throw new Error(error.message);
-
-  revalidatePath(`/sets/${setId}`);
-  revalidatePath('/');
+  await setPublished(setId, false);
 }
 
 export async function deleteSet(setId: string) {

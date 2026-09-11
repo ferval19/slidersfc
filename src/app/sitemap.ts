@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 
+import { setPath, profilePath } from '@/lib/paths';
 import { publicSiteUrl } from '@/lib/site-url';
 import { createSupabaseAnonClient } from '@/lib/supabase/anon';
 
@@ -17,7 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   let games: { slug: string }[] = [];
-  let sets: { id: string; updated_at: string; profiles: { username: string } | null }[] = [];
+  let sets: { slug: string; updated_at: string; profiles: { username: string } | null }[] = [];
 
   try {
     const supabase = createSupabaseAnonClient();
@@ -26,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       supabase.from('games').select('slug'),
       supabase
         .from('slider_sets')
-        .select('id, updated_at, profiles ( username )')
+        .select('slug, updated_at, profiles!inner ( username )')
         .eq('is_published', true)
         .order('created_at', { ascending: false })
         .limit(500),
@@ -52,14 +53,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily' as const,
       priority: 0.8,
     })),
-    ...sets.map((set) => ({
-      url: `${siteUrl}/sets/${set.id}`,
-      lastModified: new Date(set.updated_at),
-      changeFrequency: 'weekly' as const,
-      priority: 0.7,
-    })),
+    ...sets
+      .filter((set) => set.profiles)
+      .map((set) => ({
+        url: `${siteUrl}${setPath(set.profiles!.username, set.slug)}`,
+        lastModified: new Date(set.updated_at),
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
+      })),
     ...[...authors].map((username) => ({
-      url: `${siteUrl}/u/${username}`,
+      url: `${siteUrl}${profilePath(username)}`,
       changeFrequency: 'weekly' as const,
       priority: 0.5,
     })),

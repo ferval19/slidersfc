@@ -4,19 +4,24 @@ import Link from 'next/link';
 import { useTransition } from 'react';
 
 import { deleteSet, publishSet, unpublishSet } from '@/app/actions/sets';
+import { editSetPath } from '@/lib/paths';
 
 export function SetOwnerActions({
   setId,
+  username,
+  slug,
   isPublished,
 }: {
   setId: string;
+  username: string;
+  slug: string;
   isPublished: boolean;
 }) {
   const [pending, startTransition] = useTransition();
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Link href={`/sets/${setId}/editar`} className="btn btn-quiet">
+      <Link href={editSetPath(username, slug)} className="btn btn-quiet">
         Editar
       </Link>
 

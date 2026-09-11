@@ -7,9 +7,9 @@ import { supabaseEnvOrNull } from './env';
 const PROTECTED_PREFIXES = ['/sets/nuevo', '/ajustes'];
 
 /**
- * Refresca el token de sesión en cada navegación y protege las rutas
- * que requieren sesión. Las rutas /sets/[id]/editar se comprueban además
- * en el servidor, porque sólo el dueño puede editar.
+ * Refresca el token de sesión en cada navegación y protege las rutas que
+ * requieren sesión. Las de edición se comprueban además en el servidor,
+ * porque aquí sólo sabemos si hay sesión, no si es el dueño.
  */
 export async function updateSession(request: NextRequest) {
   const response = NextResponse.next({ request });
@@ -53,7 +53,7 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const needsAuth =
     PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix)) ||
-    /^\/sets\/[^/]+\/editar$/.test(pathname);
+    pathname.endsWith('/editar');
 
   if (!user && needsAuth) {
     const loginUrl = request.nextUrl.clone();

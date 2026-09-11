@@ -41,6 +41,8 @@ export type SliderSet = {
   owner_id: string;
   game_id: number;
   title: string;
+  /** Lo pone un trigger al insertar y no cambia aunque cambie el título. */
+  slug: string;
   description: string | null;
   version: number;
   is_published: boolean;
@@ -110,7 +112,13 @@ export type Database = {
         Row: SliderSet;
         Insert: Insert<
           SliderSet,
-          'id' | 'description' | 'version' | 'is_published' | 'created_at' | 'updated_at'
+          | 'id'
+          | 'slug'
+          | 'description'
+          | 'version'
+          | 'is_published'
+          | 'created_at'
+          | 'updated_at'
         >;
         Update: Partial<SliderSet>;
         Relationships: [

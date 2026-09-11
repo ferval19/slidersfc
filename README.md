@@ -35,7 +35,8 @@ Editor del dashboard, o con la CLI (`supabase db push`):
 2. `supabase/migrations/20260911120100_rls.sql` — Row Level Security
 3. `supabase/migrations/20260911120200_profiles_trigger.sql` — perfil automático al registrarse
 4. `supabase/seed/01_catalog.sql` — juegos y catálogo de sliders
-5. `supabase/seed/02_set_full_manual_fg.sql` — set de inicio para FC26
+5. `supabase/migrations/20260912140000_set_slugs.sql` — URLs amigables
+6. `supabase/seed/02_set_full_manual_fg.sql` — set de inicio para FC26
    (requiere haber entrado una vez con `ferval19@gmail.com`; ver
    [supabase/README.md](supabase/README.md))
 
@@ -92,6 +93,14 @@ Dos cosas cambian con esa plantilla:
   antes que la persona y **consumen el token de un solo uso**, lo que produce
   un `otp_expired` en el primer clic. Un código escrito a mano no se gasta.
 
+#### Límite de correos
+
+El SMTP que trae Supabase de serie es para pruebas: tiene un límite de unos
+pocos correos **por hora y por proyecto**, no por destinatario, así que cambiar
+de correo no lo esquiva. Antes de abrir la web a gente hay que configurar un
+SMTP propio en *Project Settings → Authentication → SMTP Settings* (Resend,
+Brevo, Mailgun, SES...). Mientras, el acceso con X no gasta correos.
+
 Ojo también con el **Site URL** del proyecto: Supabase entrega ahí los errores
 de acceso, así que si apunta a producción, un fallo probando en local te deja
 en el dominio de producción. La app detecta esos parámetros de error en
@@ -124,10 +133,12 @@ src/
   app/
     page.tsx                  feed público con filtros
     juegos/[slug]/            listado por juego
-    sets/[id]/                detalle: valores + comentarios por slider
-    sets/[id]/editar/         edición (sólo el dueño)
-    sets/nuevo/               creación
     u/[username]/             perfil público
+    u/[username]/[slug]/      detalle: valores + comentarios por slider
+    u/[username]/[slug]/editar/       edición (sólo el dueño)
+    u/[username]/[slug]/opengraph-image.tsx   tarjeta para redes sociales
+    sets/nuevo/               creación
+    sets/[id]/                redirección permanente a la URL amigable
     login/                    email + X
     auth/callback|confirm/    vuelta de OAuth y de magic link
     actions/                  Server Actions (sets, comentarios, auth)
@@ -160,6 +171,27 @@ el ámbito de cada slider. Está documentada en
 `user` / `cpu_opponent` / `cpu_teammate` (en FC26 y anteriores, `user` / `cpu`).
 Los sliders que sólo existen de un lado usan un único ámbito: la barra de
 potencia es sólo del usuario, y los controles de la CPU sólo de la CPU.
+
+### URLs
+
+Los sets viven en `/u/<usuario>/<slug>`. El slug lo pone un trigger al
+insertar, a partir del título, y **no cambia aunque cambie el título**: un
+enlace compartido tiene que seguir funcionando. Las URLs antiguas por UUID
+(`/sets/<id>`) redirigen de forma permanente.
+
+Se descartó `/<usuario>/<slug>` a secas porque un espacio de nombres en la
+raíz choca con `/login`, `/perfil`, `/juegos` y `/auth`, y obligaría a
+mantener una lista de nombres reservados cada vez que se añade una ruta.
+
+### Imagen para redes sociales
+
+Cada set genera su propia tarjeta en `opengraph-image.tsx`: título, autor,
+juego y cinco sliders con sus valores dibujados a escala. Se cachea una hora y
+usa el cliente anónimo, sin cookies, porque quien la pide son los bots.
+
+Las fuentes viven en `public/fonts/` como fichero, no descargadas en caliente.
+`fetch(new URL(..., import.meta.url))` no funciona al prerenderizar con
+Turbopack, y `public/` es lo único que se despliega siempre tal cual.
 
 ### Versionado
 

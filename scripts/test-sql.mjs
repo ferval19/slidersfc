@@ -26,6 +26,7 @@ const MIGRATIONS = [
   'supabase/migrations/20260911120100_rls.sql',
   'supabase/migrations/20260911120200_profiles_trigger.sql',
   'supabase/migrations/20260912090000_drop_mode.sql',
+  'supabase/migrations/20260912140000_set_slugs.sql',
 ];
 const CATALOG = 'supabase/seed/01_catalog.sql';
 const STARTER_SET = 'supabase/seed/02_set_full_manual_fg.sql';
@@ -54,10 +55,11 @@ async function freshDatabase({ withUser = true, withCatalog = true } = {}) {
     create role authenticated;
   `);
 
-  // El drop de `mode` va después del catálogo, como en la puesta en marcha real.
+  // El drop de `mode` y los slugs van después del catálogo, como en la puesta
+  // en marcha real.
   for (const file of MIGRATIONS.slice(0, 3)) await db.exec(read(file));
   if (withCatalog) await db.exec(read(CATALOG));
-  await db.exec(read(MIGRATIONS[3]));
+  for (const file of MIGRATIONS.slice(3)) await db.exec(read(file));
   if (withUser) await db.exec(`insert into auth.users (email) values ('${EMAIL}');`);
 
   return db;
@@ -89,6 +91,35 @@ const count = async (db, sql) => (await db.query(sql)).rows[0].n;
   check('y el perfil pasa a fullmanualfg', 1 === await count(db,
     `select count(*)::int as n from profiles where username = 'fullmanualfg'`));
 
+  const slug = await db.query(`select slug from slider_sets`);
+  check(
+    'el set recibe un slug legible',
+    slug.rows[0]?.slug === 'full-manual-fg-v3-0',
+    JSON.stringify(slug.rows),
+  );
+
+  // Un título con acentos y símbolos, y dos iguales del mismo dueño
+  const owner = await db.query(`select id from profiles limit 1`);
+  await db.exec(`
+    insert into slider_sets (owner_id, game_id, title)
+    values ('${owner.rows[0].id}', (select id from games where slug = 'fc26'), 'Simulación ¡Máxima! 2026'),
+           ('${owner.rows[0].id}', (select id from games where slug = 'fc26'), 'Simulación ¡Máxima! 2026');
+  `);
+  const slugs = await db.query(`select slug from slider_sets order by slug`);
+  check(
+    'los acentos y los duplicados se resuelven',
+    slugs.rows.some((r) => r.slug === 'simulacion-maxima-2026') &&
+      slugs.rows.some((r) => r.slug === 'simulacion-maxima-2026-1'),
+    JSON.stringify(slugs.rows.map((r) => r.slug)),
+  );
+
+  // Cambiar el título no debe mover el slug: los enlaces compartidos siguen vivos
+  await db.exec(`update slider_sets set title = 'Otro título' where slug = 'simulacion-maxima-2026'`);
+  check(
+    'cambiar el título no cambia el slug',
+    1 === await count(db, `select count(*)::int as n from slider_sets where slug = 'simulacion-maxima-2026'`),
+  );
+
   const gaps = await db.query(`
     select d.slug, d.applies_to
     from slider_definitions d
@@ -117,9 +148,21 @@ const count = async (db, sql) => (await db.query(sql)).rows[0].n;
   // Reejecutar no debe duplicar
   await db.exec(read(CATALOG));
   await db.exec(read(STARTER_SET));
-  check('reejecutar los seeds no duplica', 1 === await count(db,
-    `select count(*)::int as n from slider_sets`) && 50 === await count(db,
-    `select count(*)::int as n from slider_set_values`));
+  check(
+    'reejecutar los seeds no duplica',
+    1 ===
+      (await count(
+        db,
+        `select count(*)::int as n from slider_sets where title = 'Full Manual FG v3.0'`,
+      )) &&
+      50 ===
+        (await count(
+          db,
+          `select count(*)::int as n from slider_set_values v
+           join slider_sets s on s.id = v.slider_set_id
+           where s.title = 'Full Manual FG v3.0'`,
+        )),
+  );
 
   await db.close();
 }
