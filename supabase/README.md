@@ -31,6 +31,23 @@ psql "$SUPABASE_DB_URL" -f supabase/seed/01_catalog.sql
 
 Sin CLI: pega cada fichero en el SQL Editor del dashboard, en ese orden.
 
+## Probar el SQL antes de pegarlo
+
+```bash
+npm run test:sql
+```
+
+Levanta un Postgres en memoria, aplica las migraciones y los seeds en orden y
+comprueba el resultado: cuántos sliders quedan por juego, que el set de inicio
+tenga sus 50 valores sin huecos, que reejecutar los seeds no duplique nada, que
+los tres caminos de error aborten sin dejar el set a medias, y que RLS esté
+activada en las seis tablas.
+
+Ojo con dos cosas al escribir SQL para el editor de Supabase: ejecuta cada
+sentencia en su propia transacción (así que una tabla temporal con
+`on commit drop` no sobrevive a la siguiente sentencia — usa un único bloque
+`do`, que es atómico), y PGlite no trae `pgcrypto`, que en Supabase sí está.
+
 ## Catálogo de sliders
 
 `seed/catalog.mjs` es la fuente de verdad. Para cambiarlo:
