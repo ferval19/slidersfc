@@ -3,12 +3,12 @@ import Link from 'next/link';
 import { Avatar } from '@/components/avatar';
 import { Logo } from '@/components/logo';
 import { SITE_BYLINE } from '@/lib/constants';
-import { getCurrentProfile } from '@/lib/supabase/server';
 import { getGames } from '@/lib/queries';
+import { getSessionProfile } from '@/lib/supabase/server';
 
 export async function SiteHeader() {
-  const [profile, games] = await Promise.all([
-    getCurrentProfile().catch(() => null),
+  const [session, games] = await Promise.all([
+    getSessionProfile(),
     getGames().catch(() => []),
   ]);
 
@@ -31,25 +31,32 @@ export async function SiteHeader() {
             </Link>
           ))}
 
-          {profile ? (
+          {/* Se decide con la SESIÓN, no con el perfil: si la fila de perfil
+              falta, /perfil la repara. Antes se mostraba «Entrar» a alguien
+              que ya estaba dentro. */}
+          {session.user ? (
             <>
               <Link href="/sets/nuevo" className="btn btn-primary ml-2">
-                Nuevo set
+                <span className="sm:hidden">Nuevo</span>
+                <span className="hidden sm:inline">Nuevo set</span>
               </Link>
               <Link
-                href={`/u/${profile.username}`}
-                className="ml-1 p-1"
-                title={`Perfil de @${profile.username}`}
+                href="/perfil"
+                className="ml-1 flex items-center gap-2 px-1.5 py-1 transition-colors hover:text-ink-user"
+                title="Mi perfil"
               >
                 <Avatar
-                  url={profile.avatar_url}
-                  name={profile.display_name ?? profile.username}
-                  size={28}
+                  url={session.profile?.avatar_url}
+                  name={session.profile?.display_name ?? session.profile?.username ?? session.user.email}
+                  size={26}
                 />
+                <span className="eyebrow max-w-24 truncate text-chalk">
+                  {session.profile?.username ?? 'Mi perfil'}
+                </span>
               </Link>
             </>
           ) : (
-            <Link href="/login" className="btn btn-ghost ml-2">
+            <Link href="/login?next=/perfil" className="btn btn-ghost ml-2">
               Entrar
             </Link>
           )}

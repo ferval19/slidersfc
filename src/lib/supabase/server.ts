@@ -47,6 +47,34 @@ export async function getCurrentUser() {
   }
 }
 
+/**
+ * Sesión y perfil en una sola llamada, para que el header no pida el usuario
+ * dos veces. `profile` puede ser null con `user` presente: la fila de perfil
+ * se repara al entrar en /perfil.
+ */
+export async function getSessionProfile() {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return { user: null, profile: null };
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    return { user, profile };
+  } catch (error) {
+    unstable_rethrow(error);
+    console.error('[slidersfc] getSessionProfile falló:', error);
+    return { user: null, profile: null };
+  }
+}
+
 /** Perfil del usuario autenticado actual, o null. */
 export async function getCurrentProfile() {
   try {
