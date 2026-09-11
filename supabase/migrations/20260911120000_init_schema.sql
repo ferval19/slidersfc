@@ -1,4 +1,4 @@
--- SliderXI — esquema inicial
+-- SlidersFC — esquema inicial
 -- Fase 0 del plan de desarrollo. Todo el control de acceso vive en RLS
 -- (ver 20260911120100_rls.sql), no en el backend de Next.js.
 

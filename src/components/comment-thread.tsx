@@ -37,7 +37,7 @@ export function CommentList({ comments }: { comments: CommentView[] }) {
               {comment.author.username ? (
                 <Link
                   href={`/u/${comment.author.username}`}
-                  className="font-bold text-chalk hover:text-flare"
+                  className="font-bold text-chalk hover:text-accent"
                 >
                   {comment.author.displayName ?? comment.author.username}
                 </Link>
@@ -82,7 +82,7 @@ export function CommentComposer({
   if (!canComment) {
     return (
       <p className="text-xs text-muted">
-        <Link href={`/login?next=/sets/${setId}`} className="font-semibold text-flare hover:underline">
+        <Link href={`/login?next=/sets/${setId}`} className="font-semibold text-accent hover:underline">
           Entra
         </Link>{' '}
         para comentar.
@@ -107,7 +107,7 @@ export function CommentComposer({
         className="field resize-y"
       />
       {state.error ? (
-        <p className="text-xs text-flare" role="alert">
+        <p className="text-xs text-danger" role="alert">
           {state.error}
         </p>
       ) : null}

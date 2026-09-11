@@ -22,9 +22,9 @@ export async function generateMetadata({
 
   return {
     title: `${name} (@${profile.username})`,
-    description: profile.bio ?? `Sets de sliders publicados por ${name} en SliderXI.`,
+    description: profile.bio ?? `Sets de sliders publicados por ${name} en SlidersFC.`,
     openGraph: {
-      title: `${name} en SliderXI`,
+      title: `${name} en SlidersFC`,
       description: profile.bio ?? `Sets de sliders publicados por ${name}.`,
       type: 'profile',
     },

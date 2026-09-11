@@ -39,7 +39,7 @@ export function SetOwnerActions({
 
       <button
         type="button"
-        className="btn btn-ghost text-flare"
+        className="btn btn-ghost text-danger"
         disabled={pending}
         onClick={() => {
           if (!confirm('¿Borrar este set? Se borrarán también sus valores y comentarios.')) return;

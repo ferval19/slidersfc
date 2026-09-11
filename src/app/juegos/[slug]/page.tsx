@@ -19,7 +19,7 @@ export async function generateMetadata({
 
   return {
     title: `Sliders de ${game.name}`,
-    description: `Sets de sliders de ${game.name} publicados por la comunidad de SliderXI.`,
+    description: `Sets de sliders de ${game.name} publicados por la comunidad de SlidersFC.`,
   };
 }
 

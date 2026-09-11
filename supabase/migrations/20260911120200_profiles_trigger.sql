@@ -1,4 +1,4 @@
--- SliderXI — creación automática de perfil al registrarse (Fase 1)
+-- SlidersFC — creación automática de perfil al registrarse (Fase 1)
 -- Deriva el username del handle de X si el login fue por OAuth, o del email.
 -- Desambigua añadiendo un sufijo numérico si ya existe.
 

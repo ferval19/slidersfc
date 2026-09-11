@@ -218,7 +218,7 @@ export function SliderSetForm({
       </section>
 
       {state.error ? (
-        <p className="rounded-lg border border-flare/40 bg-flare/10 px-3 py-2 text-sm text-flare" role="alert">
+        <p className="rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">
           {state.error}
         </p>
       ) : null}

@@ -1,6 +1,6 @@
 import type { SetMode, SliderScope } from './database.types';
 
-export const SITE_NAME = 'SliderXI';
+export const SITE_NAME = 'SlidersFC';
 export const SITE_TAGLINE = 'Sliders de EA SPORTS FC, con la comunidad comentando valor a valor.';
 export const SITE_BYLINE = 'by Full Manual FG';
 

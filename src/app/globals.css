@@ -1,24 +1,34 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   SliderXI — sistema visual
+   SlidersFC — sistema visual
    Oscuro, contraste alto, tipografía contundente y tarjetas, en la línea de la
-   web oficial de FC27, pero con acento propio (naranja incandescente + cian)
+   web oficial de FC27, pero con acento propio (azul cobalto sobre negro azulado)
    para que se lea a la primera que esto NO es un producto oficial de EA.
+
+   Toda la paleta son tokens: para darle otra vuelta basta cambiar los valores
+   de --color-accent / --color-signal aquí arriba.
 --------------------------------------------------------------------------- */
 
 @theme {
-  --color-void: #08090b;
-  --color-surface: #101317;
-  --color-raised: #171b21;
-  --color-line: #242a33;
-  --color-line-strong: #333b46;
-  --color-muted: #8b95a4;
-  --color-chalk: #e9edf2;
-  --color-flare: #ff5a1f;
-  --color-flare-dim: #c7401166;
-  --color-pitch: #2de2c5;
+  --color-void: #07080c;
+  --color-surface: #0e1016;
+  --color-raised: #151924;
+  --color-line: #202636;
+  --color-line-strong: #2f3748;
+  --color-muted: #8791a6;
+  --color-chalk: #eaeef6;
+
+  /* Acento: azul cobalto de focos de estadio. Frío y técnico, lejos del
+     verde de EA SPORTS FC y de cualquier tono cálido. */
+  --color-accent: #3d6dff;
+  --color-accent-soft: #6b8fff;
+  --color-accent-dim: #3d6dff29;
+
+  /* Señal: sólo para contadores y estados positivos, nunca para acciones. */
+  --color-signal: #56e3f5;
   --color-warn: #ffc53d;
+  --color-danger: #ff5a6e;
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
@@ -35,18 +45,18 @@ body {
   color: var(--color-chalk);
   font-family: var(--font-sans);
   background-image:
-    radial-gradient(58rem 30rem at 12% -8%, #ff5a1f1a, transparent 70%),
-    radial-gradient(48rem 26rem at 92% 0%, #2de2c514, transparent 70%);
+    radial-gradient(62rem 32rem at 10% -10%, #3d6dff26, transparent 70%),
+    radial-gradient(46rem 26rem at 95% -2%, #56e3f512, transparent 70%);
   background-repeat: no-repeat;
 }
 
 ::selection {
-  background: var(--color-flare);
-  color: #0b0b0b;
+  background: var(--color-accent);
+  color: #ffffff;
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-pitch);
+  outline: 2px solid var(--color-accent-soft);
   outline-offset: 2px;
 }
 
@@ -95,11 +105,11 @@ body {
   }
 
   .btn-primary {
-    background-color: var(--color-flare);
-    color: #120600;
+    background-color: var(--color-accent);
+    color: #ffffff;
   }
   .btn-primary:hover:not(:disabled) {
-    background-color: #ff7440;
+    background-color: var(--color-accent-soft);
   }
 
   .btn-ghost {
@@ -135,9 +145,9 @@ body {
     color: var(--color-muted);
   }
   .chip-active {
-    border-color: var(--color-flare);
-    background-color: #ff5a1f1f;
-    color: var(--color-flare);
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-dim);
+    color: var(--color-accent-soft);
   }
 
   .field {
@@ -150,7 +160,7 @@ body {
     color: var(--color-chalk);
   }
   .field::placeholder {
-    color: #5d6673;
+    color: #5a6479;
   }
   .field:focus {
     border-color: var(--color-line-strong);

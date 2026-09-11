@@ -9,7 +9,7 @@ import { getCurrentUser } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
   title: 'Nuevo set',
-  description: 'Publica tu set de sliders en SliderXI.',
+  description: 'Publica tu set de sliders en SlidersFC.',
 };
 
 export default async function NewSetPage() {

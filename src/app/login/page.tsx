@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'Entrar',
-  description: 'Entra en SliderXI con tu cuenta de X o con tu email.',
+  description: 'Entra en SlidersFC con tu cuenta de X o con tu email.',
 };
 
 export default async function LoginPage({
@@ -23,7 +23,7 @@ export default async function LoginPage({
 
   return (
     <div className="mx-auto max-w-md px-5 py-16">
-      <p className="eyebrow">SliderXI</p>
+      <p className="eyebrow">SlidersFC</p>
       <h1 className="mt-2 text-3xl font-extrabold tracking-tight">
         Entra y publica tus sliders
       </h1>
@@ -32,7 +32,7 @@ export default async function LoginPage({
       </p>
 
       {params.error ? (
-        <p className="mt-6 rounded-lg border border-flare/40 bg-flare/10 px-3 py-2 text-sm text-flare" role="alert">
+        <p className="mt-6 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">
           {params.error}
         </p>
       ) : null}

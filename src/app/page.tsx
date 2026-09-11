@@ -28,7 +28,7 @@ export default async function HomePage({
         <p className="eyebrow">Sliders de EA SPORTS FC · by Full Manual FG</p>
         <h1 className="mt-4 max-w-3xl text-4xl leading-[1.05] font-extrabold tracking-tight sm:text-6xl">
           Los sliders que hacen que el juego
-          <span className="text-flare"> se sienta bien</span>.
+          <span className="text-accent"> se sienta bien</span>.
         </h1>
         <p className="mt-5 max-w-2xl text-base text-muted sm:text-lg">
           Publica tu set, explica por qué cada valor está donde está, y deja que la

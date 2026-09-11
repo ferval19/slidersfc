@@ -1,4 +1,4 @@
-# SliderXI
+# SlidersFC
 
 Sliders de EA SPORTS FC publicados por la comunidad, con comentarios anclados a
 cada slider individual. Sub-marca de **Full Manual FG**.

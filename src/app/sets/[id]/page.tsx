@@ -79,7 +79,7 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
             name={detail.owner.display_name ?? detail.owner.username}
             size={30}
           />
-          <Link href={`/u/${detail.owner.username}`} className="font-bold text-chalk hover:text-flare">
+          <Link href={`/u/${detail.owner.username}`} className="font-bold text-chalk hover:text-accent">
             {detail.owner.display_name ?? detail.owner.username}
           </Link>
           {detail.owner.twitter_handle ? (

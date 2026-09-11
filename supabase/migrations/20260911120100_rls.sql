@@ -1,4 +1,4 @@
--- SliderXI — Row Level Security
+-- SlidersFC — Row Level Security
 -- Sección 4 del plan: los permisos viven aquí, no en Next.js.
 -- auth.uid() se envuelve en (select auth.uid()) para que Postgres lo evalúe
 -- una sola vez por consulta en lugar de una vez por fila.

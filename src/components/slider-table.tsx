@@ -93,7 +93,7 @@ export function SliderTable({
                             title={`${row.name} · ${SCOPE_LABELS[cell.scope]} — comentarios`}
                             className={`flex items-center justify-center gap-1.5 rounded-lg border px-2 py-1.5 transition-colors ${
                               isOpen
-                                ? 'border-flare bg-flare/10'
+                                ? 'border-accent bg-accent/10'
                                 : 'border-line bg-raised hover:border-line-strong'
                             }`}
                           >
@@ -101,7 +101,7 @@ export function SliderTable({
                               {cell.value ?? '–'}
                             </span>
                             {cell.commentCount > 0 ? (
-                              <span className="rounded-full bg-pitch/15 px-1.5 text-[0.625rem] font-bold text-pitch">
+                              <span className="rounded-full bg-signal/15 px-1.5 text-[0.625rem] font-bold text-signal">
                                 {cell.commentCount}
                               </span>
                             ) : null}
