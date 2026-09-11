@@ -52,9 +52,30 @@ En **Authentication → URL Configuration**, añade a *Redirect URLs*:
 ```
 http://localhost:3000/auth/callback
 http://localhost:3000/auth/confirm
+http://localhost:3000/auth/finalizar
 https://<tu-dominio>/auth/callback
 https://<tu-dominio>/auth/confirm
+https://<tu-dominio>/auth/finalizar
 ```
+
+#### Plantilla del email de acceso (recomendado)
+
+La app acepta las tres formas en las que Supabase puede devolver al usuario
+(`?code=`, `?token_hash=` y `#access_token=`), así que con la plantilla por
+defecto funciona. Pero la plantilla por defecto usa el flujo PKCE, y eso obliga
+a abrir el enlace **en el mismo navegador** que lo pidió: si te llega al móvil y
+lo pediste en el portátil, falla con *«PKCE code verifier not found»*.
+
+Para evitarlo, en **Authentication → Emails → Magic Link** cambia el enlace por:
+
+```html
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">
+  Entrar en SlidersFC
+</a>
+```
+
+Con `TokenHash` la verificación no depende de una cookie previa, así que el
+enlace funciona desde cualquier dispositivo.
 
 ### 5. Arrancar
 
