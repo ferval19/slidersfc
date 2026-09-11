@@ -1,0 +1,107 @@
+-- GENERADO POR scripts/build-seed.mjs — no editar a mano.
+-- Editar supabase/seed/catalog.mjs y ejecutar `npm run seed:build`.
+
+begin;
+
+-- Juegos ------------------------------------------------------------------
+insert into public.games (slug, name, release_year) values
+  ('fc27', 'EA SPORTS FC 27', 2026),
+  ('fc26', 'EA SPORTS FC 26', 2025)
+on conflict (slug) do update
+  set name = excluded.name, release_year = excluded.release_year;
+
+-- Sliders -----------------------------------------------------------------
+insert into public.slider_definitions
+  (game_id, category, applies_to, name, slug, min_value, max_value, default_value, sort_order)
+values
+  ((select id from public.games where slug = 'fc27'), 'speed', 'user', 'Sprint Speed', 'sprint_speed', 0, 100, 50, 0),
+  ((select id from public.games where slug = 'fc27'), 'speed', 'cpu_opponent', 'Sprint Speed', 'sprint_speed', 0, 100, 50, 0),
+  ((select id from public.games where slug = 'fc27'), 'speed', 'cpu_teammate', 'Sprint Speed', 'sprint_speed', 0, 100, 50, 0),
+  ((select id from public.games where slug = 'fc27'), 'speed', 'user', 'Acceleration', 'acceleration', 0, 100, 50, 10),
+  ((select id from public.games where slug = 'fc27'), 'speed', 'cpu_opponent', 'Acceleration', 'acceleration', 0, 100, 50, 10),
+  ((select id from public.games where slug = 'fc27'), 'speed', 'cpu_teammate', 'Acceleration', 'acceleration', 0, 100, 50, 10),
+  ((select id from public.games where slug = 'fc27'), 'shooting', 'user', 'Shot Error', 'shot_error', 0, 100, 50, 20),
+  ((select id from public.games where slug = 'fc27'), 'shooting', 'cpu_opponent', 'Shot Error', 'shot_error', 0, 100, 50, 20),
+  ((select id from public.games where slug = 'fc27'), 'shooting', 'cpu_teammate', 'Shot Error', 'shot_error', 0, 100, 50, 20),
+  ((select id from public.games where slug = 'fc27'), 'shooting', 'user', 'Shot Speed', 'shot_speed', 0, 100, 50, 30),
+  ((select id from public.games where slug = 'fc27'), 'shooting', 'cpu_opponent', 'Shot Speed', 'shot_speed', 0, 100, 50, 30),
+  ((select id from public.games where slug = 'fc27'), 'shooting', 'cpu_teammate', 'Shot Speed', 'shot_speed', 0, 100, 50, 30),
+  ((select id from public.games where slug = 'fc27'), 'shooting', 'user', 'Power Bar', 'power_bar', 0, 100, 50, 40),
+  ((select id from public.games where slug = 'fc27'), 'passing', 'user', 'Pass Error', 'pass_error', 0, 100, 50, 50),
+  ((select id from public.games where slug = 'fc27'), 'passing', 'cpu_opponent', 'Pass Error', 'pass_error', 0, 100, 50, 50),
+  ((select id from public.games where slug = 'fc27'), 'passing', 'cpu_teammate', 'Pass Error', 'pass_error', 0, 100, 50, 50),
+  ((select id from public.games where slug = 'fc27'), 'passing', 'user', 'Pass Speed', 'pass_speed', 0, 100, 50, 60),
+  ((select id from public.games where slug = 'fc27'), 'passing', 'cpu_opponent', 'Pass Speed', 'pass_speed', 0, 100, 50, 60),
+  ((select id from public.games where slug = 'fc27'), 'passing', 'cpu_teammate', 'Pass Speed', 'pass_speed', 0, 100, 50, 60),
+  ((select id from public.games where slug = 'fc27'), 'ball_control', 'user', 'First Touch Control Error', 'first_touch_control_error', 0, 100, 50, 70),
+  ((select id from public.games where slug = 'fc27'), 'ball_control', 'cpu_opponent', 'First Touch Control Error', 'first_touch_control_error', 0, 100, 50, 70),
+  ((select id from public.games where slug = 'fc27'), 'ball_control', 'cpu_teammate', 'First Touch Control Error', 'first_touch_control_error', 0, 100, 50, 70),
+  ((select id from public.games where slug = 'fc27'), 'goalkeeping', 'user', 'Goalkeeper Ability', 'goalkeeper_ability', 0, 100, 50, 80),
+  ((select id from public.games where slug = 'fc27'), 'goalkeeping', 'cpu_opponent', 'Goalkeeper Ability', 'goalkeeper_ability', 0, 100, 50, 80),
+  ((select id from public.games where slug = 'fc27'), 'goalkeeping', 'cpu_teammate', 'Goalkeeper Ability', 'goalkeeper_ability', 0, 100, 50, 80),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'user', 'Positioning: Marking', 'marking', 0, 100, 50, 90),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'cpu_opponent', 'Positioning: Marking', 'marking', 0, 100, 50, 90),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'cpu_teammate', 'Positioning: Marking', 'marking', 0, 100, 50, 90),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'user', 'Positioning: Run Frequency', 'run_frequency', 0, 100, 50, 100),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'cpu_opponent', 'Positioning: Run Frequency', 'run_frequency', 0, 100, 50, 100),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'cpu_teammate', 'Positioning: Run Frequency', 'run_frequency', 0, 100, 50, 100),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'user', 'Positioning: Line Height', 'line_height', 0, 100, 50, 110),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'cpu_opponent', 'Positioning: Line Height', 'line_height', 0, 100, 50, 110),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'cpu_teammate', 'Positioning: Line Height', 'line_height', 0, 100, 50, 110),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'user', 'Positioning: Line Length', 'line_length', 0, 100, 50, 120),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'cpu_opponent', 'Positioning: Line Length', 'line_length', 0, 100, 50, 120),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'cpu_teammate', 'Positioning: Line Length', 'line_length', 0, 100, 50, 120),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'user', 'Positioning: Line Width', 'line_width', 0, 100, 50, 130),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'cpu_opponent', 'Positioning: Line Width', 'line_width', 0, 100, 50, 130),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'cpu_teammate', 'Positioning: Line Width', 'line_width', 0, 100, 50, 130),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'user', 'Positioning: Fullback Positioning', 'fullback_positioning', 0, 100, 50, 140),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'cpu_opponent', 'Positioning: Fullback Positioning', 'fullback_positioning', 0, 100, 50, 140),
+  ((select id from public.games where slug = 'fc27'), 'positioning', 'cpu_teammate', 'Positioning: Fullback Positioning', 'fullback_positioning', 0, 100, 50, 140),
+  ((select id from public.games where slug = 'fc27'), 'injuries', 'user', 'Injury Frequency', 'injury_frequency', 0, 100, 50, 150),
+  ((select id from public.games where slug = 'fc27'), 'injuries', 'cpu_opponent', 'Injury Frequency', 'injury_frequency', 0, 100, 50, 150),
+  ((select id from public.games where slug = 'fc27'), 'injuries', 'cpu_teammate', 'Injury Frequency', 'injury_frequency', 0, 100, 50, 150),
+  ((select id from public.games where slug = 'fc27'), 'injuries', 'user', 'Injury Severity', 'injury_severity', 0, 100, 50, 160),
+  ((select id from public.games where slug = 'fc27'), 'injuries', 'cpu_opponent', 'Injury Severity', 'injury_severity', 0, 100, 50, 160),
+  ((select id from public.games where slug = 'fc27'), 'injuries', 'cpu_teammate', 'Injury Severity', 'injury_severity', 0, 100, 50, 160),
+  ((select id from public.games where slug = 'fc26'), 'speed', 'user', 'Sprint Speed', 'sprint_speed', 0, 100, 50, 0),
+  ((select id from public.games where slug = 'fc26'), 'speed', 'cpu', 'Sprint Speed', 'sprint_speed', 0, 100, 50, 0),
+  ((select id from public.games where slug = 'fc26'), 'speed', 'user', 'Acceleration', 'acceleration', 0, 100, 50, 10),
+  ((select id from public.games where slug = 'fc26'), 'speed', 'cpu', 'Acceleration', 'acceleration', 0, 100, 50, 10),
+  ((select id from public.games where slug = 'fc26'), 'shooting', 'user', 'Shot Error', 'shot_error', 0, 100, 50, 20),
+  ((select id from public.games where slug = 'fc26'), 'shooting', 'cpu', 'Shot Error', 'shot_error', 0, 100, 50, 20),
+  ((select id from public.games where slug = 'fc26'), 'shooting', 'user', 'Shot Speed', 'shot_speed', 0, 100, 50, 30),
+  ((select id from public.games where slug = 'fc26'), 'shooting', 'cpu', 'Shot Speed', 'shot_speed', 0, 100, 50, 30),
+  ((select id from public.games where slug = 'fc26'), 'shooting', 'user', 'Power Bar', 'power_bar', 0, 100, 50, 40),
+  ((select id from public.games where slug = 'fc26'), 'passing', 'user', 'Pass Error', 'pass_error', 0, 100, 50, 50),
+  ((select id from public.games where slug = 'fc26'), 'passing', 'cpu', 'Pass Error', 'pass_error', 0, 100, 50, 50),
+  ((select id from public.games where slug = 'fc26'), 'passing', 'user', 'Pass Speed', 'pass_speed', 0, 100, 50, 60),
+  ((select id from public.games where slug = 'fc26'), 'passing', 'cpu', 'Pass Speed', 'pass_speed', 0, 100, 50, 60),
+  ((select id from public.games where slug = 'fc26'), 'ball_control', 'user', 'First Touch Control Error', 'first_touch_control_error', 0, 100, 50, 70),
+  ((select id from public.games where slug = 'fc26'), 'ball_control', 'cpu', 'First Touch Control Error', 'first_touch_control_error', 0, 100, 50, 70),
+  ((select id from public.games where slug = 'fc26'), 'goalkeeping', 'user', 'Goalkeeper Ability', 'goalkeeper_ability', 0, 100, 50, 80),
+  ((select id from public.games where slug = 'fc26'), 'goalkeeping', 'cpu', 'Goalkeeper Ability', 'goalkeeper_ability', 0, 100, 50, 80),
+  ((select id from public.games where slug = 'fc26'), 'positioning', 'user', 'Positioning: Marking', 'marking', 0, 100, 50, 90),
+  ((select id from public.games where slug = 'fc26'), 'positioning', 'cpu', 'Positioning: Marking', 'marking', 0, 100, 50, 90),
+  ((select id from public.games where slug = 'fc26'), 'positioning', 'user', 'Positioning: Run Frequency', 'run_frequency', 0, 100, 50, 100),
+  ((select id from public.games where slug = 'fc26'), 'positioning', 'cpu', 'Positioning: Run Frequency', 'run_frequency', 0, 100, 50, 100),
+  ((select id from public.games where slug = 'fc26'), 'positioning', 'user', 'Positioning: Line Height', 'line_height', 0, 100, 50, 110),
+  ((select id from public.games where slug = 'fc26'), 'positioning', 'cpu', 'Positioning: Line Height', 'line_height', 0, 100, 50, 110),
+  ((select id from public.games where slug = 'fc26'), 'positioning', 'user', 'Positioning: Line Length', 'line_length', 0, 100, 50, 120),
+  ((select id from public.games where slug = 'fc26'), 'positioning', 'cpu', 'Positioning: Line Length', 'line_length', 0, 100, 50, 120),
+  ((select id from public.games where slug = 'fc26'), 'positioning', 'user', 'Positioning: Line Width', 'line_width', 0, 100, 50, 130),
+  ((select id from public.games where slug = 'fc26'), 'positioning', 'cpu', 'Positioning: Line Width', 'line_width', 0, 100, 50, 130),
+  ((select id from public.games where slug = 'fc26'), 'positioning', 'user', 'Positioning: Fullback Positioning', 'fullback_positioning', 0, 100, 50, 140),
+  ((select id from public.games where slug = 'fc26'), 'positioning', 'cpu', 'Positioning: Fullback Positioning', 'fullback_positioning', 0, 100, 50, 140),
+  ((select id from public.games where slug = 'fc26'), 'injuries', 'user', 'Injury Frequency', 'injury_frequency', 0, 100, 50, 150),
+  ((select id from public.games where slug = 'fc26'), 'injuries', 'cpu', 'Injury Frequency', 'injury_frequency', 0, 100, 50, 150),
+  ((select id from public.games where slug = 'fc26'), 'injuries', 'user', 'Injury Severity', 'injury_severity', 0, 100, 50, 160),
+  ((select id from public.games where slug = 'fc26'), 'injuries', 'cpu', 'Injury Severity', 'injury_severity', 0, 100, 50, 160)
+on conflict (game_id, slug, applies_to) do update
+  set category      = excluded.category,
+      name          = excluded.name,
+      min_value     = excluded.min_value,
+      max_value     = excluded.max_value,
+      default_value = excluded.default_value,
+      sort_order    = excluded.sort_order;
+
+commit;

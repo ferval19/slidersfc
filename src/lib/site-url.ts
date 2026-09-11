@@ -1,0 +1,24 @@
+import { headers } from 'next/headers';
+
+/**
+ * Origen absoluto de la petición actual. Necesario para construir los
+ * redirect_to de Supabase Auth, que no aceptan rutas relativas.
+ */
+export async function getSiteOrigin() {
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, '');
+  }
+
+  const headerList = await headers();
+  const host = headerList.get('x-forwarded-host') ?? headerList.get('host') ?? 'localhost:3000';
+  const protocol = headerList.get('x-forwarded-proto') ?? (host.startsWith('localhost') ? 'http' : 'https');
+
+  return `${protocol}://${host}`;
+}
+
+/** Evita open redirects: sólo se admiten rutas internas. */
+export function safeNextPath(next: unknown): string {
+  const value = typeof next === 'string' ? next : '';
+  if (value.startsWith('/') && !value.startsWith('//')) return value;
+  return '/';
+}

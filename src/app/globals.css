@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   SliderXI — sistema visual
+   Oscuro, contraste alto, tipografía contundente y tarjetas, en la línea de la
+   web oficial de FC27, pero con acento propio (naranja incandescente + cian)
+   para que se lea a la primera que esto NO es un producto oficial de EA.
+--------------------------------------------------------------------------- */
+
+@theme {
+  --color-void: #08090b;
+  --color-surface: #101317;
+  --color-raised: #171b21;
+  --color-line: #242a33;
+  --color-line-strong: #333b46;
+  --color-muted: #8b95a4;
+  --color-chalk: #e9edf2;
+  --color-flare: #ff5a1f;
+  --color-flare-dim: #c7401166;
+  --color-pitch: #2de2c5;
+  --color-warn: #ffc53d;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --radius-card: 14px;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-void);
+  color: var(--color-chalk);
+  font-family: var(--font-sans);
+  background-image:
+    radial-gradient(58rem 30rem at 12% -8%, #ff5a1f1a, transparent 70%),
+    radial-gradient(48rem 26rem at 92% 0%, #2de2c514, transparent 70%);
+  background-repeat: no-repeat;
+}
+
+::selection {
+  background: var(--color-flare);
+  color: #0b0b0b;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-pitch);
+  outline-offset: 2px;
+}
+
+@layer components {
+  /* Etiqueta en mayúsculas — el tic tipográfico de la marca */
+  .eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-card);
+  }
+
+  .card-hover {
+    transition: border-color 150ms ease, transform 150ms ease;
+  }
+  .card-hover:hover {
+    border-color: var(--color-line-strong);
+    transform: translateY(-2px);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 10px;
+    padding: 0.625rem 1.125rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background-color: var(--color-flare);
+    color: #120600;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background-color: #ff7440;
+  }
+
+  .btn-ghost {
+    background-color: transparent;
+    border-color: var(--color-line-strong);
+    color: var(--color-chalk);
+  }
+  .btn-ghost:hover:not(:disabled) {
+    border-color: var(--color-chalk);
+  }
+
+  .btn-quiet {
+    background-color: var(--color-raised);
+    color: var(--color-chalk);
+    border-color: var(--color-line);
+  }
+  .btn-quiet:hover:not(:disabled) {
+    border-color: var(--color-line-strong);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-line);
+    background-color: var(--color-raised);
+    padding: 0.25rem 0.625rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .chip-active {
+    border-color: var(--color-flare);
+    background-color: #ff5a1f1f;
+    color: var(--color-flare);
+  }
+
+  .field {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid var(--color-line);
+    background-color: var(--color-void);
+    padding: 0.625rem 0.75rem;
+    font-size: 0.9375rem;
+    color: var(--color-chalk);
+  }
+  .field::placeholder {
+    color: #5d6673;
+  }
+  .field:focus {
+    border-color: var(--color-line-strong);
+  }
+
+  /* Valor de un slider, en mono para que las columnas se alineen */
+  .value-pill {
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+}
