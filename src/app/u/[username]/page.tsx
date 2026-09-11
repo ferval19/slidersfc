@@ -49,14 +49,14 @@ export default async function ProfilePage({
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-12">
-      <header className="flex flex-wrap items-start gap-5 border-b border-line pb-8">
+      <header className="flex flex-wrap items-start gap-5 pb-8">
         <Avatar url={profile.avatar_url} name={profile.display_name ?? profile.username} size={64} />
 
         <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-extrabold tracking-tight">
+          <h1 className="display text-[clamp(2.25rem,6vw,3.5rem)]">
             {profile.display_name ?? profile.username}
           </h1>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-chalk-dim">
             @{profile.username}
             {profile.twitter_handle ? (
               <>
@@ -79,7 +79,7 @@ export default async function ProfilePage({
       </header>
 
       <section className="py-8">
-        <h2 className="text-lg font-bold tracking-tight">
+        <h2 className="display text-3xl">
           {published.length} {published.length === 1 ? 'set publicado' : 'sets publicados'}
         </h2>
 
@@ -105,16 +105,19 @@ export default async function ProfilePage({
       </section>
 
       {isMe && drafts.length > 0 ? (
-        <section className="border-t border-line py-8">
-          <h2 className="text-lg font-bold tracking-tight">
-            Borradores <span className="text-muted">· sólo los ves tú</span>
-          </h2>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {drafts.map((set) => (
-              <SetCard key={set.id} set={set} />
-            ))}
-          </div>
-        </section>
+        <>
+          <div className="chalk-rule" />
+          <section className="py-9">
+            <h2 className="display text-3xl">
+              Borradores <span className="text-chalk-dim">· sólo los ves tú</span>
+            </h2>
+            <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {drafts.map((set) => (
+                <SetCard key={set.id} set={set} />
+              ))}
+            </ul>
+          </section>
+        </>
       ) : null}
     </div>
   );

@@ -1,39 +1,29 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   SlidersFC — sistema visual
-   Oscuro, contraste alto, tipografía contundente y tarjetas, en la línea de la
-   web oficial de FC27, pero con acento propio (azul cobalto sobre negro azulado)
-   para que se lea a la primera que esto NO es un producto oficial de EA.
-
-   Toda la paleta son tokens: para darle otra vuelta basta cambiar los valores
-   de --color-accent / --color-signal aquí arriba.
+   SlidersFC — la pizarra del entrenador
+   Ver docs/direccion-visual.md. Verde botella, tiza y tres rotuladores que
+   codifican el ámbito del slider (tú / CPU compañero / CPU rival).
 --------------------------------------------------------------------------- */
 
 @theme {
-  --color-void: #07080c;
-  --color-surface: #0e1016;
-  --color-raised: #151924;
-  --color-line: #202636;
-  --color-line-strong: #2f3748;
-  --color-muted: #8791a6;
-  --color-chalk: #eaeef6;
+  --color-board: #0b241f;
+  --color-board-deep: #06170f;
+  --color-board-raised: #12342c;
+  --color-chalk: #f2efe4;
+  --color-chalk-dim: #93a9a1;
+  --color-chalk-line: #f2efe429;
 
-  /* Acento: azul cobalto de focos de estadio. Frío y técnico, lejos del
-     verde de EA SPORTS FC y de cualquier tono cálido. */
-  --color-accent: #3d6dff;
-  --color-accent-soft: #6b8fff;
-  --color-accent-dim: #3d6dff29;
+  /* Rotuladores. No son decoración: dicen de quién es el valor. */
+  --color-ink-user: #ffd24a;
+  --color-ink-mate: #7fe0c8;
+  --color-ink-rival: #ff5c7a;
 
-  /* Señal: sólo para contadores y estados positivos, nunca para acciones. */
-  --color-signal: #56e3f5;
-  --color-warn: #ffc53d;
-  --color-danger: #ff5a6e;
+  --font-display: var(--font-big-shoulders), "Arial Narrow", sans-serif;
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-
-  --radius-card: 14px;
+  --radius-panel: 3px;
 }
 
 html {
@@ -41,80 +31,119 @@ html {
 }
 
 body {
-  background-color: var(--color-void);
+  background-color: var(--color-board);
   color: var(--color-chalk);
   font-family: var(--font-sans);
-  background-image:
-    radial-gradient(62rem 32rem at 10% -10%, #3d6dff26, transparent 70%),
-    radial-gradient(46rem 26rem at 95% -2%, #56e3f512, transparent 70%);
-  background-repeat: no-repeat;
+}
+
+/* Polvo de tiza. Una sola capa, muy baja, sobre todo lo demás. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.28;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 ::selection {
-  background: var(--color-accent);
-  color: #ffffff;
+  background: var(--color-ink-user);
+  color: var(--color-board-deep);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent-soft);
-  outline-offset: 2px;
+  outline: 2px solid var(--color-ink-user);
+  outline-offset: 3px;
 }
 
 @layer components {
-  /* Etiqueta en mayúsculas — el tic tipográfico de la marca */
-  .eyebrow {
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
+  /* --- Tipografía ---------------------------------------------------- */
+
+  .display {
+    font-family: var(--font-display);
+    font-weight: 900;
     text-transform: uppercase;
-    color: var(--color-muted);
+    line-height: 0.86;
+    letter-spacing: 0.005em;
   }
 
-  .card {
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-line);
-    border-radius: var(--radius-card);
+  /* Etiqueta en mono: el tic tipográfico del sistema */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-chalk-dim);
   }
 
-  .card-hover {
-    transition: border-color 150ms ease, transform 150ms ease;
+  .value-pill {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
-  .card-hover:hover {
-    border-color: var(--color-line-strong);
-    transform: translateY(-2px);
+
+  /* --- Superficies ---------------------------------------------------- */
+
+  .panel {
+    background-color: var(--color-board-raised);
+    border: 1px solid var(--color-chalk-line);
+    border-radius: var(--radius-panel);
   }
+
+  .panel-hover {
+    transition: border-color 160ms ease, background-color 160ms ease;
+  }
+  .panel-hover:hover {
+    border-color: #f2efe45c;
+    background-color: #163a31;
+  }
+
+  /* Filete de tiza dibujado a mano: temblor real, no border-top */
+  .chalk-rule {
+    height: 7px;
+    border: 0;
+    background-repeat: repeat-x;
+    background-size: 220px 7px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='7'%3E%3Cpath d='M0 4.2 Q28 2.4 55 3.8 T110 3.1 T166 4.4 T220 3.2' fill='none' stroke='%23f2efe4' stroke-opacity='0.34' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  }
+
+  /* --- Controles ------------------------------------------------------ */
 
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border-radius: 10px;
-    padding: 0.625rem 1.125rem;
-    font-size: 0.8125rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
     border: 1px solid transparent;
+    border-radius: 2px;
+    padding: 0.6875rem 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     cursor: pointer;
     transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
   }
   .btn:disabled {
-    opacity: 0.5;
+    opacity: 0.45;
     cursor: not-allowed;
   }
 
   .btn-primary {
-    background-color: var(--color-accent);
-    color: #ffffff;
+    background-color: var(--color-ink-user);
+    color: var(--color-board-deep);
   }
   .btn-primary:hover:not(:disabled) {
-    background-color: var(--color-accent-soft);
+    background-color: #ffe07d;
   }
 
   .btn-ghost {
     background-color: transparent;
-    border-color: var(--color-line-strong);
+    border-color: #f2efe44d;
     color: var(--color-chalk);
   }
   .btn-ghost:hover:not(:disabled) {
@@ -122,55 +151,76 @@ body {
   }
 
   .btn-quiet {
-    background-color: var(--color-raised);
+    background-color: var(--color-board-raised);
+    border-color: var(--color-chalk-line);
     color: var(--color-chalk);
-    border-color: var(--color-line);
   }
   .btn-quiet:hover:not(:disabled) {
-    border-color: var(--color-line-strong);
+    border-color: #f2efe470;
   }
 
   .chip {
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    border-radius: 999px;
-    border: 1px solid var(--color-line);
-    background-color: var(--color-raised);
-    padding: 0.25rem 0.625rem;
+    border: 1px solid var(--color-chalk-line);
+    border-radius: 2px;
+    background-color: transparent;
+    padding: 0.3125rem 0.625rem;
+    font-family: var(--font-mono);
     font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
+    font-weight: 500;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--color-muted);
+    color: var(--color-chalk-dim);
+    transition: color 140ms ease, border-color 140ms ease;
+  }
+  .chip:hover {
+    color: var(--color-chalk);
+    border-color: #f2efe470;
   }
   .chip-active {
-    border-color: var(--color-accent);
-    background-color: var(--color-accent-dim);
-    color: var(--color-accent-soft);
+    border-color: var(--color-ink-user);
+    color: var(--color-ink-user);
+  }
+  .chip-active:hover {
+    color: var(--color-ink-user);
+    border-color: var(--color-ink-user);
   }
 
   .field {
     width: 100%;
-    border-radius: 10px;
-    border: 1px solid var(--color-line);
-    background-color: var(--color-void);
-    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--color-chalk-line);
+    border-radius: 2px;
+    background-color: var(--color-board-deep);
+    padding: 0.6875rem 0.75rem;
     font-size: 0.9375rem;
     color: var(--color-chalk);
   }
   .field::placeholder {
-    color: #5a6479;
+    color: #63786f;
   }
   .field:focus {
-    border-color: var(--color-line-strong);
+    border-color: #f2efe470;
   }
 
-  /* Valor de un slider, en mono para que las columnas se alineen */
-  .value-pill {
-    font-family: var(--font-mono);
-    font-size: 0.9375rem;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
+  /* --- Ilustración ---------------------------------------------------- */
+
+  /* Trazo de tiza: rugosidad y extremos redondeados */
+  .chalk-stroke {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: url(#chalk-rough);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

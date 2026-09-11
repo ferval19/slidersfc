@@ -1,14 +1,27 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Big_Shoulders, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 
+import { ChalkFilters } from '@/components/chalk';
 import { SetupNotice } from '@/components/setup-notice';
+import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
-import { SITE_BYLINE, SITE_NAME, SITE_TAGLINE } from '@/lib/constants';
+import { SITE_NAME, SITE_TAGLINE } from '@/lib/constants';
 import { publicSiteUrl } from '@/lib/site-url';
 import './globals.css';
 
-const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
-const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
+const display = Big_Shoulders({ variable: '--font-big-shoulders', subsets: ['latin'] });
+
+const sans = IBM_Plex_Sans({
+  variable: '--font-plex-sans',
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+});
+
+const mono = IBM_Plex_Mono({
+  variable: '--font-plex-mono',
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+});
 
 const siteUrl = publicSiteUrl();
 
@@ -37,22 +50,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${display.variable} ${sans.variable} ${mono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        <ChalkFilters />
         <SiteHeader />
         <SetupNotice />
         <main className="flex-1">{children}</main>
-        <footer className="mt-20 border-t border-line">
-          <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-8 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
-            <p>
-              {SITE_NAME} <span className="text-line-strong">·</span> {SITE_BYLINE}
-            </p>
-            <p>
-              Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.
-            </p>
-          </div>
-        </footer>
+        <SiteFooter />
       </body>
     </html>
   );

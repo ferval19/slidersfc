@@ -3,8 +3,16 @@
 import { useActionState, useMemo, useState } from 'react';
 
 import type { SetFormState } from '@/app/actions/sets';
-import { categoryLabel, MODES, SCOPE_LABELS, sortCategories, sortScopes } from '@/lib/constants';
-import type { Game, SetMode, SliderDefinition, SliderScope } from '@/lib/database.types';
+import { CATEGORY_DRAWINGS } from '@/components/chalk';
+import { ScaleLegend, ScaleTrack } from '@/components/slider-scale';
+import {
+  categoryLabel,
+  SCOPE_INK,
+  SCOPE_LABELS,
+  sortCategories,
+  sortScopes,
+} from '@/lib/constants';
+import type { Game, SliderDefinition, SliderScope } from '@/lib/database.types';
 
 type Props = {
   action: (state: SetFormState, formData: FormData) => Promise<SetFormState>;
@@ -14,7 +22,6 @@ type Props = {
     gameId: number;
     title: string;
     description: string;
-    mode: SetMode;
     isPublished: boolean;
     values: Record<string, number>;
   };
@@ -59,17 +66,15 @@ export function SliderSetForm({
     setValues((previous) => ({ ...previous, [String(definitionId)]: next }));
   };
 
-  const resetToDefaults = () => setValues(defaultsFor(definitions));
-
   return (
-    <form action={formAction} className="flex flex-col gap-8">
+    <form action={formAction} className="flex flex-col gap-10">
       <input type="hidden" name="game_id" value={gameId} />
       {Object.entries(values).map(([definitionId, value]) => (
         <input key={definitionId} type="hidden" name={`v_${definitionId}`} value={value} />
       ))}
 
       {/* Metadatos del set */}
-      <section className="card flex flex-col gap-5 p-5">
+      <section className="panel flex flex-col gap-5 p-5 sm:p-6">
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5 sm:col-span-2">
             <span className="eyebrow">Título</span>
@@ -79,7 +84,7 @@ export function SliderSetForm({
               minLength={3}
               maxLength={120}
               defaultValue={initial?.title}
-              placeholder="Full Manual · Leyenda · 6 min"
+              placeholder="Full manual · Leyenda · 8 min"
               className="field"
             />
           </label>
@@ -99,31 +104,20 @@ export function SliderSetForm({
               ))}
             </select>
             {lockGame ? (
-              <span className="text-xs text-muted">
+              <span className="text-xs text-chalk-dim">
                 El juego no se puede cambiar después de crear el set.
               </span>
             ) : null}
-          </label>
-
-          <label className="flex flex-col gap-1.5">
-            <span className="eyebrow">Modo</span>
-            <select name="mode" defaultValue={initial?.mode ?? 'carrera'} className="field">
-              {MODES.map((mode) => (
-                <option key={mode.value} value={mode.value}>
-                  {mode.label} — {mode.hint}
-                </option>
-              ))}
-            </select>
           </label>
 
           <label className="flex flex-col gap-1.5 sm:col-span-2">
             <span className="eyebrow">Descripción</span>
             <textarea
               name="description"
-              rows={4}
+              rows={5}
               maxLength={2000}
               defaultValue={initial?.description}
-              placeholder="Dificultad, duración de los tiempos, controles, y qué buscas con estos valores."
+              placeholder="Dificultad, duración de los tiempos, cámara y controles. Sin eso, tus valores no significan lo mismo para quien los copie."
               className="field resize-y"
             />
           </label>
@@ -131,99 +125,115 @@ export function SliderSetForm({
       </section>
 
       {/* Valores */}
-      <section className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-end justify-between gap-3">
+      <section className="flex flex-col gap-8">
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
           <div>
-            <h2 className="text-xl font-bold tracking-tight">Valores</h2>
-            <p className="mt-1 text-xs text-muted">
-              {definitions.length} sliders · rellena sólo lo que cambies, el resto se queda en
-              su valor por defecto.
+            <h2 className="display text-4xl">Valores</h2>
+            <p className="mt-2 text-xs text-chalk-dim">
+              {definitions.length} sliders. Lo que no toques se queda en su valor por defecto.
             </p>
           </div>
-          <button type="button" onClick={resetToDefaults} className="btn btn-quiet">
-            Restablecer
-          </button>
+          <div className="flex flex-wrap items-center gap-5">
+            <ScaleLegend scopes={scopes} labels={SCOPE_LABELS} />
+            <button
+              type="button"
+              onClick={() => setValues(defaultsFor(definitions))}
+              className="btn btn-quiet"
+            >
+              Restablecer
+            </button>
+          </div>
         </div>
 
-        {blocks.map((block) => (
-          <div key={block.category} className="card overflow-hidden">
-            <header className="border-b border-line px-5 py-3">
-              <h3 className="text-sm font-bold tracking-wide uppercase">
-                {categoryLabel(block.category)}
-              </h3>
-            </header>
+        {blocks.map((block) => {
+          const Drawing = CATEGORY_DRAWINGS[block.category as keyof typeof CATEGORY_DRAWINGS];
 
-            <div className="overflow-x-auto">
-              <div className="min-w-[22rem]">
-                <div
-                  className="grid items-center gap-2 border-b border-line/70 px-5 py-2"
-                  style={{ gridTemplateColumns: gridColumns(scopes.length) }}
-                >
-                  <span className="eyebrow">Slider</span>
-                  {scopes.map((scope) => (
-                    <span key={scope} className="eyebrow text-center">
-                      {SCOPE_LABELS[scope]}
-                    </span>
-                  ))}
-                </div>
+          return (
+            <div key={block.category}>
+              <header className="flex items-center gap-3 border-b border-chalk-line pb-3">
+                {Drawing ? <Drawing className="size-7 text-chalk-dim" /> : null}
+                <h3 className="display text-2xl">{categoryLabel(block.category)}</h3>
+              </header>
 
-                {block.rows.map((row) => (
-                  <div
-                    key={row.slug}
-                    className="grid items-center gap-2 border-b border-line/40 px-5 py-2 last:border-b-0"
-                    style={{ gridTemplateColumns: gridColumns(scopes.length) }}
-                  >
-                    <span className="truncate text-sm font-medium" title={row.name}>
-                      {row.name}
-                    </span>
-
-                    {scopes.map((scope) => {
+              <ul>
+                {block.rows.map((row) => {
+                  const marks = scopes
+                    .map((scope) => {
                       const definition = row.byScope[scope];
+                      if (!definition) return null;
+                      return {
+                        scope,
+                        value: values[String(definition.id)] ?? definition.default_value,
+                      };
+                    })
+                    .filter((mark): mark is { scope: SliderScope; value: number } => mark !== null);
 
-                      if (!definition) {
-                        return (
-                          <span key={scope} className="text-center text-sm text-line-strong">
-                            —
-                          </span>
-                        );
-                      }
+                  return (
+                    <li
+                      key={row.slug}
+                      className="grid items-center gap-x-5 gap-y-1 border-b border-chalk-line/60 py-2.5 last:border-b-0 sm:grid-cols-[minmax(8rem,14rem)_1fr_auto]"
+                    >
+                      <span className="text-sm leading-tight font-semibold">{row.name}</span>
 
-                      return (
-                        <input
-                          key={scope}
-                          type="number"
-                          inputMode="numeric"
-                          min={definition.min_value}
-                          max={definition.max_value}
-                          value={values[String(definition.id)] ?? definition.default_value}
-                          onChange={(event) =>
-                            setValue(
-                              definition.id,
-                              event.target.value,
-                              definition.min_value,
-                              definition.max_value,
-                            )
+                      <ScaleTrack min={0} max={100} marks={marks} className="min-w-32" />
+
+                      <div className="flex items-center gap-1.5">
+                        {scopes.map((scope) => {
+                          const definition = row.byScope[scope];
+
+                          if (!definition) {
+                            return (
+                              <span
+                                key={scope}
+                                className="w-14 text-center text-sm text-chalk-dim/40"
+                                title={`${SCOPE_LABELS[scope]}: no aplica`}
+                              >
+                                —
+                              </span>
+                            );
                           }
-                          aria-label={`${row.name} — ${SCOPE_LABELS[scope]}`}
-                          className="field value-pill px-2 py-1.5 text-center"
-                        />
-                      );
-                    })}
-                  </div>
-                ))}
-              </div>
+
+                          return (
+                            <input
+                              key={scope}
+                              type="number"
+                              inputMode="numeric"
+                              min={definition.min_value}
+                              max={definition.max_value}
+                              value={values[String(definition.id)] ?? definition.default_value}
+                              onChange={(event) =>
+                                setValue(
+                                  definition.id,
+                                  event.target.value,
+                                  definition.min_value,
+                                  definition.max_value,
+                                )
+                              }
+                              aria-label={`${row.name} — ${SCOPE_LABELS[scope]}`}
+                              className={`field value-pill w-14 px-1 py-1.5 text-center ${SCOPE_INK[scope].text}`}
+                            />
+                          );
+                        })}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </section>
 
       {state.error ? (
-        <p className="rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">
+        <p
+          className="border border-ink-rival/50 bg-ink-rival/10 px-3 py-2.5 text-sm text-ink-rival"
+          role="alert"
+        >
           {state.error}
         </p>
       ) : null}
 
-      <div className="sticky bottom-0 -mx-5 flex flex-wrap items-center gap-3 border-t border-line bg-void/95 px-5 py-4 backdrop-blur">
+      <div className="sticky bottom-0 -mx-5 flex flex-wrap items-center gap-3 bg-board/95 px-5 py-4 backdrop-blur">
         <button
           type="submit"
           name="intent"
@@ -244,19 +254,13 @@ export function SliderSetForm({
             Guardar borrador
           </button>
         ) : null}
-        <p className="text-xs text-muted">
-          Un borrador sólo lo ves tú hasta que lo publiques.
-        </p>
+        <p className="text-xs text-chalk-dim">Un borrador sólo lo ves tú hasta que lo publiques.</p>
       </div>
     </form>
   );
 }
 
 // ---------------------------------------------------------------------------
-
-function gridColumns(scopeCount: number) {
-  return `minmax(9rem, 1fr) repeat(${scopeCount}, minmax(4.5rem, 6rem))`;
-}
 
 function defaultsFor(definitions: SliderDefinition[]) {
   const values: Record<string, number> = {};
@@ -274,7 +278,6 @@ type FormRow = {
 
 function buildBlocks(definitions: SliderDefinition[]) {
   const scopes = sortScopes([...new Set(definitions.map((d) => d.applies_to))]);
-
   const byCategory = new Map<string, Map<string, FormRow>>();
 
   for (const definition of definitions) {

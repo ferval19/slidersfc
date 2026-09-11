@@ -14,7 +14,7 @@ export function LoginForm({ next }: { next: string }) {
       <div className="card p-6">
         <p className="eyebrow">Revisa tu correo</p>
         <h2 className="mt-2 text-xl font-bold">Te hemos enviado un enlace</h2>
-        <p className="mt-2 text-sm text-muted">
+        <p className="mt-2 text-sm text-chalk-dim">
           Hemos mandado un enlace de acceso a <span className="text-chalk">{state.sent}</span>.
           Ábrelo en este mismo navegador y entrarás directamente.
         </p>
@@ -55,7 +55,7 @@ export function LoginForm({ next }: { next: string }) {
         </label>
 
         {state.error ? (
-          <p className="text-sm text-danger" role="alert">
+          <p className="text-sm text-ink-rival" role="alert">
             {state.error}
           </p>
         ) : null}
@@ -63,7 +63,7 @@ export function LoginForm({ next }: { next: string }) {
         <button type="submit" className="btn btn-primary" disabled={pending}>
           {pending ? 'Enviando…' : 'Enviarme un enlace'}
         </button>
-        <p className="text-xs text-muted">
+        <p className="text-xs text-chalk-dim">
           Sin contraseñas: te llega un enlace de un solo uso a tu correo.
         </p>
       </form>

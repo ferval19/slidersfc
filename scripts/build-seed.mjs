@@ -42,7 +42,14 @@ for (const game of games) {
   );
 
   for (const slider of ordered) {
-    const scopes = slider.userOnly ? ['user'] : game.scopes;
+    // Un slider de la CPU va en el ámbito rival del juego: `cpu` en FC26,
+    // `cpu_opponent` en FC27.
+    const cpuScope = game.scopes.find((scope) => scope.startsWith('cpu'));
+    const scopes = slider.userOnly
+      ? ['user']
+      : slider.cpuOnly
+        ? [cpuScope].filter(Boolean)
+        : game.scopes;
     for (const scope of scopes) {
       rows.push(
         `  ((select id from public.games where slug = ${q(game.slug)}), ` +
@@ -68,9 +75,22 @@ lines.push(
   '      default_value = excluded.default_value,',
   '      sort_order    = excluded.sort_order;',
   '',
-  'commit;',
-  '',
 );
+
+// Sincroniza: lo que ya no está en el catálogo se borra, para que renombrar
+// un slug no deje sliders huérfanos colgando en la UI.
+lines.push('-- Limpieza de sliders que ya no están en el catálogo ---------------------');
+for (const game of games) {
+  const slugs = sliders.map((slider) => q(slider.slug)).join(', ');
+  lines.push(
+    'delete from public.slider_definitions',
+    `where game_id = (select id from public.games where slug = ${q(game.slug)})`,
+    `  and slug not in (${slugs});`,
+    '',
+  );
+}
+
+lines.push('commit;', '');
 
 writeFileSync(out, lines.join('\n'), 'utf8');
 console.log(`✓ ${rows.length} sliders para ${games.length} juegos → supabase/seed/01_catalog.sql`);

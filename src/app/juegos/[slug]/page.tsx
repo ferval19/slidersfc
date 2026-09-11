@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation';
 import { EmptyState } from '@/components/empty-state';
 import { FilterBar } from '@/components/filter-bar';
 import { SetCard } from '@/components/set-card';
-import { isMode } from '@/lib/constants';
 import { getGameBySlug, getGames, getPublishedSets } from '@/lib/queries';
 
 export async function generateMetadata({
@@ -23,37 +22,30 @@ export async function generateMetadata({
   };
 }
 
-export default async function GamePage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ slug: string }>;
-  searchParams: Promise<{ modo?: string }>;
-}) {
+export default async function GamePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { modo } = await searchParams;
-  const activeMode = isMode(modo) ? modo : undefined;
 
   const game = await getGameBySlug(slug);
   if (!game) notFound();
 
   const [games, sets] = await Promise.all([
     getGames(),
-    getPublishedSets({ gameSlug: slug, mode: activeMode, limit: 60 }),
+    getPublishedSets({ gameSlug: slug, limit: 60 }),
   ]);
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-12">
       <p className="eyebrow">{game.release_year ?? ''}</p>
-      <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Sliders de {game.name}
+      <h1 className="display mt-3 text-[clamp(2.75rem,9vw,5.5rem)]">
+        Sliders de<br />
+        <span className="text-ink-user">{game.name}</span>
       </h1>
-      <p className="mt-3 text-sm text-muted">
+      <p className="mt-3 text-sm text-chalk-dim">
         {sets.length} {sets.length === 1 ? 'set publicado' : 'sets publicados'}
       </p>
 
       <div className="mt-8">
-        <FilterBar games={games} activeGame={slug} activeMode={activeMode} />
+        <FilterBar games={games} activeGame={slug} />
       </div>
 
       <div className="mt-7">
@@ -64,11 +56,11 @@ export default async function GamePage({
             action={{ href: '/sets/nuevo', label: 'Publicar un set' }}
           />
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {sets.map((set) => (
               <SetCard key={set.id} set={set} />
             ))}
-          </div>
+          </ul>
         )}
       </div>
     </div>

@@ -4,7 +4,6 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type {
   Game,
   Profile,
-  SetMode,
   SliderComment,
   SliderDefinition,
   SliderSet,
@@ -73,9 +72,9 @@ export async function getGameBySlug(slug: string): Promise<Game | null> {
   );
 }
 
-/** Feed público. `gameSlug` y `mode` son filtros opcionales. */
+/** Feed público. `gameSlug` es un filtro opcional. */
 export async function getPublishedSets(
-  options: { gameSlug?: string; mode?: SetMode; limit?: number } = {},
+  options: { gameSlug?: string; limit?: number } = {},
 ): Promise<SetListItem[]> {
   const game = options.gameSlug ? await getGameBySlug(options.gameSlug) : null;
   if (options.gameSlug && !game) return [];
@@ -91,7 +90,6 @@ export async function getPublishedSets(
         .limit(options.limit ?? 30);
 
       if (game) query = query.eq('game_id', game.id);
-      if (options.mode) query = query.eq('mode', options.mode);
 
       const { data } = await query;
       return (data ?? []) as unknown as SetListItem[];

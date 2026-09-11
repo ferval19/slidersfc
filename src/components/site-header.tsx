@@ -13,23 +13,21 @@ export async function SiteHeader() {
   ]);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-void/85 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center gap-4 px-5 py-3.5">
-        <Link href="/" className="flex items-baseline gap-2">
+    <header className="sticky top-0 z-30 bg-board/92 backdrop-blur">
+      <div className="mx-auto flex max-w-6xl items-center gap-4 px-5 py-3">
+        <Link href="/" className="flex items-baseline gap-2.5">
           <Logo />
-          <span className="hidden text-[0.625rem] tracking-[0.14em] text-muted uppercase sm:inline">
-            {SITE_BYLINE}
-          </span>
+          <span className="eyebrow hidden sm:inline">{SITE_BYLINE}</span>
         </Link>
 
-        <nav className="ml-auto flex items-center gap-1 text-sm">
+        <nav className="ml-auto flex items-center gap-1">
           {games.slice(0, 3).map((game) => (
             <Link
               key={game.slug}
               href={`/juegos/${game.slug}`}
-              className="hidden rounded-lg px-2.5 py-1.5 font-semibold text-muted transition-colors hover:text-chalk sm:block"
+              className="hidden px-2.5 py-1.5 font-mono text-xs font-medium tracking-[0.12em] text-chalk-dim uppercase transition-colors hover:text-chalk sm:block"
             >
-              {game.slug.toUpperCase()}
+              {game.slug}
             </Link>
           ))}
 
@@ -40,10 +38,14 @@ export async function SiteHeader() {
               </Link>
               <Link
                 href={`/u/${profile.username}`}
-                className="ml-1 flex items-center gap-2 rounded-lg px-1.5 py-1 hover:bg-raised"
+                className="ml-1 p-1"
                 title={`Perfil de @${profile.username}`}
               >
-                <Avatar url={profile.avatar_url} name={profile.display_name ?? profile.username} size={28} />
+                <Avatar
+                  url={profile.avatar_url}
+                  name={profile.display_name ?? profile.username}
+                  size={28}
+                />
               </Link>
             </>
           ) : (
@@ -53,6 +55,7 @@ export async function SiteHeader() {
           )}
         </nav>
       </div>
+      <div className="chalk-rule" />
     </header>
   );
 }

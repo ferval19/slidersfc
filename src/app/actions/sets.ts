@@ -3,7 +3,6 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { isMode } from '@/lib/constants';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { SliderDefinition } from '@/lib/database.types';
 
@@ -14,7 +13,6 @@ const VALUE_PREFIX = 'v_';
 type ParsedForm = {
   title: string;
   description: string | null;
-  mode: 'carrera' | 'online' | 'amistoso';
   gameId: number;
   publish: boolean;
   values: Map<number, number>;
@@ -29,11 +27,6 @@ function parseForm(formData: FormData): ParsedForm | { error: string } {
   const rawDescription = String(formData.get('description') ?? '').trim();
   if (rawDescription.length > 2000) {
     return { error: 'La descripción no puede pasar de 2000 caracteres.' };
-  }
-
-  const mode = formData.get('mode');
-  if (!isMode(mode)) {
-    return { error: 'Elige un modo de juego válido.' };
   }
 
   const gameId = Number(formData.get('game_id'));
@@ -59,7 +52,6 @@ function parseForm(formData: FormData): ParsedForm | { error: string } {
   return {
     title,
     description: rawDescription === '' ? null : rawDescription,
-    mode,
     gameId,
     publish: formData.get('intent') === 'publish',
     values,
@@ -119,7 +111,6 @@ export async function createSet(
       game_id: parsed.gameId,
       title: parsed.title,
       description: parsed.description,
-      mode: parsed.mode,
       is_published: parsed.publish,
     })
     .select('id')
@@ -202,7 +193,6 @@ export async function updateSet(
     .update({
       title: parsed.title,
       description: parsed.description,
-      mode: parsed.mode,
       is_published: parsed.publish || existing.is_published,
       version: nextVersion,
     })

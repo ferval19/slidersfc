@@ -1,9 +1,7 @@
 export function Logo({ className = '' }: { className?: string }) {
   return (
-    <span
-      className={`font-sans text-lg font-extrabold tracking-tight uppercase ${className}`}
-    >
-      Sliders<span className="text-accent">FC</span>
+    <span className={`display text-2xl leading-none ${className}`}>
+      Sliders<span className="text-ink-user">FC</span>
     </span>
   );
 }

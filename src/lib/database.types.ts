@@ -5,7 +5,6 @@
 //   supabase gen types typescript --project-id <ref> > src/lib/database.types.ts
 
 export type SliderScope = 'user' | 'cpu' | 'cpu_opponent' | 'cpu_teammate';
-export type SetMode = 'carrera' | 'online' | 'amistoso';
 
 export type Profile = {
   id: string;
@@ -43,7 +42,6 @@ export type SliderSet = {
   game_id: number;
   title: string;
   description: string | null;
-  mode: SetMode;
   version: number;
   is_published: boolean;
   created_at: string;

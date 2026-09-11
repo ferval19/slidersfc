@@ -8,9 +8,9 @@ export function SetupNotice() {
   if (isSupabaseConfigured()) return null;
 
   return (
-    <div className="border-b border-warn/30 bg-warn/10">
+    <div className="border-b border-ink-user/30 bg-ink-user/10">
       <div className="mx-auto max-w-6xl px-5 py-3 text-sm">
-        <p className="font-bold text-warn">Supabase no está configurado</p>
+        <p className="font-bold text-ink-user">Supabase no está configurado</p>
         <p className="mt-1 text-chalk/80">
           Rellena{' '}
           <code className="font-mono text-xs text-chalk">NEXT_PUBLIC_SUPABASE_URL</code> y{' '}

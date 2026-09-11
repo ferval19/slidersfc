@@ -81,5 +81,5 @@ export function AuthHashHandler({ next }: { next: string }) {
     );
   }
 
-  return <p className="text-sm text-muted">Iniciando sesión…</p>;
+  return <p className="text-sm text-chalk-dim">Iniciando sesión…</p>;
 }

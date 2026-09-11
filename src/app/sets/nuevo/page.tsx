@@ -32,8 +32,8 @@ export default async function NewSetPage() {
   return (
     <div className="mx-auto max-w-4xl px-5 py-10">
       <p className="eyebrow">Nuevo set</p>
-      <h1 className="mt-2 text-3xl font-extrabold tracking-tight">Publica tus sliders</h1>
-      <p className="mt-3 max-w-prose text-sm text-muted">
+      <h1 className="display mt-3 text-[clamp(2.5rem,8vw,4.5rem)]">Publica tus sliders</h1>
+      <p className="mt-3 max-w-prose text-sm text-chalk-dim">
         Cuenta en la descripción con qué dificultad y duración de tiempos juegas: sin eso, los
         valores no significan lo mismo para quien los copie.
       </p>

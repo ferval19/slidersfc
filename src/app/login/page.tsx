@@ -24,15 +24,13 @@ export default async function LoginPage({
   return (
     <div className="mx-auto max-w-md px-5 py-16">
       <p className="eyebrow">SlidersFC</p>
-      <h1 className="mt-2 text-3xl font-extrabold tracking-tight">
-        Entra y publica tus sliders
-      </h1>
-      <p className="mt-3 text-sm text-muted">
+      <h1 className="display mt-3 text-5xl">Entra y publica tus sliders</h1>
+      <p className="mt-3 text-sm text-chalk-dim">
         Necesitas una cuenta para crear sets y comentar los de los demás. Leer es libre.
       </p>
 
       {params.error ? (
-        <p className="mt-6 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">
+        <p className="mt-6 rounded-lg border border-ink-rival/40 bg-ink-rival/10 px-3 py-2 text-sm text-ink-rival" role="alert">
           {params.error}
         </p>
       ) : null}

@@ -35,6 +35,9 @@ Editor del dashboard, o con la CLI (`supabase db push`):
 2. `supabase/migrations/20260911120100_rls.sql` — Row Level Security
 3. `supabase/migrations/20260911120200_profiles_trigger.sql` — perfil automático al registrarse
 4. `supabase/seed/01_catalog.sql` — juegos y catálogo de sliders
+5. `supabase/seed/02_set_full_manual_fg.sql` — set de inicio para FC26
+   (requiere haber entrado una vez con `ferval19@gmail.com`; ver
+   [supabase/README.md](supabase/README.md))
 
 El seed es idempotente: se puede volver a aplicar sin duplicar nada.
 
@@ -121,6 +124,13 @@ supabase/
 scripts/build-seed.mjs        generador del seed
 ```
 
+## Dirección visual
+
+La pizarra del entrenador: verde botella, tiza y tres rotuladores que codifican
+el ámbito de cada slider. Está documentada en
+[docs/direccion-visual.md](docs/direccion-visual.md) — léela antes de tocar
+`globals.css`.
+
 ## Modelo de datos
 
 `profiles`, `games`, `slider_definitions`, `slider_sets`, `slider_set_values`,
@@ -129,6 +139,8 @@ scripts/build-seed.mjs        generador del seed
 
 `slider_definitions.applies_to` modela la separación de FC27:
 `user` / `cpu_opponent` / `cpu_teammate` (en FC26 y anteriores, `user` / `cpu`).
+Los sliders que sólo existen de un lado usan un único ámbito: la barra de
+potencia es sólo del usuario, y los controles de la CPU sólo de la CPU.
 
 ### Versionado
 

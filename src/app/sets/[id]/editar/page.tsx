@@ -31,9 +31,9 @@ export default async function EditSetPage({ params }: { params: Promise<{ id: st
   return (
     <div className="mx-auto max-w-4xl px-5 py-10">
       <p className="eyebrow">Editar set</p>
-      <h1 className="mt-2 text-3xl font-extrabold tracking-tight">{detail.set.title}</h1>
+      <h1 className="display mt-3 text-[clamp(2.25rem,7vw,4rem)]">{detail.set.title}</h1>
       {detail.set.is_published ? (
-        <p className="mt-3 max-w-prose text-sm text-muted">
+        <p className="mt-3 max-w-prose text-sm text-chalk-dim">
           Este set ya está publicado. Si cambias algún valor, la versión pasará a v
           {detail.set.version + 1} y los comentarios anteriores quedarán marcados como
           &laquo;de la v{detail.set.version}&raquo;.
@@ -51,7 +51,6 @@ export default async function EditSetPage({ params }: { params: Promise<{ id: st
             gameId: detail.set.game_id,
             title: detail.set.title,
             description: detail.set.description ?? '',
-            mode: detail.set.mode,
             isPublished: detail.set.is_published,
             values,
           }}

@@ -37,21 +37,21 @@ export function CommentList({ comments }: { comments: CommentView[] }) {
               {comment.author.username ? (
                 <Link
                   href={`/u/${comment.author.username}`}
-                  className="font-bold text-chalk hover:text-accent"
+                  className="font-bold text-chalk hover:text-ink-user"
                 >
                   {comment.author.displayName ?? comment.author.username}
                 </Link>
               ) : (
                 <span className="font-bold text-chalk">Usuario borrado</span>
               )}
-              <span className="text-muted">{relativeDate(comment.createdAt)}</span>
+              <span className="text-chalk-dim">{relativeDate(comment.createdAt)}</span>
               {comment.isStale ? (
-                <span className="chip border-warn/40 py-0 text-[0.625rem] text-warn">
+                <span className="eyebrow text-ink-user">
                   de la v{comment.setVersion}
                 </span>
               ) : null}
             </p>
-            <p className="mt-1 text-sm whitespace-pre-wrap text-chalk/90">{comment.body}</p>
+            <p className="mt-1.5 text-sm leading-relaxed whitespace-pre-wrap text-chalk/90">{comment.body}</p>
           </div>
         </li>
       ))}
@@ -81,8 +81,8 @@ export function CommentComposer({
 
   if (!canComment) {
     return (
-      <p className="text-xs text-muted">
-        <Link href={`/login?next=/sets/${setId}`} className="font-semibold text-accent hover:underline">
+      <p className="text-xs text-chalk-dim">
+        <Link href={`/login?next=/sets/${setId}`} className="font-semibold text-ink-user hover:underline">
           Entra
         </Link>{' '}
         para comentar.
@@ -107,7 +107,7 @@ export function CommentComposer({
         className="field resize-y"
       />
       {state.error ? (
-        <p className="text-xs text-danger" role="alert">
+        <p className="text-xs text-ink-rival" role="alert">
           {state.error}
         </p>
       ) : null}

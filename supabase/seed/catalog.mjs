@@ -1,46 +1,73 @@
-// Catálogo de sliders — fuente única de verdad para el seed (Fase 2 del plan).
+// Catálogo de sliders — fuente única de verdad para el seed.
 //
-// ⚠️ REVISAR ANTES DE LANZAR: esta lista es el conjunto canónico de sliders de
-// gameplay de EA SPORTS FC (estable desde FC24) con el desdoble
-// user / cpu_opponent / cpu_teammate que introduce FC27. Si tu documento
-// `fc27-catalogo-sliders.md` añade sliders nuevos (p. ej. "Finesse Shot Error"),
-// añádelos aquí y vuelve a ejecutar `npm run seed:build`. Nada más hay que
-// tocar: el SQL se regenera y es idempotente.
+// Los nombres van en español porque son los que aparecen en el menú del juego
+// para esta comunidad. A los de posicionamiento se les quita el prefijo
+// «Posicionamiento:» del menú, porque la cabecera de la categoría ya lo dice. La lista de FC26 sale del documento de Full Manual FG
+// («Sliders - Full Manual FG», v3.0), así que es la real, no una aproximación.
+//
+// Para cambiarla: edita este fichero, `npm run seed:build`, y vuelve a aplicar
+// supabase/seed/01_catalog.sql. El SQL generado también borra los sliders que
+// ya no estén aquí, así que renombrar un slug es seguro.
 //
 // applies_to:
 //   FC27 y posteriores -> user, cpu_opponent, cpu_teammate
 //   FC26 y anteriores  -> user, cpu
+//
+// userOnly: existe una sola vez, en el lado del jugador.
+// cpuOnly:  existe una sola vez, en el lado de la CPU rival.
 
 export const games = [
   { slug: 'fc27', name: 'EA SPORTS FC 27', release_year: 2026, scopes: ['user', 'cpu_opponent', 'cpu_teammate'] },
   { slug: 'fc26', name: 'EA SPORTS FC 26', release_year: 2025, scopes: ['user', 'cpu'] },
 ];
 
-// userOnly: el slider existe una sola vez, en el lado del jugador.
 export const sliders = [
-  { slug: 'sprint_speed',              name: 'Sprint Speed',                      category: 'speed' },
-  { slug: 'acceleration',              name: 'Acceleration',                      category: 'speed' },
+  // Velocidad
+  { slug: 'sprint_speed',            name: 'Velocidad',                                   category: 'speed' },
+  { slug: 'acceleration',            name: 'Aceleración',                                 category: 'speed' },
 
-  { slug: 'shot_error',                name: 'Shot Error',                        category: 'shooting' },
-  { slug: 'shot_speed',                name: 'Shot Speed',                        category: 'shooting' },
-  { slug: 'power_bar',                 name: 'Power Bar',                         category: 'shooting', userOnly: true },
+  // Tiro
+  { slug: 'shot_error',              name: 'Fallo al tirar',                              category: 'shooting' },
+  { slug: 'shot_speed',              name: 'Velocidad de tiro',                           category: 'shooting' },
+  { slug: 'header_shot_error',       name: 'Fallo al rematar de cabeza',                  category: 'shooting' },
 
-  { slug: 'pass_error',                name: 'Pass Error',                        category: 'passing' },
-  { slug: 'pass_speed',                name: 'Pass Speed',                        category: 'passing' },
+  // Pase
+  { slug: 'pass_error',              name: 'Fallo al pasar',                              category: 'passing' },
+  { slug: 'pass_speed',              name: 'Velocidad del pase',                          category: 'passing' },
+  { slug: 'header_pass_error',       name: 'Fallo al pasar de cabeza',                    category: 'passing' },
 
-  { slug: 'first_touch_control_error', name: 'First Touch Control Error',         category: 'ball_control' },
+  // Control de balón
+  { slug: 'power_bar',               name: 'Barra de potencia',                           category: 'ball_control', userOnly: true },
+  { slug: 'first_touch_error',       name: 'Error de control al primer toque',            category: 'ball_control' },
+  { slug: 'interception_error',      name: 'Fallo al interceptar',                        category: 'ball_control' },
+  { slug: 'deflection_error',        name: 'Fallo al desviar el balón',                   category: 'ball_control' },
 
-  { slug: 'goalkeeper_ability',        name: 'Goalkeeper Ability',                category: 'goalkeeping' },
+  // Defensa
+  { slug: 'tackle_assistance',       name: 'Asistencia en entradas',                      category: 'defending' },
 
-  { slug: 'marking',                   name: 'Positioning: Marking',              category: 'positioning' },
-  { slug: 'run_frequency',             name: 'Positioning: Run Frequency',        category: 'positioning' },
-  { slug: 'line_height',               name: 'Positioning: Line Height',          category: 'positioning' },
-  { slug: 'line_length',               name: 'Positioning: Line Length',          category: 'positioning' },
-  { slug: 'line_width',                name: 'Positioning: Line Width',           category: 'positioning' },
-  { slug: 'fullback_positioning',      name: 'Positioning: Fullback Positioning', category: 'positioning' },
+  // Portería
+  { slug: 'goalkeeper_ability',      name: 'Habilidad del guardameta',                    category: 'goalkeeping' },
 
-  { slug: 'injury_frequency',          name: 'Injury Frequency',                  category: 'injuries' },
-  { slug: 'injury_severity',           name: 'Injury Severity',                   category: 'injuries' },
+  // Posición del equipo
+  { slug: 'marking',                 name: 'Marcaje',                    category: 'positioning' },
+  { slug: 'run_frequency',           name: 'Frecuencia de desmarques',   category: 'positioning' },
+  { slug: 'line_height',             name: 'Altura de la línea',         category: 'positioning' },
+  { slug: 'line_length',             name: 'Distancia de la línea',      category: 'positioning' },
+  { slug: 'line_width',              name: 'Ancho de la línea',          category: 'positioning' },
+  { slug: 'defensive_positioning',   name: 'Posiciones defensivas',      category: 'positioning' },
+
+  // Lesiones
+  { slug: 'injury_frequency',        name: 'Frecuencia de lesiones',                      category: 'injuries' },
+  { slug: 'injury_severity',         name: 'Gravedad de la lesión',                       category: 'injuries' },
+
+  // Controles de la CPU — un solo valor, del lado de la CPU
+  { slug: 'cpu_tackle_aggression',         name: 'Agresividad en las entradas',            category: 'cpu_controls', cpuOnly: true },
+  { slug: 'cpu_buildup_speed',             name: 'Velocidad de creación',                  category: 'cpu_controls', cpuOnly: true },
+  { slug: 'cpu_shot_frequency',            name: 'Frecuencia de tiros',                    category: 'cpu_controls', cpuOnly: true },
+  { slug: 'cpu_first_touch_pass_frequency', name: 'Frecuencia de pases al primer toque',   category: 'cpu_controls', cpuOnly: true },
+  { slug: 'cpu_cross_frequency',           name: 'Frecuencia de centros',                  category: 'cpu_controls', cpuOnly: true },
+  { slug: 'cpu_dribble_frequency',         name: 'Frecuencia de regates',                  category: 'cpu_controls', cpuOnly: true },
+  { slug: 'cpu_flair_frequency',           name: 'Frecuencia de filigranas',               category: 'cpu_controls', cpuOnly: true },
 ];
 
 // Orden en el que se pintan las categorías en la UI y en el formulario.
@@ -49,9 +76,11 @@ export const categoryOrder = [
   'shooting',
   'passing',
   'ball_control',
+  'defending',
   'goalkeeping',
   'positioning',
   'injuries',
+  'cpu_controls',
 ];
 
 export const DEFAULTS = { min: 0, max: 100, default: 50 };

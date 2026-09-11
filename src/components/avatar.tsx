@@ -18,7 +18,7 @@ export function Avatar({
         alt=""
         width={size}
         height={size}
-        className="shrink-0 rounded-full border border-line object-cover"
+        className="shrink-0 rounded-full border border-chalk-line object-cover"
         style={{ width: size, height: size }}
       />
     );
@@ -27,7 +27,7 @@ export function Avatar({
   return (
     <span
       aria-hidden
-      className="grid shrink-0 place-items-center rounded-full border border-line bg-raised font-bold text-muted"
+      className="grid shrink-0 place-items-center rounded-full border border-chalk-line bg-board-raised font-mono font-semibold text-chalk-dim"
       style={{ width: size, height: size, fontSize: size * 0.45 }}
     >
       {initial}
