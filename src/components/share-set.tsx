@@ -42,7 +42,7 @@ export function ShareSet({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <button type="button" onClick={share} className="btn btn-primary">
+      <button type="button" onClick={share} className="btn btn-quiet">
         {copied ? '¡Enlace copiado!' : 'Compartir'}
       </button>
 

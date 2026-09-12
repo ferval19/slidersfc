@@ -9,7 +9,7 @@ import { ShareSet } from '@/components/share-set';
 import { SliderTable } from '@/components/slider-table';
 import { getSetDetail } from '@/lib/queries';
 import { buildSetView } from '@/lib/set-view';
-import { profilePath, setPath } from '@/lib/paths';
+import { consolePath, profilePath, setPath } from '@/lib/paths';
 import { publicSiteUrl } from '@/lib/site-url';
 import { getCurrentUser } from '@/lib/supabase/server';
 
@@ -117,9 +117,17 @@ export default async function SetDetailPage({ params }: { params: Params }) {
           </p>
         ) : null}
 
-        {/* Compartir va para todo el mundo, no sólo para el autor: el set se
-            comparte más veces de las que se edita. */}
+        {/* «Meter en la consola» es la acción principal: es para lo que se
+            abre un set. Compartir va para todo el mundo y no sólo para el
+            autor, porque un set se comparte más veces de las que se edita. */}
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2">
+          <Link
+            href={consolePath(detail.owner.username, detail.set.slug)}
+            className="btn btn-primary"
+          >
+            Meter en la consola
+          </Link>
+
           {detail.set.is_published ? (
             <ShareSet url={shareUrl} title={detail.set.title} gameName={detail.game.name} />
           ) : null}

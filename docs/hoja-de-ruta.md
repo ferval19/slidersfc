@@ -37,7 +37,7 @@ que hace que la web valga la pena visitar el primer día.
 
 ## AHORA — antes de que salga FC27
 
-Presupuesto realista: unas 10 tardes. Es todo lo que hay.
+Presupuesto realista: unas 10 tardes. Es todo lo que hay. (5) ya está hecho.
 
 | # | Qué | Por qué ahora | Esfuerzo |
 | --- | --- | --- | --- |
@@ -45,7 +45,7 @@ Presupuesto realista: unas 10 tardes. Es todo lo que hay.
 | 2 | **Acceso con X** | Bloqueante de hecho: tu audiencia ya está en X y así nadie depende del correo. El botón está hecho, falta activar el proveedor | 1 hora |
 | 3 | **Quitar Deployment Protection** y dominio propio | Ahora mismo la web sólo la ves tú | 30 min |
 | 4 | **Confirmar el catálogo de FC27** con el juego delante | Ya está cargado a partir de las Pitch Notes de EA y del listado de fifauteam: 61 sliders, 121 filas. Falta cotejar los nombres del menú en español y el rango 1-99. Nombres mal = pierdes credibilidad ante justo la gente que se fija | 1 tarde, el **18/09** |
-| 5 | **Modo consola** | *La* función de retorno. Un set se usa con el móvil en la mano navegando menús en la tele. El **orden del menú ya está hecho**; falta la vista móvil con números grandes y una marca por slider según los vas metiendo. Nadie más lo hace | 1-2 tardes |
+| ~~5~~ | ~~**Modo consola**~~ **HECHO** | `/u/<usuario>/<slug>/consola`: una columna en el orden del menú, números grandes, marca por slider con el progreso guardado en el navegador, y bloqueo de pantalla para que no se apague el móvil a mitad | — |
 | 6 | **Importar set desde texto pegado** | La diferencia entre 2 y 15 sets el día del lanzamiento. La gente ya tiene sus sliders en Notion, en una captura o en un hilo; pegarlos y mapearlos al catálogo convierte 15 minutos de formulario en 30 segundos | 2 tardes |
 | 7 | **Mínimos de moderación**: borrar tu propio comentario, reportar, límite de ritmo | La acción de borrar ya existe pero no tiene interfaz. Sin esto, el primer troll es un problema manual | 1 tarde |
 | 8 | **Analítica** (Vercel Analytics o Plausible) | Sin esto vas a ciegas en la única semana que importa | 30 min |

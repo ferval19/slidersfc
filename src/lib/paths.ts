@@ -19,6 +19,10 @@ export function editSetPath(username: string, slug: string) {
   return `/u/${username}/${slug}/editar`;
 }
 
+export function consolePath(username: string, slug: string) {
+  return `/u/${username}/${slug}/consola`;
+}
+
 /**
  * Camino de un set tolerante a datos incompletos: si falta el slug o el
  * usuario (por ejemplo, con la migración de slugs sin aplicar), cae en la URL
