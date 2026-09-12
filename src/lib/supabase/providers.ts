@@ -11,8 +11,11 @@ import { supabaseEnvOrNull } from './env';
  * `signInWithOAuth` no lo detecta porque no llama al servidor: sólo construye
  * la URL.
  *
- * La respuesta se cachea cinco minutos: cambia cuando se toca el panel de
- * Supabase, no en cada clic.
+ * La respuesta se cachea un minuto. Poco, a propósito: cambia sólo cuando se
+ * toca el panel de Supabase, pero justo entonces es cuando alguien está
+ * activando el proveedor y probando si ya funciona. Con una caché larga, el
+ * botón seguiría diciendo que está desactivado un buen rato después de
+ * activarlo.
  */
 export async function isProviderEnabled(provider: string): Promise<boolean> {
   const env = supabaseEnvOrNull();
@@ -21,7 +24,7 @@ export async function isProviderEnabled(provider: string): Promise<boolean> {
   try {
     const response = await fetch(`${env.url}/auth/v1/settings`, {
       headers: { apikey: env.key },
-      next: { revalidate: 300 },
+      next: { revalidate: 60 },
     });
 
     if (!response.ok) return false;
