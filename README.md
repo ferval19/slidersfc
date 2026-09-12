@@ -46,7 +46,22 @@ El seed es idempotente: se puede volver a aplicar sin duplicar nada.
 
 En **Authentication → Providers**:
 
-- **Email**: activado por defecto. La app usa magic link, sin contraseñas.
+- **Email**: activado por defecto. La app ofrece **correo y contraseña** como
+  camino principal, y el enlace mágico como alternativa.
+
+  **Desactiva «Confirm email»** (*Authentication → Providers → Email*) si
+  quieres que crear una cuenta no mande ningún correo. Con la confirmación
+  activada, registrarse sigue dependiendo del correo — y por tanto del límite
+  de envíos. Con ella desactivada, la cuenta queda lista al instante y el
+  correo sólo hace falta para recuperar una contraseña olvidada.
+
+  Puedes comprobar cómo está con:
+
+  ```bash
+  curl -s -H "apikey: $ANON_KEY" "$SUPABASE_URL/auth/v1/settings" | grep autoconfirm
+  ```
+
+  `mailer_autoconfirm: true` = no manda correo al registrarse.
 - **Twitter (X)**: actívalo y pega el API Key / API Secret de tu app de
   developer.x.com. Ojo: el proveedor de Supabase usa **OAuth 1.0a**, así que
   son la *API Key* y la *API Secret*, no el client id/secret de OAuth 2.0.

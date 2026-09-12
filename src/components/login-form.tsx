@@ -1,10 +1,13 @@
 'use client';
 
-import { useActionState } from 'react';
+import Link from 'next/link';
+import { useActionState, useState } from 'react';
 
 import {
   signInWithEmail,
+  signInWithPassword,
   signInWithTwitter,
+  signUpWithPassword,
   verifyEmailCode,
   type AuthFormState,
   type CodeFormState,
@@ -13,15 +16,13 @@ import {
 const initialState: AuthFormState = {};
 const initialCodeState: CodeFormState = {};
 
-export function LoginForm({ next }: { next: string }) {
-  const [state, formAction, pending] = useActionState(signInWithEmail, initialState);
+type Mode = 'entrar' | 'crear' | 'enlace';
 
-  if (state.sent) {
-    return <SentPanel email={state.sent} next={next} />;
-  }
+export function LoginForm({ next }: { next: string }) {
+  const [mode, setMode] = useState<Mode>('entrar');
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-6">
       <form action={signInWithTwitter}>
         <input type="hidden" name="next" value={next} />
         <button type="submit" className="btn btn-quiet w-full">
@@ -33,15 +34,66 @@ export function LoginForm({ next }: { next: string }) {
       </form>
 
       <div className="flex items-center gap-3">
-        <span className="h-px flex-1 bg-line" />
-        <span className="eyebrow">o con tu email</span>
-        <span className="h-px flex-1 bg-line" />
+        <span className="h-px flex-1 bg-chalk-line" />
+        <span className="eyebrow">o con tu correo</span>
+        <span className="h-px flex-1 bg-chalk-line" />
+      </div>
+
+      {mode === 'enlace' ? (
+        <MagicLinkForm next={next} onBack={() => setMode('entrar')} />
+      ) : (
+        <PasswordForm
+          key={mode}
+          mode={mode}
+          next={next}
+          onModeChange={setMode}
+        />
+      )}
+    </div>
+  );
+}
+
+/** Entrar o crear cuenta con correo y contraseña. */
+function PasswordForm({
+  mode,
+  next,
+  onModeChange,
+}: {
+  mode: 'entrar' | 'crear';
+  next: string;
+  onModeChange: (mode: Mode) => void;
+}) {
+  const creating = mode === 'crear';
+  const [state, formAction, pending] = useActionState(
+    creating ? signUpWithPassword : signInWithPassword,
+    initialState,
+  );
+
+  // Cuenta creada pero Supabase pide confirmar el correo antes de entrar.
+  if (state.sent) return <SentPanel email={state.sent} next={next} confirming />;
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex gap-2" role="tablist">
+        {(['entrar', 'crear'] as const).map((option) => (
+          <button
+            key={option}
+            type="button"
+            role="tab"
+            aria-selected={mode === option}
+            onClick={() => onModeChange(option)}
+            className={`chip flex-1 justify-center py-2 ${mode === option ? 'chip-active' : ''}`}
+          >
+            {option === 'entrar' ? 'Entrar' : 'Crear cuenta'}
+          </button>
+        ))}
       </div>
 
       <form action={formAction} className="flex flex-col gap-3">
         <input type="hidden" name="next" value={next} />
+
         <label className="flex flex-col gap-1.5">
-          <span className="eyebrow">Email</span>
+          <span className="eyebrow">Correo</span>
           <input
             type="email"
             name="email"
@@ -52,39 +104,134 @@ export function LoginForm({ next }: { next: string }) {
           />
         </label>
 
+        <label className="flex flex-col gap-1.5">
+          <span className="eyebrow">Contraseña</span>
+          <input
+            type="password"
+            name="password"
+            required
+            minLength={8}
+            autoComplete={creating ? 'new-password' : 'current-password'}
+            placeholder={creating ? 'Mínimo 8 caracteres' : ''}
+            className="field"
+          />
+        </label>
+
+        {creating ? (
+          <label className="flex flex-col gap-1.5">
+            <span className="eyebrow">Repite la contraseña</span>
+            <input
+              type="password"
+              name="password_confirm"
+              required
+              minLength={8}
+              autoComplete="new-password"
+              className="field"
+            />
+          </label>
+        ) : null}
+
         {state.error ? (
           <p className="text-sm text-ink-rival" role="alert">
             {state.error}
           </p>
         ) : null}
 
-        <button type="submit" className="btn btn-primary" disabled={pending}>
-          {pending ? 'Enviando…' : 'Enviarme un enlace'}
+        <button type="submit" className="btn btn-primary mt-1" disabled={pending}>
+          {pending ? 'Un momento…' : creating ? 'Crear mi cuenta' : 'Entrar'}
         </button>
-        <p className="text-xs text-chalk-dim">
-          Sin contraseñas: te llega un enlace de un solo uso a tu correo.
-        </p>
       </form>
+
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs text-chalk-dim">
+        <button
+          type="button"
+          onClick={() => onModeChange('enlace')}
+          className="font-semibold text-chalk-dim underline-offset-4 hover:text-chalk hover:underline"
+        >
+          Prefiero un enlace por correo
+        </button>
+        {!creating ? (
+          <Link href="/recuperar" className="underline-offset-4 hover:text-chalk hover:underline">
+            ¿Olvidaste tu contraseña?
+          </Link>
+        ) : null}
+      </div>
     </div>
   );
 }
 
+/** Enlace mágico, sin contraseña. */
+function MagicLinkForm({ next, onBack }: { next: string; onBack: () => void }) {
+  const [state, formAction, pending] = useActionState(signInWithEmail, initialState);
+
+  if (state.sent) return <SentPanel email={state.sent} next={next} />;
+
+  return (
+    <form action={formAction} className="flex flex-col gap-3">
+      <input type="hidden" name="next" value={next} />
+
+      <label className="flex flex-col gap-1.5">
+        <span className="eyebrow">Correo</span>
+        <input
+          type="email"
+          name="email"
+          required
+          autoComplete="email"
+          placeholder="tu@email.com"
+          className="field"
+        />
+      </label>
+
+      {state.error ? (
+        <p className="text-sm text-ink-rival" role="alert">
+          {state.error}
+        </p>
+      ) : null}
+
+      <button type="submit" className="btn btn-primary" disabled={pending}>
+        {pending ? 'Enviando…' : 'Enviarme un enlace'}
+      </button>
+
+      <button
+        type="button"
+        onClick={onBack}
+        className="self-start text-xs font-semibold text-chalk-dim underline-offset-4 hover:text-chalk hover:underline"
+      >
+        Volver a la contraseña
+      </button>
+    </form>
+  );
+}
+
 /**
- * Después de enviar el correo. Se ofrecen las dos vías a la vez porque el
+ * Después de mandar el correo. Se ofrecen las dos vías a la vez porque el
  * enlace se rompe con facilidad — los escáneres de correo lo abren antes que
  * la persona y consumen el token — y el código escrito a mano no.
  */
-function SentPanel({ email, next }: { email: string; next: string }) {
+export function SentPanel({
+  email,
+  next,
+  confirming = false,
+}: {
+  email: string;
+  next: string;
+  confirming?: boolean;
+}) {
   const [state, formAction, pending] = useActionState(verifyEmailCode, initialCodeState);
 
   return (
     <div className="flex flex-col gap-6">
       <div className="panel p-6">
         <p className="eyebrow">Revisa tu correo</p>
-        <h2 className="display mt-2 text-3xl">Te lo hemos enviado</h2>
+        <h2 className="display mt-2 text-3xl">
+          {confirming ? 'Confirma tu cuenta' : 'Te lo hemos enviado'}
+        </h2>
         <p className="mt-3 text-sm text-chalk-dim">
-          A <span className="text-chalk">{email}</span>. Abre el enlace en este mismo
-          navegador y entrarás directo.
+          {confirming
+            ? 'Tu cuenta está creada. Abre el enlace que te hemos mandado a '
+            : 'A '}
+          <span className="text-chalk">{email}</span>
+          {confirming ? ' para poder entrar.' : '. Abre el enlace en este mismo navegador y entrarás directo.'}
         </p>
       </div>
 

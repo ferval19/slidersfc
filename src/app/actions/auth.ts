@@ -61,11 +61,12 @@ export async function verifyEmailCode(
 
   const supabase = await createSupabaseServerClient();
 
-  // Según si la cuenta ya existía, Supabase espera el tipo `email` o
-  // `magiclink`. Probamos los dos antes de dar el error por definitivo.
+  // El tipo depende de cómo se pidió el código: `magiclink` si la cuenta ya
+  // existía, `signup` si es una cuenta nueva sin confirmar, `email` en el
+  // resto. Probamos los tres antes de dar el error por definitivo.
   let lastError: Parameters<typeof authErrorMessage>[0] = null;
 
-  for (const type of ['email', 'magiclink'] as const) {
+  for (const type of ['email', 'magiclink', 'signup'] as const) {
     const { error } = await supabase.auth.verifyOtp({ email, token, type });
     if (!error) {
       revalidatePath('/', 'layout');
@@ -115,4 +116,123 @@ export async function signOut() {
   await supabase.auth.signOut();
   revalidatePath('/', 'layout');
   redirect('/');
+}
+
+// ---------------------------------------------------------------------------
+// Correo y contraseña
+//
+// Es el camino que no depende del correo: con «Confirm email» desactivado en
+// Supabase, crear la cuenta y entrar no manda ni un mensaje. El enlace mágico
+// se queda como alternativa, y el correo sólo hace falta para recuperar una
+// contraseña olvidada.
+// ---------------------------------------------------------------------------
+
+const MIN_PASSWORD = 8;
+
+function readCredentials(formData: FormData) {
+  const email = String(formData.get('email') ?? '').trim().toLowerCase();
+  const password = String(formData.get('password') ?? '');
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { error: 'Escribe un email válido.' as const };
+  }
+
+  if (password.length < MIN_PASSWORD) {
+    return { error: `La contraseña debe tener al menos ${MIN_PASSWORD} caracteres.` as const };
+  }
+
+  return { email, password };
+}
+
+export async function signInWithPassword(
+  _prevState: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const credentials = readCredentials(formData);
+  if ('error' in credentials) return credentials;
+
+  const next = safeNextPath(formData.get('next'));
+  const supabase = await createSupabaseServerClient();
+
+  const { error } = await supabase.auth.signInWithPassword(credentials);
+  if (error) return { error: authErrorMessage(error) };
+
+  revalidatePath('/', 'layout');
+  redirect(next);
+}
+
+export async function signUpWithPassword(
+  _prevState: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const credentials = readCredentials(formData);
+  if ('error' in credentials) return credentials;
+
+  if (String(formData.get('password')) !== String(formData.get('password_confirm'))) {
+    return { error: 'Las dos contraseñas no coinciden.' };
+  }
+
+  const next = safeNextPath(formData.get('next'));
+  const supabase = await createSupabaseServerClient();
+  const origin = await getSiteOrigin();
+
+  const { data, error } = await supabase.auth.signUp({
+    ...credentials,
+    options: { emailRedirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(next)}` },
+  });
+
+  if (error) return { error: authErrorMessage(error) };
+
+  // Con «Confirm email» activado, Supabase no devuelve sesión: hay que
+  // confirmar el correo antes. Sin él, la cuenta queda lista y se entra.
+  if (!data.session) return { sent: credentials.email };
+
+  revalidatePath('/', 'layout');
+  redirect(next);
+}
+
+export async function requestPasswordReset(
+  _prevState: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const email = String(formData.get('email') ?? '').trim().toLowerCase();
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { error: 'Escribe un email válido.' };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const origin = await getSiteOrigin();
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/confirm?next=${encodeURIComponent('/cuenta/contrasena')}`,
+  });
+
+  if (error) return { error: authErrorMessage(error) };
+
+  return { sent: email };
+}
+
+/** Cambiar la contraseña. Requiere sesión: la crea el enlace de recuperación. */
+export async function updatePassword(
+  _prevState: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const password = String(formData.get('password') ?? '');
+
+  if (password.length < MIN_PASSWORD) {
+    return { error: `La contraseña debe tener al menos ${MIN_PASSWORD} caracteres.` };
+  }
+
+  if (password !== String(formData.get('password_confirm'))) {
+    return { error: 'Las dos contraseñas no coinciden.' };
+  }
+
+  const supabase = await createSupabaseServerClient();
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { error: authErrorMessage(error) };
+
+  revalidatePath('/', 'layout');
+  redirect('/perfil');
 }

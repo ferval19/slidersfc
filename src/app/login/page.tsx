@@ -26,7 +26,8 @@ export default async function LoginPage({
       <p className="eyebrow">SlidersFC</p>
       <h1 className="display mt-3 text-5xl">Entra y publica tus sliders</h1>
       <p className="mt-3 text-sm text-chalk-dim">
-        Necesitas una cuenta para crear sets y comentar los de los demás. Leer es libre.
+        Necesitas una cuenta para publicar sets y comentar los de los demás. Leer es
+        libre.
       </p>
 
       {params.error ? (
