@@ -1,17 +1,36 @@
 #!/usr/bin/env node
 // Genera supabase/seed/01_catalog.sql a partir de supabase/seed/catalog.mjs.
-// El SQL resultante es idempotente: se puede volver a aplicar sin duplicar.
+// El SQL resultante es idempotente y sincroniza: lo que ya no está en el
+// catálogo se borra, para que renombrar un slug no deje filas huérfanas.
 
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
-import { games, sliders, categoryOrder, DEFAULTS } from '../supabase/seed/catalog.mjs';
+import { games, slidersByGame, categoryOrder } from '../supabase/seed/catalog.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const out = join(here, '..', 'supabase', 'seed', '01_catalog.sql');
 
 const q = (value) => `'${String(value).replace(/'/g, "''")}'`;
+
+/** Los ámbitos concretos de un slider en un juego, según su `sides`. */
+function scopesFor(slider, game) {
+  const { user, cpu, cpuTeammate } = game.scopes;
+
+  switch (slider.sides ?? 'both') {
+    case 'user':
+      return [user];
+    case 'cpu':
+      return [cpu];
+    // Rival y compañero por separado. Si el juego no los desdobla (FC26),
+    // queda un solo lado de CPU.
+    case 'cpu_both':
+      return cpuTeammate ? [cpu, cpuTeammate] : [cpu];
+    default:
+      return [user, cpu];
+  }
+}
 
 const lines = [
   '-- GENERADO POR scripts/build-seed.mjs — no editar a mano.',
@@ -19,47 +38,41 @@ const lines = [
   '',
   'begin;',
   '',
+  '-- Juegos ------------------------------------------------------------------',
+  'insert into public.games (slug, name, release_year) values',
+  games.map((g) => `  (${q(g.slug)}, ${q(g.name)}, ${g.release_year})`).join(',\n'),
+  'on conflict (slug) do update',
+  '  set name = excluded.name, release_year = excluded.release_year;',
+  '',
+  '-- Sliders -----------------------------------------------------------------',
 ];
 
-lines.push('-- Juegos ------------------------------------------------------------------');
-lines.push('insert into public.games (slug, name, release_year) values');
-lines.push(
-  games
-    .map((g) => `  (${q(g.slug)}, ${q(g.name)}, ${g.release_year})`)
-    .join(',\n'),
-);
-lines.push('on conflict (slug) do update');
-lines.push('  set name = excluded.name, release_year = excluded.release_year;');
-lines.push('');
-
-lines.push('-- Sliders -----------------------------------------------------------------');
-
 const rows = [];
+const summary = [];
+
 for (const game of games) {
-  let sortOrder = 0;
+  const sliders = slidersByGame[game.slug] ?? [];
   const ordered = [...sliders].sort(
     (a, b) => categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category),
   );
 
+  let sortOrder = 0;
+  let gameRows = 0;
+
   for (const slider of ordered) {
-    // Un slider de la CPU va en el ámbito rival del juego: `cpu` en FC26,
-    // `cpu_opponent` en FC27.
-    const cpuScope = game.scopes.find((scope) => scope.startsWith('cpu'));
-    const scopes = slider.userOnly
-      ? ['user']
-      : slider.cpuOnly
-        ? [cpuScope].filter(Boolean)
-        : game.scopes;
-    for (const scope of scopes) {
+    for (const scope of scopesFor(slider, game)) {
       rows.push(
         `  ((select id from public.games where slug = ${q(game.slug)}), ` +
           `${q(slider.category)}, ${q(scope)}, ${q(slider.name)}, ${q(slider.slug)}, ` +
-          `${slider.min ?? DEFAULTS.min}, ${slider.max ?? DEFAULTS.max}, ` +
-          `${slider.default ?? DEFAULTS.default}, ${sortOrder})`,
+          `${slider.min ?? game.range.min}, ${slider.max ?? game.range.max}, ` +
+          `${slider.default ?? game.range.default}, ${sortOrder})`,
       );
+      gameRows += 1;
     }
     sortOrder += 10;
   }
+
+  summary.push(`${game.slug}: ${sliders.length} sliders → ${gameRows} filas`);
 }
 
 lines.push(
@@ -75,13 +88,11 @@ lines.push(
   '      default_value = excluded.default_value,',
   '      sort_order    = excluded.sort_order;',
   '',
+  '-- Limpieza: lo que ya no está en el catálogo -------------------------------',
 );
 
-// Sincroniza: lo que ya no está en el catálogo se borra, para que renombrar
-// un slug no deje sliders huérfanos colgando en la UI.
-lines.push('-- Limpieza de sliders que ya no están en el catálogo ---------------------');
 for (const game of games) {
-  const slugs = sliders.map((slider) => q(slider.slug)).join(', ');
+  const slugs = (slidersByGame[game.slug] ?? []).map((s) => q(s.slug)).join(', ');
   lines.push(
     'delete from public.slider_definitions',
     `where game_id = (select id from public.games where slug = ${q(game.slug)})`,
@@ -93,4 +104,5 @@ for (const game of games) {
 lines.push('commit;', '');
 
 writeFileSync(out, lines.join('\n'), 'utf8');
-console.log(`✓ ${rows.length} sliders para ${games.length} juegos → supabase/seed/01_catalog.sql`);
+console.log(`✓ ${rows.length} filas → supabase/seed/01_catalog.sql`);
+for (const line of summary) console.log(`  ${line}`);

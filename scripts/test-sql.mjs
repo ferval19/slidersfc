@@ -82,8 +82,34 @@ const count = async (db, sql) => (await db.query(sql)).rows[0].n;
 
   check('fc26 tiene 50 sliders', 50 === await count(db,
     `select count(*)::int as n from slider_definitions d join games g on g.id = d.game_id where g.slug = 'fc26'`));
-  check('fc27 tiene 71 sliders', 71 === await count(db,
+  check('fc27 tiene 121 filas de slider', 121 === await count(db,
     `select count(*)::int as n from slider_definitions d join games g on g.id = d.game_id where g.slug = 'fc27'`));
+
+  // FC27 desdobla CPU rival y compañero sólo en los de comportamiento de la
+  // CPU; los de jugabilidad son usuario / CPU rival.
+  const fc27Teammate = await db.query(`
+    select distinct d.category
+    from slider_definitions d join games g on g.id = d.game_id
+    where g.slug = 'fc27' and d.applies_to = 'cpu_teammate'
+  `);
+  check(
+    'en fc27 sólo los controles de la CPU tienen lado de compañero',
+    fc27Teammate.rows.length === 1 && fc27Teammate.rows[0].category === 'cpu_controls',
+    JSON.stringify(fc27Teammate.rows.map((r) => r.category)),
+  );
+
+  const ranges = await db.query(`
+    select distinct g.slug, d.min_value, d.max_value
+    from slider_definitions d join games g on g.id = d.game_id
+    order by g.slug
+  `);
+  check(
+    'fc27 usa 1-99 y fc26 0-100',
+    ranges.rows.length === 2 &&
+      ranges.rows.some((r) => r.slug === 'fc27' && r.min_value === 1 && r.max_value === 99) &&
+      ranges.rows.some((r) => r.slug === 'fc26' && r.min_value === 0 && r.max_value === 100),
+    JSON.stringify(ranges.rows),
+  );
   check('el set de inicio queda publicado', 1 === await count(db,
     `select count(*)::int as n from slider_sets where is_published`));
   check('con los 50 valores', 50 === await count(db,

@@ -2,15 +2,20 @@
 
 Estado: MVP funcionando. Fecha de este corte: 12/09/2026.
 
-## El contexto que ordena todo lo demás
+## El calendario que ordena todo lo demás
 
-Si FC27 sale a finales de septiembre como los anteriores, quedan **unas dos
-semanas** para el único momento del año en que este nicho tiene un pico real de
-búsquedas: la semana del lanzamiento, cuando a todo el mundo se le queda
-obsoleto su set y sale a buscar uno nuevo.
+| Fecha | Qué |
+| --- | --- |
+| **18/09** | Acceso anticipado a FC27: se puede ver el menú de sliders definitivo |
+| **25/09** | Lanzamiento de FC27 |
+
+El pico anual de búsquedas de este nicho es la semana del 25, cuando a todo el
+mundo se le queda obsoleto su set. Quedan **13 días**, y el catálogo de FC27 ya
+no es una incógnita bloqueante: tiene fecha propia el 18 y es una tarde de
+comprobar nombres, no de investigar.
 
 Eso convierte la prioridad en una pregunta sola: **¿qué tiene que estar listo
-para que esa semana cuente?** Lo que no responda a eso, espera.
+para el 25?** Lo que no responda a eso, espera.
 
 ## El criterio de priorización
 
@@ -39,7 +44,7 @@ Presupuesto realista: unas 10 tardes. Es todo lo que hay.
 | 1 | **SMTP propio** (Resend, Brevo, SES) | Bloqueante. El SMTP de serie de Supabase da unos pocos correos **por hora y por proyecto**: con él, dos personas registrándose a la vez dejan fuera al resto | 1 tarde |
 | 2 | **Acceso con X** | Bloqueante de hecho: tu audiencia ya está en X y así nadie depende del correo. El botón está hecho, falta activar el proveedor | 1 hora |
 | 3 | **Quitar Deployment Protection** y dominio propio | Ahora mismo la web sólo la ves tú | 30 min |
-| 4 | **Verificar el catálogo de FC27** con el juego delante | El de FC27 es hoy una copia del de FC26. Nombres mal = pierdes credibilidad ante justo la gente que se fija | 1 tarde (depende del juego) |
+| 4 | **Confirmar el catálogo de FC27** con el juego delante | Ya está cargado a partir de las Pitch Notes de EA y del listado de fifauteam: 61 sliders, 121 filas. Falta cotejar los nombres del menú en español y el rango 1-99. Nombres mal = pierdes credibilidad ante justo la gente que se fija | 1 tarde, el **18/09** |
 | 5 | **Modo consola** | *La* función de retorno. Un set se usa con el móvil en la mano navegando menús en la tele: vista móvil, orden del menú del juego, números grandes y una marca por slider según los metes. Nadie más lo hace | 2 tardes |
 | 6 | **Importar set desde texto pegado** | La diferencia entre 2 y 15 sets el día del lanzamiento. La gente ya tiene sus sliders en Notion, en una captura o en un hilo; pegarlos y mapearlos al catálogo convierte 15 minutos de formulario en 30 segundos | 2 tardes |
 | 7 | **Mínimos de moderación**: borrar tu propio comentario, reportar, límite de ritmo | La acción de borrar ya existe pero no tiene interfaz. Sin esto, el primer troll es un problema manual | 1 tarde |
@@ -86,10 +91,30 @@ Decirlo explícitamente ahorra discusiones después.
 | Riesgo | Impacto | Qué hacer |
 | --- | --- | --- |
 | **La semilla de autores no cuaja** | Alto: sin sets ajenos, la web es un publicador de una sola persona | El importador (6) baja el coste de publicar. Habla con los 5-10 antes del lanzamiento, no después |
-| **FC27 cambia los sliders más de lo previsto** | Medio: catálogo mal el día clave | (4) con el juego delante. El catálogo se regenera con un fichero y un comando, está preparado para eso |
-| **La fecha de FC27 no es la que supongo** | Medio: el plan entero cuelga de eso | Confírmala. Si hay más margen, sube (9) y (15) a Ahora |
+| **Los nombres del catálogo de FC27 no son los del menú** | Bajo ya: la estructura está y cuadra con las cifras de EA (+23 y +9 frente a los +25 y +10 anunciados). Lo que falta son los rótulos | (4) el 18/09. Se corrigen en `catalog.mjs` y se regenera |
 | **El SMTP se queda corto en el pico** | Alto: nadie entra el día que más gente llega | Con (2) el correo deja de ser el único camino |
 | **Trabajas solo y a ratos** | Alto: 10 tardes es el techo | Si algo entra en Ahora, algo sale. El orden de la tabla ya es el orden de recorte: de abajo hacia arriba |
+
+## Nota sobre el catálogo de FC27
+
+Está cargado ya, pero **es preliminar**: reconstruido antes del lanzamiento a
+partir de las Pitch Notes de EA y del listado publicado por fifauteam. Lo que
+sé y lo que no:
+
+**Fiable** — la estructura. EA anuncia 25 sliders de jugabilidad y 10 de CPU
+nuevos, y el listado da +23 y +9 frente a FC26: cuadra. Y confirma el desdoble
+**CPU rival / CPU compañero**, que sólo afecta a los de comportamiento de la
+CPU: los de jugabilidad siguen siendo usuario / CPU rival. Eso corrige lo que
+había antes, que daba tres lados a todos los sliders.
+
+**Por confirmar el 18/09** — los rótulos exactos del menú en español (los he
+traducido yo: «tiro colocado» para *finesse*, «contención» para *jockey*,
+«faltas tácticas» para *professional*…), si falta algún slider, y si el rango
+es 1-99 como dice la fuente. FC26 se queda en 0-100 hasta tener evidencia de
+lo contrario.
+
+Los slugs son lo que no conviene cambiar después; los nombres se corrigen en
+`supabase/seed/catalog.mjs` y se regenera con un comando.
 
 ## Lo que ya está bien y no hay que tocar
 
