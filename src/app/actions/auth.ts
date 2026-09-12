@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 
 import { authErrorMessage } from '@/lib/auth-errors';
 import { getSiteOrigin, safeNextPath } from '@/lib/site-url';
+import { isProviderEnabled } from '@/lib/supabase/providers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export type AuthFormState = { error?: string; sent?: string };
@@ -78,6 +79,17 @@ export async function verifyEmailCode(
 
 export async function signInWithTwitter(formData: FormData) {
   const next = safeNextPath(formData.get('next'));
+
+  // Se comprueba antes de salir del sitio: con el proveedor desactivado,
+  // Supabase responde un 400 crudo y la persona se queda sin vuelta atrás.
+  if (!(await isProviderEnabled('twitter'))) {
+    redirect(
+      `/login?error=${encodeURIComponent(
+        'El acceso con X no está activado todavía. Entra con tu correo mientras tanto.',
+      )}&next=${encodeURIComponent(next)}`,
+    );
+  }
+
   const supabase = await createSupabaseServerClient();
   const origin = await getSiteOrigin();
 

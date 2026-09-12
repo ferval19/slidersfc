@@ -48,8 +48,20 @@ En **Authentication → Providers**:
 
 - **Email**: activado por defecto. La app usa magic link, sin contraseñas.
 - **Twitter (X)**: actívalo y pega el API Key / API Secret de tu app de
-  developer.x.com. En la app de X, la callback URL es
-  `https://<tu-proyecto>.supabase.co/auth/v1/callback`.
+  developer.x.com. Ojo: el proveedor de Supabase usa **OAuth 1.0a**, así que
+  son la *API Key* y la *API Secret*, no el client id/secret de OAuth 2.0.
+
+  En la app de X:
+  - Callback URL: `https://<tu-proyecto>.supabase.co/auth/v1/callback`
+  - Website URL: tu dominio
+  - Activa **«Request email address from users»**. Sin eso, X no devuelve
+    correo, la cuenta se crea sin él y Supabase no puede enlazarla con una
+    cuenta que ya exista con el mismo correo: saldrían dos usuarios distintos.
+
+  Mientras el proveedor esté desactivado, el botón no te saca del sitio: la
+  aplicación lo comprueba antes (`src/lib/supabase/providers.ts`) porque
+  `/auth/v1/authorize` responde un 400 crudo y dejaría a la persona tirada en
+  una página de error de Supabase.
 
 En **Authentication → URL Configuration**, añade a *Redirect URLs*:
 
