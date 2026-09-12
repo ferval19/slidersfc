@@ -1,3 +1,4 @@
+import { orderCategories } from '@/lib/category-order';
 import { sortScopes } from '@/lib/constants';
 import { groupDefinitions, type SetDetail } from '@/lib/queries';
 import type { SliderScope } from '@/lib/database.types';
@@ -120,25 +121,3 @@ export function buildSetView(detail: SetDetail, currentUserId: string | null): S
   };
 }
 
-/**
- * Ordena las categorías por el `sort_order` más bajo de sus sliders, que es
- * como están en el menú del juego. Antes había una lista fija repetida en la
- * aplicación, que podía desviarse del catálogo sin que se notara.
- */
-export function orderCategories(
-  definitions: { category: string; sort_order: number }[],
-  categories: string[],
-) {
-  const first = new Map<string, number>();
-
-  for (const definition of definitions) {
-    const current = first.get(definition.category);
-    if (current === undefined || definition.sort_order < current) {
-      first.set(definition.category, definition.sort_order);
-    }
-  }
-
-  return [...categories].sort(
-    (a, b) => (first.get(a) ?? Number.MAX_SAFE_INTEGER) - (first.get(b) ?? Number.MAX_SAFE_INTEGER),
-  );
-}

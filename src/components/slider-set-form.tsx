@@ -6,7 +6,7 @@ import type { SetFormState } from '@/app/actions/sets';
 import { CATEGORY_DRAWINGS } from '@/components/chalk';
 import { ScaleLegend, ScaleTrack } from '@/components/slider-scale';
 import { categoryLabel, SCOPE_INK, SCOPE_LABELS, sortScopes } from '@/lib/constants';
-import { orderCategories } from '@/lib/set-view';
+import { orderCategories } from '@/lib/category-order';
 import type { Game, SliderDefinition, SliderScope } from '@/lib/database.types';
 
 type Props = {
