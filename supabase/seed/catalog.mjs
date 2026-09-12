@@ -170,15 +170,24 @@ const fc27 = [
 
 export const slidersByGame = { fc26, fc27 };
 
-// Orden en el que se pintan las categorías en la UI y en el formulario.
+// Orden EXACTO del menú del juego. No es estético: la gente consulta un set
+// con el móvil en la mano mientras va metiendo los valores en la consola, así
+// que cualquier desvío les obliga a buscar.
+//
+// Fuente: el documento de Full Manual FG (que se escribió recorriendo el menú)
+// y el listado de fifauteam para FC27. Las dos coinciden.
+//
+// De aquí sale el `sort_order` de cada slider, y la aplicación ordena por ese
+// campo en lugar de repetir esta lista: si estuviera en dos sitios, acabarían
+// desincronizados.
 export const categoryOrder = [
   'speed',
   'shooting',
   'passing',
-  'ball_control',
-  'defending',
+  'injuries',
   'goalkeeping',
   'positioning',
-  'injuries',
+  'ball_control',
+  'defending',
   'cpu_controls',
 ];

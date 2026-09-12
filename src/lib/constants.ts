@@ -16,18 +16,6 @@ export const CATEGORY_LABELS: Record<string, string> = {
   cpu_controls: 'Controles de la CPU',
 };
 
-export const CATEGORY_ORDER = [
-  'speed',
-  'shooting',
-  'passing',
-  'ball_control',
-  'defending',
-  'goalkeeping',
-  'positioning',
-  'injuries',
-  'cpu_controls',
-];
-
 export const SCOPE_LABELS: Record<SliderScope, string> = {
   user: 'Usuario',
   cpu: 'CPU',
@@ -55,14 +43,6 @@ export const SCOPE_INK: Record<SliderScope, { hex: string; text: string; border:
 
 export function categoryLabel(category: string) {
   return CATEGORY_LABELS[category] ?? category;
-}
-
-export function sortCategories(categories: string[]) {
-  return [...categories].sort((a, b) => {
-    const ia = CATEGORY_ORDER.indexOf(a);
-    const ib = CATEGORY_ORDER.indexOf(b);
-    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
-  });
 }
 
 export function sortScopes(scopes: SliderScope[]) {

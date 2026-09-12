@@ -5,13 +5,8 @@ import { useActionState, useMemo, useState } from 'react';
 import type { SetFormState } from '@/app/actions/sets';
 import { CATEGORY_DRAWINGS } from '@/components/chalk';
 import { ScaleLegend, ScaleTrack } from '@/components/slider-scale';
-import {
-  categoryLabel,
-  SCOPE_INK,
-  SCOPE_LABELS,
-  sortCategories,
-  sortScopes,
-} from '@/lib/constants';
+import { categoryLabel, SCOPE_INK, SCOPE_LABELS, sortScopes } from '@/lib/constants';
+import { orderCategories } from '@/lib/set-view';
 import type { Game, SliderDefinition, SliderScope } from '@/lib/database.types';
 
 type Props = {
@@ -290,7 +285,7 @@ function buildBlocks(definitions: SliderDefinition[]) {
     rows.get(definition.slug)!.byScope[definition.applies_to] = definition;
   }
 
-  const blocks = sortCategories([...byCategory.keys()]).map((category) => ({
+  const blocks = orderCategories(definitions, [...byCategory.keys()]).map((category) => ({
     category,
     rows: [...byCategory.get(category)!.values()],
   }));

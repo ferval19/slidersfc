@@ -98,6 +98,29 @@ const count = async (db, sql) => (await db.query(sql)).rows[0].n;
     JSON.stringify(fc27Teammate.rows.map((r) => r.category)),
   );
 
+  // El orden del menú del juego: es lo que permite ir metiendo los valores
+  // mientras se consulta el set, así que se comprueba, no se supone.
+  const ORDEN_DEL_MENU = [
+    'speed', 'shooting', 'passing', 'injuries', 'goalkeeping',
+    'positioning', 'ball_control', 'defending', 'cpu_controls',
+  ];
+
+  for (const game of ['fc26', 'fc27']) {
+    const ordered = await db.query(`
+      select d.category, min(d.sort_order) as first
+      from slider_definitions d join games g on g.id = d.game_id
+      where g.slug = '${game}'
+      group by d.category
+      order by first
+    `);
+    const actual = ordered.rows.map((r) => r.category);
+    check(
+      `${game} sigue el orden del menú del juego`,
+      JSON.stringify(actual) === JSON.stringify(ORDEN_DEL_MENU),
+      actual.join(' → '),
+    );
+  }
+
   const ranges = await db.query(`
     select distinct g.slug, d.min_value, d.max_value
     from slider_definitions d join games g on g.id = d.game_id
