@@ -5,6 +5,11 @@ cada slider individual. Sub-marca de **Full Manual FG**.
 
 Stack: Next.js 16 (App Router, TypeScript, Tailwind v4) + Supabase (Postgres, Auth, RLS).
 
+- [Mapa del código](codemap.md) — qué hay dónde y las decisiones que no se deducen leyendo
+- [Dirección visual](docs/direccion-visual.md) — la pizarra del entrenador
+- [Hoja de ruta](docs/hoja-de-ruta.md) — qué viene y en qué orden
+- [Historial](#historial) — qué se ha hecho y por qué
+
 ---
 
 ## Puesta en marcha
@@ -164,31 +169,8 @@ npm run dev
 
 ## Estructura
 
-```
-src/
-  app/
-    page.tsx                  feed público con filtros
-    juegos/[slug]/            listado por juego
-    u/[username]/             perfil público
-    u/[username]/[slug]/      detalle: valores + comentarios por slider
-    u/[username]/[slug]/editar/       edición (sólo el dueño)
-    u/[username]/[slug]/opengraph-image.tsx   tarjeta para redes sociales
-    sets/nuevo/               creación
-    sets/[id]/                redirección permanente a la URL amigable
-    login/                    email + X
-    auth/callback|confirm/    vuelta de OAuth y de magic link
-    actions/                  Server Actions (sets, comentarios, auth)
-  components/                 UI
-  lib/
-    queries.ts                lecturas del servidor
-    set-view.ts               adapta el detalle del set a los Client Components
-    supabase/                 clientes (server, browser, sesión)
-supabase/
-  migrations/                 esquema + RLS + trigger de perfil
-  seed/catalog.mjs            catálogo de sliders (fuente de verdad)
-  seed/01_catalog.sql         generado desde catalog.mjs
-scripts/build-seed.mjs        generador del seed
-```
+Está en el [mapa del código](codemap.md), con las decisiones que no se deducen
+leyendo los ficheros. Aquí no se repite para que no se desvíe.
 
 ## Dirección visual
 
@@ -248,6 +230,119 @@ service role key.
 Vercel, importando el repo. Añade en el proyecto las mismas variables de
 `.env.local`, con `NEXT_PUBLIC_SITE_URL` apuntando al dominio real, y añade ese
 dominio a las Redirect URLs de Supabase.
+
+---
+
+## Historial
+
+Qué se ha ido haciendo y, sobre todo, **por qué**. Se actualiza conforme
+avanzamos; los detalles de implementación están en el
+[mapa del código](codemap.md).
+
+### 11–12/09/2026 · Del plan al MVP
+
+Arranca el proyecto desde un plan previo: Next.js + Supabase, sets de sliders
+con **comentarios anclados a cada valor**, que es el diferencial del producto.
+Esquema completo con RLS en las seis tablas, catálogo de sliders generado
+desde un único fichero, CRUD de sets, feed, perfiles y comentarios.
+
+Los dos documentos de referencia del plan no eran accesibles, así que el
+catálogo se montó con la lista canónica de EA FC. Resultó estar incompleto —
+ver más abajo.
+
+### 12/09 · Arreglos de arranque
+
+Cuatro fallos que impedían levantar la app, todos encontrados probándola de
+verdad:
+
+- `NEXT_PUBLIC_SITE_URL` presente pero **vacía** hacía `new URL('')` en el
+  layout: 500 en todas las páginas. `??` no captura la cadena vacía.
+- La URL de Supabase copiada del panel puede traer el sufijo `/rest/v1/`, y el
+  cliente añade esa ruta él mismo: *Invalid path specified in request URL*.
+  Ahora se normaliza.
+- El proxy leía el entorno fuera del `try`.
+- Los `catch` de lectura se tragaban las excepciones internas de Next.
+
+### 12/09 · SlidersFC y la pizarra táctica
+
+Cambio de nombre desde SliderXI. El primer diseño (negro y un acento) era la
+plantilla por defecto, así que se rehace partiendo del material propio: **la
+pizarra del entrenador**. Verde botella, tiza y trazo dibujado a mano.
+
+Lo que lo sostiene: los **tres rotuladores codifican el ámbito** del slider
+(tú / CPU compañero / CPU rival), y el elemento firma es **el regulador** — un
+valor se lee como posición en una escala, y las muescas de todos los ámbitos
+comparten carril, así que la forma de un set se ve de un vistazo.
+
+### 12/09 · El catálogo real de FC26 y fuera los modos
+
+Con el documento de Full Manual FG en mano, el catálogo de FC26 pasa a ser el
+real: **29 sliders en español**, no los 17 inventados en inglés. Y se carga el
+set «Full Manual FG v3.0» con sus 50 valores, con el crédito a @Shinogoblin.
+
+Se elimina el campo `mode`: los sliders sólo existen offline, así que no
+distinguía nada útil.
+
+### 12/09 · La saga del acceso
+
+Varias vueltas, todas por el mismo sitio: el correo.
+
+- `/auth/confirm` sólo miraba `token_hash`, pero la plantilla por defecto de
+  Supabase manda `?code=`. El enlace del correo caía siempre en error.
+- Los errores salían **en inglés**; se traducen todos por código y por texto.
+- Un usuario con sesión pero sin fila de perfil veía «Entrar» y `/login` lo
+  devolvía a la portada: **bucle sin salida**. El header pasa a mirar la
+  sesión, y `/perfil` repara el perfil si falta.
+- Supabase devuelve al *Site URL* cuando el `redirect_to` no está en la lista
+  blanca, así que `AuthRelay` recoge la vuelta **caiga donde caiga**.
+- Los escáneres de correo consumen el enlace antes que la persona
+  (`otp_expired` en el primer clic): se añade **código de 6 dígitos**.
+- Y finalmente **correo y contraseña**, que es lo que no depende del correo.
+
+### 12/09 · URLs amigables, compartir y favicon
+
+Los sets pasan de `/sets/<uuid>` a **`/u/<usuario>/<slug>`**, con el slug
+puesto por un trigger y estable aunque cambie el título. Botón de compartir,
+**tarjeta de OpenGraph** por set con sus valores dibujados a escala, y favicon
+SFC con la tipografía de la marca.
+
+Se descartó `/<usuario>/<slug>` a secas: choca con `/login`, `/perfil` y
+compañía, y obligaría a mantener una lista de nombres reservados.
+
+### 12/09 · Pruebas del SQL
+
+Tras dos errores de SQL descubiertos pegándolo en el panel de Supabase,
+`npm run test:sql` levanta un **Postgres en memoria** (PGlite) y ejecuta toda
+la cadena: migraciones, seeds, los caminos de error y la cobertura de RLS.
+
+### 12/09 · Modo consola y orden del menú
+
+El orden de las categorías que había era inventado: **cinco de nueve estaban
+mal**. El real sale del documento de Full Manual FG y se confirma después con
+el juego. No es estético — se consulta un set mientras se meten los valores.
+
+Y se añade el **modo consola**: una columna, números grandes, marca por slider
+con el progreso guardado, y bloqueo de pantalla.
+
+### 19/09 · FC27, del juego real
+
+Con el acceso anticipado, el catálogo de FC27 se rehace desde las capturas del
+menú: **61 sliders** con sus nombres y su orden reales. Los totales coincidían
+con la reconstrucción previa, pero casi nada más: «tiros de calidad» y no
+«colocado», «vaselina», «zapatazo», «brega»; varios sliders son de **altura**
+y no de velocidad; y el desdoble CPU rival / CPU de tu equipo resulta estar
+**sólo** en la pestaña de comportamiento de la CPU.
+
+Se carga también «Jugabilidad realista de FC27» con los 121 valores de fábrica,
+como referencia contra la que comparar cualquier set.
+
+### 19/09 · La imagen que no salía
+
+Compartir un set por WhatsApp no enseñaba imagen. Las metaetiquetas estaban,
+pero anunciaban `http://localhost:3000/...`: sin `NEXT_PUBLIC_SITE_URL` en
+Vercel, el origen caía a localhost. Ahora sale de una cascada que incluye las
+variables que Vercel pone solas. Y se añade una **imagen por defecto** para
+portada, juegos y perfiles, que no tenían ninguna.
 
 ---
 
