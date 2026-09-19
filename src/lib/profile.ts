@@ -19,12 +19,15 @@ export const BIO_MAX = 280;
 export const DISPLAY_NAME_MAX = 60;
 /** El límite de X, no nuestro. */
 export const TWITTER_MAX = 15;
+/** Tope de longitud de la URL del canal ya normalizada, no de lo que pega el usuario. */
+export const YOUTUBE_MAX = 200;
 
 export type ProfileFields = {
   username: string;
   display_name: string | null;
   bio: string | null;
   twitter_handle: string | null;
+  youtube_url: string | null;
   avatar_url: string | null;
 };
 
@@ -34,6 +37,7 @@ export type ProfileInput = {
   bio: string;
   twitterHandle: string;
   avatarUrl: string;
+  youtubeUrl: string;
 };
 
 /** Quita acentos: «José» → «jose», en vez de rechazarlo por carácter raro. */
@@ -69,6 +73,59 @@ export function normalizeTwitterHandle(raw: string) {
     .replace(/\/+$/, '');
 
   return withoutUrl.replace(/^@+/, '');
+}
+
+/**
+ * Reconoce un canal de YouTube en cualquiera de las formas en que la gente
+ * lo pega: el enlace entero (con o sin `www.`/`m.`, con o sin subrutas como
+ * `/videos` o `?sub_confirmation=1`), o sólo el `@handle` —con o sin arroba—.
+ * También admite los formatos antiguos `/channel/UC...`, `/c/...` y
+ * `/user/...`.
+ *
+ * Devuelve:
+ *   - `null` si la entrada está vacía (no hay canal que guardar).
+ *   - la URL canónica (`https://www.youtube.com/...`) si la reconoce.
+ *   - `undefined` si hay texto pero no es un canal reconocible —incluye los
+ *     enlaces a un vídeo suelto (`youtu.be/...`, `.../watch?v=...`), que no
+ *     son un canal— para que `validateProfile` lo distinga de «vacío».
+ */
+export function normalizeYoutube(raw: string): string | null | undefined {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+
+  // Una palabra suelta, con o sin arroba y sin barras ni puntos: se asume
+  // que es el handle tal cual, como cuando se pega sólo el nombre de usuario.
+  if (!trimmed.includes('/') && !trimmed.includes('.')) {
+    const handle = trimmed.replace(/^@+/, '');
+    return /^[A-Za-z0-9._-]{3,30}$/.test(handle)
+      ? `https://www.youtube.com/@${handle}`
+      : undefined;
+  }
+
+  // A partir de aquí se trata como una URL, con protocolo o sin él.
+  let url: URL;
+  try {
+    url = new URL(/^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`);
+  } catch {
+    return undefined;
+  }
+
+  const host = url.hostname.toLowerCase().replace(/^(?:www|m)\./, '');
+  // youtu.be siempre enlaza a un vídeo, nunca a un canal.
+  if (host !== 'youtube.com') return undefined;
+
+  const path = url.pathname.replace(/\/+$/, '');
+
+  // /watch?v=... es un vídeo, no un canal.
+  if (path === '/watch') return undefined;
+
+  const handleMatch = path.match(/^\/@([A-Za-z0-9._-]{3,30})(?:\/.*)?$/);
+  if (handleMatch) return `https://www.youtube.com/@${handleMatch[1]}`;
+
+  const legacyMatch = path.match(/^\/(channel|c|user)\/([A-Za-z0-9._-]{1,100})$/i);
+  if (legacyMatch) return `https://www.youtube.com/${legacyMatch[1].toLowerCase()}/${legacyMatch[2]}`;
+
+  return undefined;
 }
 
 function emptyToNull(text: string) {
@@ -117,6 +174,14 @@ export function validateProfile(
     return { error: 'La cuenta de X sólo admite letras, números y guión bajo (15 como mucho).' };
   }
 
+  const youtubeUrl = normalizeYoutube(input.youtubeUrl);
+  if (youtubeUrl === undefined) {
+    return { error: 'El canal de YouTube no se reconoce. Pega el enlace de tu canal o tu @nombre.' };
+  }
+  if (youtubeUrl && youtubeUrl.length > YOUTUBE_MAX) {
+    return { error: 'El enlace del canal es demasiado largo.' };
+  }
+
   const avatarUrl = emptyToNull(input.avatarUrl);
   const unchanged = avatarUrl !== null && avatarUrl === options.currentAvatarUrl;
   if (avatarUrl && !unchanged && !avatarUrl.startsWith(options.avatarPrefix)) {
@@ -129,6 +194,7 @@ export function validateProfile(
       display_name: displayName,
       bio,
       twitter_handle: twitterHandle,
+      youtube_url: youtubeUrl,
       avatar_url: avatarUrl,
     },
   };

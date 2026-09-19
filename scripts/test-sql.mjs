@@ -28,6 +28,7 @@ const MIGRATIONS = [
   'supabase/migrations/20260912090000_drop_mode.sql',
   'supabase/migrations/20260912140000_set_slugs.sql',
   'supabase/migrations/20260919160000_username_history.sql',
+  'supabase/migrations/20260919180000_profile_youtube.sql',
 ];
 const CATALOG = 'supabase/seed/01_catalog.sql';
 const STARTER_SET = 'supabase/seed/02_set_full_manual_fg.sql';
@@ -370,6 +371,34 @@ await (await expectFailure(
     'tocar la biografía no toca el historial',
     antes === (await count(db, `select count(*)::int as n from public.username_history`)),
   );
+
+  await db.close();
+}
+
+// --- Canal de YouTube en el perfil -----------------------------------------
+{
+  const db = await freshDatabase({ withCatalog: false });
+  const me = (await db.query(`select id from auth.users where email = '${EMAIL}'`)).rows[0].id;
+
+  await db.exec(
+    `update public.profiles set youtube_url = 'https://www.youtube.com/@FullManualFG' where id = '${me}'`,
+  );
+  check(
+    'un canal de YouTube se guarda',
+    1 === (await count(db, `select count(*)::int as n from public.profiles where youtube_url is not null`)),
+  );
+
+  // La aplicación normaliza antes de guardar; esto es la red por debajo.
+  let rejected = false;
+  try {
+    await db.exec(`update public.profiles set youtube_url = 'https://vimeo.com/x' where id = '${me}'`);
+  } catch {
+    rejected = true;
+  }
+  check('un enlace que no es de YouTube lo rechaza la base', rejected);
+
+  await db.exec(`update public.profiles set youtube_url = null where id = '${me}'`);
+  check('se puede dejar vacío', true);
 
   await db.close();
 }

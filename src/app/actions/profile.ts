@@ -37,6 +37,7 @@ export async function updateProfile(
       displayName: String(formData.get('display_name') ?? ''),
       bio: String(formData.get('bio') ?? ''),
       twitterHandle: String(formData.get('twitter_handle') ?? ''),
+      youtubeUrl: String(formData.get('youtube_url') ?? ''),
       avatarUrl: String(formData.get('avatar_url') ?? ''),
     },
     {

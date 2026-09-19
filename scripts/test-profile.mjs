@@ -10,7 +10,12 @@
  * seguridad: que la foto no pueda apuntar a un servidor ajeno.
  */
 
-import { normalizeTwitterHandle, normalizeUsername, validateProfile } from '../src/lib/profile.ts';
+import {
+  normalizeTwitterHandle,
+  normalizeUsername,
+  normalizeYoutube,
+  validateProfile,
+} from '../src/lib/profile.ts';
 
 const PREFIX = 'https://tsvupvrlpbbskjvpzgfl.supabase.co/storage/v1/object/public/avatars/';
 
@@ -21,7 +26,14 @@ function check(label, ok, detail = '') {
   if (!ok) failures += 1;
 }
 
-const base = { username: 'fullmanualfg', displayName: '', bio: '', twitterHandle: '', avatarUrl: '' };
+const base = {
+  username: 'fullmanualfg',
+  displayName: '',
+  bio: '',
+  twitterHandle: '',
+  avatarUrl: '',
+  youtubeUrl: '',
+};
 const run = (input, options = {}) =>
   validateProfile({ ...base, ...input }, { avatarPrefix: PREFIX, ...options });
 
@@ -79,6 +91,89 @@ check(
     { currentAvatarUrl: 'https://pbs.twimg.com/profile_images/1.jpg' },
   ),
 );
+
+// --- Canal de YouTube -----------------------------------------------------
+check('vacío es null', normalizeYoutube('') === null);
+check('sólo espacios es null', normalizeYoutube('   ') === null);
+check('con arroba', normalizeYoutube('@FullManualFG') === 'https://www.youtube.com/@FullManualFG');
+check(
+  'texto suelto sin barras ni puntos se asume como handle',
+  normalizeYoutube('FullManualFG') === 'https://www.youtube.com/@FullManualFG',
+);
+check('sin protocolo', normalizeYoutube('youtube.com/@xyz') === 'https://www.youtube.com/@xyz');
+check('con www', normalizeYoutube('www.youtube.com/@xyz') === 'https://www.youtube.com/@xyz');
+check('con http', normalizeYoutube('http://youtube.com/@xyz') === 'https://www.youtube.com/@xyz');
+check(
+  'con el subdominio móvil',
+  normalizeYoutube('https://m.youtube.com/@xyz') === 'https://www.youtube.com/@xyz',
+);
+check(
+  'quita la subruta /videos',
+  normalizeYoutube('https://www.youtube.com/@xyz/videos') === 'https://www.youtube.com/@xyz',
+);
+check(
+  'quita ?sub_confirmation=1',
+  normalizeYoutube('https://www.youtube.com/@xyz?sub_confirmation=1') === 'https://www.youtube.com/@xyz',
+);
+check(
+  'quita la barra final',
+  normalizeYoutube('https://www.youtube.com/@xyz/') === 'https://www.youtube.com/@xyz',
+);
+check(
+  'formato /channel/UC...',
+  normalizeYoutube('https://www.youtube.com/channel/UCabc123') ===
+    'https://www.youtube.com/channel/UCabc123',
+);
+check(
+  'formato /c/...',
+  normalizeYoutube('https://www.youtube.com/c/NombreCanal') === 'https://www.youtube.com/c/NombreCanal',
+);
+check(
+  'formato /user/...',
+  normalizeYoutube('https://www.youtube.com/user/NombreViejo') ===
+    'https://www.youtube.com/user/NombreViejo',
+);
+
+check(
+  'un vídeo de youtu.be se rechaza (no es un canal)',
+  normalizeYoutube('https://youtu.be/dQw4w9WgXcQ') === undefined,
+);
+check(
+  'un vídeo con /watch se rechaza (no es un canal)',
+  normalizeYoutube('https://www.youtube.com/watch?v=dQw4w9WgXcQ') === undefined,
+);
+check('otro dominio se rechaza', normalizeYoutube('https://vimeo.com/x') === undefined);
+check('twitch tampoco vale', normalizeYoutube('https://twitch.tv/x') === undefined);
+check('un dominio cualquiera se rechaza', normalizeYoutube('https://ejemplo.com') === undefined);
+check('una arroba sola se rechaza', normalizeYoutube('@') === undefined);
+check(
+  'un identificador demasiado corto se rechaza',
+  normalizeYoutube('@ab') === undefined,
+);
+
+check(
+  'validateProfile devuelve el error del canal con una entrada mala',
+  'error' in run({ youtubeUrl: '@ab' }),
+);
+{
+  const result = run({ youtubeUrl: '@FullManualFG' });
+  check(
+    'validateProfile devuelve la URL canónica en fields.youtube_url',
+    'fields' in result && result.fields.youtube_url === 'https://www.youtube.com/@FullManualFG',
+  );
+}
+{
+  const result = run({ youtubeUrl: '@FullManualFG' });
+  check(
+    'un canal válido no rompe el resto de campos',
+    'fields' in result &&
+      result.fields.username === 'fullmanualfg' &&
+      result.fields.display_name === null &&
+      result.fields.bio === null &&
+      result.fields.twitter_handle === null &&
+      result.fields.avatar_url === null,
+  );
+}
 
 console.log('');
 if (failures > 0) {

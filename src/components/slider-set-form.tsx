@@ -1,11 +1,12 @@
 'use client';
 
-import { useActionState, useMemo, useState } from 'react';
+import { memo, useActionState, useCallback, useMemo, useState } from 'react';
 
 import type { SetFormState } from '@/app/actions/sets';
 import { CATEGORY_DRAWINGS } from '@/components/chalk';
 import { ImportPanel } from '@/components/import-panel';
-import { ScaleLegend, ScaleTrack } from '@/components/slider-scale';
+import { SliderControl } from '@/components/slider-control';
+import { ScaleLegend } from '@/components/slider-scale';
 import { categoryLabel, SCOPE_INK, SCOPE_LABELS, sortScopes } from '@/lib/constants';
 import { orderCategories } from '@/lib/category-order';
 import type { Game, SliderDefinition, SliderScope } from '@/lib/database.types';
@@ -39,6 +40,7 @@ export function SliderSetForm({
   const [state, formAction, pending] = useActionState(action, initialState);
 
   const [gameId, setGameId] = useState<number>(initial?.gameId ?? games[0]?.id ?? 0);
+  const [folded, setFolded] = useState<ReadonlySet<string>>(new Set());
   const [values, setValues] = useState<Record<string, number>>(() => {
     if (initial) return initial.values;
     return defaultsFor(definitionsByGame[String(games[0]?.id ?? '')] ?? []);
@@ -51,23 +53,30 @@ export function SliderSetForm({
 
   const { scopes, blocks } = useMemo(() => buildBlocks(definitions), [definitions]);
 
+  /**
+   * Si el juego trae preajuste de fábrica. Cuando todos los valores por
+   * defecto son iguales es el neutro del menú, y dibujar una referencia ahí
+   * sería inventársela.
+   */
+  const hasReference = useMemo(
+    () => new Set(definitions.map((definition) => definition.default_value)).size > 1,
+    [definitions],
+  );
+
   const changeGame = (nextGameId: number) => {
     setGameId(nextGameId);
     setValues(defaultsFor(definitionsByGame[String(nextGameId)] ?? []));
   };
 
-  const setValue = (definitionId: number, raw: string, min: number, max: number) => {
-    const parsed = Number(raw);
-    const next = Number.isFinite(parsed) ? Math.min(max, Math.max(min, Math.round(parsed))) : min;
+  // Estable a propósito: es lo que permite que `SliderRow` esté memorizada y
+  // que arrastrar un regulador no repinte los otros ciento veintiuno.
+  const setValue = useCallback((definitionId: number, next: number) => {
     setValues((previous) => ({ ...previous, [String(definitionId)]: next }));
-  };
+  }, []);
 
   return (
     <form action={formAction} className="flex flex-col gap-10">
       <input type="hidden" name="game_id" value={gameId} />
-      {Object.entries(values).map(([definitionId, value]) => (
-        <input key={definitionId} type="hidden" name={`v_${definitionId}`} value={value} />
-      ))}
 
       {/* Metadatos del set */}
       <section className="panel flex flex-col gap-5 p-5 sm:p-6">
@@ -133,6 +142,19 @@ export function SliderSetForm({
             <ScaleLegend scopes={scopes} labels={SCOPE_LABELS} />
             <button
               type="button"
+              onClick={() =>
+                setFolded((previous) =>
+                  previous.size === blocks.length
+                    ? new Set()
+                    : new Set(blocks.map((block) => block.category)),
+                )
+              }
+              className="btn btn-quiet"
+            >
+              {folded.size === blocks.length ? 'Desplegar todo' : 'Plegar todo'}
+            </button>
+            <button
+              type="button"
               onClick={() => setValues(defaultsFor(definitions))}
               className="btn btn-quiet"
             >
@@ -148,85 +170,43 @@ export function SliderSetForm({
 
         {blocks.map((block) => {
           const Drawing = CATEGORY_DRAWINGS[block.category as keyof typeof CATEGORY_DRAWINGS];
+          const isFolded = folded.has(block.category);
 
           return (
             <div key={block.category}>
-              <header className="flex items-center gap-3 border-b border-chalk-line pb-3">
-                {Drawing ? <Drawing className="size-7 text-chalk-dim" /> : null}
+              <button
+                type="button"
+                onClick={() =>
+                  setFolded((previous) => {
+                    const next = new Set(previous);
+                    if (!next.delete(block.category)) next.add(block.category);
+                    return next;
+                  })
+                }
+                aria-expanded={!isFolded}
+                className="flex w-full items-center gap-3 border-b border-chalk-line pb-3 text-left transition-colors hover:text-ink-user"
+              >
+                {Drawing ? <Drawing className="size-7 shrink-0 text-chalk-dim" /> : null}
                 <h3 className="display text-2xl">{categoryLabel(block.category)}</h3>
-              </header>
+                <span className="eyebrow ml-auto">{block.rows.length}</span>
+                <span aria-hidden className={`text-xs transition-transform ${isFolded ? '' : 'rotate-90'}`}>
+                  ▶
+                </span>
+              </button>
 
-              <ul>
-                {block.rows.map((row) => {
-                  const marks = scopes
-                    .map((scope) => {
-                      const definition = row.byScope[scope];
-                      if (!definition) return null;
-                      return {
-                        scope,
-                        value: values[String(definition.id)] ?? definition.default_value,
-                      };
-                    })
-                    .filter((mark): mark is { scope: SliderScope; value: number } => mark !== null);
-
-                  return (
-                    <li
-                      key={row.slug}
-                      className="grid items-center gap-x-5 gap-y-1 border-b border-chalk-line/60 py-2.5 last:border-b-0 sm:grid-cols-[minmax(8rem,14rem)_1fr_auto]"
-                    >
-                      <span className="text-sm leading-tight font-semibold">{row.name}</span>
-
-                      {/* La misma marca gris que en la ficha: mientras editas
-                          ves cuánto te separas de lo que trae el juego. */}
-                      <ScaleTrack
-                        min={0}
-                        max={100}
-                        marks={marks}
-                        reference={row.byScope.user?.default_value ?? null}
-                        className="min-w-32"
-                      />
-
-                      <div className="flex items-center gap-1.5">
-                        {scopes.map((scope) => {
-                          const definition = row.byScope[scope];
-
-                          if (!definition) {
-                            return (
-                              <span
-                                key={scope}
-                                className="w-14 text-center text-sm text-chalk-dim/40"
-                                title={`${SCOPE_LABELS[scope]}: no aplica`}
-                              >
-                                —
-                              </span>
-                            );
-                          }
-
-                          return (
-                            <input
-                              key={scope}
-                              type="number"
-                              inputMode="numeric"
-                              min={definition.min_value}
-                              max={definition.max_value}
-                              value={values[String(definition.id)] ?? definition.default_value}
-                              onChange={(event) =>
-                                setValue(
-                                  definition.id,
-                                  event.target.value,
-                                  definition.min_value,
-                                  definition.max_value,
-                                )
-                              }
-                              aria-label={`${row.name} — ${SCOPE_LABELS[scope]}`}
-                              className={`field value-pill w-14 px-1 py-1.5 text-center ${SCOPE_INK[scope].text}`}
-                            />
-                          );
-                        })}
-                      </div>
-                    </li>
-                  );
-                })}
+              {/* Plegar esconde, no desmonta: un regulador desmontado deja de
+                  enviarse con el formulario y su valor se perdería. */}
+              <ul hidden={isFolded}>
+                {block.rows.map((row) => (
+                  <SliderRow
+                    key={row.slug}
+                    row={row}
+                    scopes={scopes}
+                    values={values}
+                    hasReference={hasReference}
+                    onChange={setValue}
+                  />
+                ))}
               </ul>
             </div>
           );
@@ -270,6 +250,66 @@ export function SliderSetForm({
 }
 
 // ---------------------------------------------------------------------------
+
+/**
+ * Una fila memorizada.
+ *
+ * El comparador mira sólo los valores de ESTA fila. Sin él, arrastrar un
+ * regulador repintaría los ciento veintidós del formulario en cada píxel del
+ * gesto, y en un móvil eso se nota.
+ */
+const SliderRow = memo(
+  function SliderRow({
+    row,
+    scopes,
+    values,
+    hasReference,
+    onChange,
+  }: {
+    row: FormRow;
+    scopes: SliderScope[];
+    values: Record<string, number>;
+    hasReference: boolean;
+    onChange: (definitionId: number, value: number) => void;
+  }) {
+    return (
+      <li className="grid gap-x-6 gap-y-1.5 border-b border-chalk-line/60 py-3.5 last:border-b-0 sm:grid-cols-[minmax(8rem,12rem)_1fr]">
+        <span className="pt-1 text-sm leading-tight font-semibold">{row.name}</span>
+
+        <div className="flex flex-col gap-1.5">
+          {scopes.map((scope) => {
+            const definition = row.byScope[scope];
+            if (!definition) return null;
+
+            return (
+              <SliderControl
+                key={scope}
+                name={`v_${definition.id}`}
+                label={SCOPE_LABELS[scope]}
+                ariaLabel={`${row.name} — ${SCOPE_LABELS[scope]}`}
+                value={values[String(definition.id)] ?? definition.default_value}
+                min={definition.min_value}
+                max={definition.max_value}
+                reference={hasReference ? definition.default_value : null}
+                ink={SCOPE_INK[scope].hex}
+                onChange={(next) => onChange(definition.id, next)}
+              />
+            );
+          })}
+        </div>
+      </li>
+    );
+  },
+  (previous, next) =>
+    previous.row === next.row &&
+    previous.scopes === next.scopes &&
+    previous.hasReference === next.hasReference &&
+    previous.onChange === next.onChange &&
+    Object.values(previous.row.byScope).every(
+      (definition) =>
+        previous.values[String(definition.id)] === next.values[String(definition.id)],
+    ),
+);
 
 function defaultsFor(definitions: SliderDefinition[]) {
   const values: Record<string, number> = {};

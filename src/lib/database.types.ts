@@ -19,6 +19,7 @@ export type Profile = {
   display_name: string | null;
   avatar_url: string | null;
   twitter_handle: string | null;
+  youtube_url: string | null;
   bio: string | null;
   created_at: string;
 };
@@ -87,7 +88,7 @@ export type Database = {
         Row: Profile;
         Insert: Insert<
           Profile,
-          'created_at' | 'display_name' | 'avatar_url' | 'twitter_handle' | 'bio'
+          'created_at' | 'display_name' | 'avatar_url' | 'twitter_handle' | 'youtube_url' | 'bio'
         >;
         Update: Partial<Profile>;
         Relationships: [];

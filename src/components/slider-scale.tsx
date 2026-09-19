@@ -13,11 +13,13 @@ function positionIn(min: number, max: number) {
 
 /**
  * El carril con sus marcas cada 25 y, detrás de todo, lo que trae el juego de
- * fábrica. Lo comparten el regulador de un set y el de una comparación: cuando
- * esto estaba copiado en dos sitios, era cuestión de tiempo que uno se
- * desviara del otro.
+ * fábrica. Lo comparten los tres sitios donde se dibuja una escala: la ficha
+ * de un set, la comparación y el regulador que se arrastra al crear un set.
+ * Cuando esto estaba copiado, era cuestión de tiempo que uno se desviara.
+ *
+ * Va siempre dentro de un contenedor `relative`.
  */
-function ScaleRail({
+export function ScaleRail({
   min,
   max,
   reference,

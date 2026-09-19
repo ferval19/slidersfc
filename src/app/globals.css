@@ -204,6 +204,103 @@ body::after {
     border-color: #f2efe470;
   }
 
+  /* --- El regulador de verdad ----------------------------------------- */
+
+  /*
+   * Un `input type="range"` nativo, vestido de tiza.
+   *
+   * Nativo y no un arrastre propio: así vienen gratis el teclado (flechas,
+   * inicio/fin), el lector de pantalla, y el gesto que más importa en el
+   * móvil — tocar en cualquier punto del carril lleva la muesca ahí, sin
+   * tener que acertarle al pulgar.
+   *
+   * El carril lo dibuja el contenedor (el filete de tiza y la marca de
+   * fábrica van detrás); aquí el fondo es transparente a propósito. La altura
+   * de 44 px es zona táctil, no adorno: lo que se ve es una muesca de 4 px.
+   */
+  .slider-input {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 44px;
+    background: transparent;
+    cursor: pointer;
+    touch-action: pan-y;
+  }
+  .slider-input:focus {
+    outline: none;
+  }
+
+  .slider-input::-webkit-slider-runnable-track {
+    height: 44px;
+    background: transparent;
+  }
+  .slider-input::-moz-range-track {
+    height: 44px;
+    background: transparent;
+  }
+
+  /* La muesca: la misma que dibuja la escala de una ficha. */
+  .slider-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 4px;
+    height: 22px;
+    margin-top: 11px;
+    border: 0;
+    border-radius: 9999px;
+    background: var(--thumb, var(--color-chalk));
+    box-shadow: 0 0 0 6px transparent;
+    transition: box-shadow 120ms ease;
+  }
+  .slider-input::-moz-range-thumb {
+    width: 4px;
+    height: 22px;
+    border: 0;
+    border-radius: 9999px;
+    background: var(--thumb, var(--color-chalk));
+    box-shadow: 0 0 0 6px transparent;
+    transition: box-shadow 120ms ease;
+  }
+
+  /* Al agarrarla o al llegar con el teclado, un halo del propio rotulador:
+     dice qué muesca se está moviendo sin taparla. */
+  .slider-input:focus-visible::-webkit-slider-thumb,
+  .slider-input:active::-webkit-slider-thumb {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--thumb, #f2efe4) 28%, transparent);
+  }
+  .slider-input:focus-visible::-moz-range-thumb,
+  .slider-input:active::-moz-range-thumb {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--thumb, #f2efe4) 28%, transparent);
+  }
+
+  /* Paso fino: los botones de −1 y +1. Grandes de verdad, que en un móvil
+     clavar un 48 arrastrando es imposible. */
+  .step-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex-shrink: 0;
+    border: 1px solid var(--color-chalk-line);
+    border-radius: 2px;
+    background-color: var(--color-board-raised);
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--color-chalk);
+    cursor: pointer;
+    transition: border-color 140ms ease, color 140ms ease;
+  }
+  .step-btn:hover:not(:disabled) {
+    border-color: #f2efe470;
+  }
+  .step-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
   /* --- Ilustración ---------------------------------------------------- */
 
   /* Trazo de tiza: rugosidad y extremos redondeados */

@@ -183,6 +183,34 @@ seeds van en un único bloque `do`, que es atómico.
 **En el modo consola el progreso va abajo.** Arriba desaparecía tras la
 cabecera del sitio, que también es fija y tiene más z-index.
 
+**Los valores se ponen arrastrando, con un `input type="range"` nativo.**
+Nativo y no un arrastre propio: así vienen gratis el teclado, el lector de
+pantalla y el gesto que más importa en el móvil — tocar en cualquier punto del
+carril lleva la muesca ahí. Lo que se viste es el pulgar (`.slider-input` en
+globals.css); el carril y la marca de fábrica los dibuja `ScaleRail` detrás,
+que es el mismo de la ficha y de la comparación. La altura de 44 px es zona
+táctil: lo que se ve es una muesca de 4 px.
+
+**Arrastrar no basta, y por eso están los botones de −1 y +1.** En un móvil de
+375 px, cien valores caben en unos trescientos píxeles: tres píxeles por
+unidad. Sin paso fino, clavar un 48 es imposible y el formulario queda bonito
+e inservible.
+
+**Las filas del formulario están memorizadas con un comparador propio** que
+mira sólo los valores de su fila. Sin él, arrastrar un regulador repinta los
+ciento veintidós del formulario en cada píxel del gesto, y en un móvil eso se
+nota.
+
+**Plegar una categoría la esconde, no la desmonta.** Un `input` desmontado deja
+de enviarse con el formulario y su valor se perdería sin avisar; uno con
+`display: none` se envía igual. Plegar hace falta de verdad: sin ello, un set
+de FC27 son diecinueve pantallas de móvil; plegado, dos y media.
+
+**Los reguladores ya no tienen inputs espejo.** Cada `range` lleva su propio
+`name="v_<id>"` y el formulario se envía con ellos. Antes había un `input
+hidden` por valor: con ciento veintidós, repintarlos en cada gesto era la mitad
+del problema.
+
 **En la comparación el color cambia de significado.** En la ficha de un set
 dice el ámbito (usuario / CPU); al comparar dos sets dice **de quién es el
 valor**, porque es lo único que se pregunta ahí. El ámbito se rotula fuera, a

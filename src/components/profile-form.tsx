@@ -8,7 +8,13 @@ import type { ProfileFormState } from '@/app/actions/profile';
 import { PitchDiagram } from '@/components/chalk';
 import { AVATAR_BUCKET, avatarObjectPath } from '@/lib/avatar-storage';
 import { ACCEPTED_IMAGE_TYPES, prepareAvatar } from '@/lib/image';
-import { BIO_MAX, DISPLAY_NAME_MAX, normalizeUsername, TWITTER_MAX } from '@/lib/profile';
+import {
+  BIO_MAX,
+  DISPLAY_NAME_MAX,
+  normalizeUsername,
+  normalizeYoutube,
+  TWITTER_MAX,
+} from '@/lib/profile';
 import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import type { Profile } from '@/lib/database.types';
 
@@ -28,6 +34,7 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
   const [displayName, setDisplayName] = useState(profile.display_name ?? '');
   const [bio, setBio] = useState(profile.bio ?? '');
   const [twitter, setTwitter] = useState(profile.twitter_handle ?? '');
+  const [youtube, setYoutube] = useState(profile.youtube_url ?? '');
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url ?? '');
 
   const [uploading, setUploading] = useState(false);
@@ -35,6 +42,11 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
   const fileInput = useRef<HTMLInputElement>(null);
 
   const renamed = username !== profile.username;
+
+  // En la ficha se enseña el canal ya limpio, no lo que se acaba de pegar:
+  // así se ve al momento si el enlace se ha entendido.
+  const youtubeUrl = normalizeYoutube(youtube);
+  const youtubeLabel = youtubeUrl ? `YouTube: ${youtubeUrl.replace('https://www.youtube.com/', '')}` : null;
   const shownName = displayName.trim() || username || profile.username;
 
   const pickAvatar = async (file: File) => {
@@ -142,6 +154,7 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
               <p className="mt-1 font-mono text-xs text-chalk-dim">
                 @{username || profile.username}
                 {twitter.trim() ? ` · X: @${twitter.trim().replace(/^@+/, '')}` : ''}
+                {youtubeLabel ? ` · ${youtubeLabel}` : ''}
               </p>
               {bio.trim() ? (
                 <p className="mt-3 max-w-prose text-sm whitespace-pre-line text-chalk/90">{bio}</p>
@@ -253,6 +266,24 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
           </div>
           <span className="text-xs text-chalk-dim">
             Puedes pegar el enlace entero; se queda con el nombre.
+          </span>
+        </label>
+
+        <label className="flex flex-col gap-1.5">
+          <span className="eyebrow">Canal de YouTube</span>
+          <input
+            name="youtube_url"
+            value={youtube}
+            onChange={(event) => setYoutube(event.target.value)}
+            placeholder="@FullManualFG"
+            className="field font-mono text-sm"
+          />
+          <span
+            className={`text-xs ${youtube.trim() && youtubeUrl === undefined ? 'text-ink-rival' : 'text-chalk-dim'}`}
+          >
+            {youtube.trim() && youtubeUrl === undefined
+              ? 'Eso no parece un canal. Pega el enlace de tu canal, o tu @nombre.'
+              : 'Tu @nombre o el enlace del canal. El de un vídeo no vale: tiene que ser el canal.'}
           </span>
         </label>
       </section>

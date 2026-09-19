@@ -80,6 +80,19 @@ export default async function ProfilePage({
                 </a>
               </>
             ) : null}
+            {profile.youtube_url ? (
+              <>
+                {' · '}
+                <a
+                  href={profile.youtube_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-chalk"
+                >
+                  YouTube: {profile.youtube_url.replace('https://www.youtube.com/', '')}
+                </a>
+              </>
+            ) : null}
           </p>
           {profile.bio ? <p className="mt-3 max-w-prose text-sm text-chalk/90">{profile.bio}</p> : null}
         </div>

@@ -56,9 +56,11 @@ Editor del dashboard, o con la CLI (`supabase db push`):
    [supabase/README.md](supabase/README.md))
 8. `supabase/migrations/20260919160000_username_history.sql` — que cambiar de
    nombre de usuario no rompa los enlaces ya compartidos
-9. `supabase/storage/01_avatars.sql` — almacén de las fotos de perfil. Va
-   aparte de las migraciones porque es configuración de Storage y
-   `npm run test:sql` no puede probarla
+9. `supabase/migrations/20260919180000_profile_youtube.sql` — el canal de
+   YouTube en el perfil
+10. `supabase/storage/01_avatars.sql` — almacén de las fotos de perfil. Va
+    aparte de las migraciones porque es configuración de Storage y
+    `npm run test:sql` no puede probarla
 
 El seed es idempotente: se puede volver a aplicar sin duplicar nada.
 
@@ -462,6 +464,42 @@ porque una comparación es justo de lo que se pega en un grupo.
 Reparto del trabajo: el modelo (`src/lib/compare.ts`) y sus 16 comprobaciones
 los escribió Sonnet con el encargo cerrado; el diseño, la interfaz y las rutas,
 Opus. Es la primera vez que se aplica la regla de trabajo del mapa del código.
+
+### 19/09 · Sliders de verdad para poner sliders
+
+Meter un set era ir picando números en casillas. En una web que va de
+reguladores, eso era la contradicción de la casa — y en el móvil, que es por
+donde va a entrar la gente, era además lento.
+
+Ahora cada valor es un **regulador que se arrastra**: un `input type="range"`
+nativo vestido de tiza, con el mismo carril y la misma marca gris de fábrica
+que ya se ven en la ficha de un set. Nativo a propósito: así funcionan el
+teclado y el lector de pantalla sin escribir nada, y sobre todo funciona el
+gesto que importa en un móvil — tocar en cualquier punto del carril lleva la
+muesca ahí, sin tener que acertarle al pulgar.
+
+Arrastrar sirve para acercarse. Para clavar un 48 no: en una pantalla de 375 px
+hay tres píxeles por unidad. Por eso cada regulador lleva **−1 y +1** en
+botones grandes y la casilla del número sigue ahí para teclear. Ese es el
+reparto: el dedo para lo bruto, los botones para lo fino.
+
+Dos cosas que no se ven pero sostienen esto. Las filas están **memorizadas**
+con un comparador que mira sólo sus propios valores, porque si no, arrastrar
+uno repintaba los ciento veintidós en cada píxel del gesto. Y las **categorías
+se pliegan**: un set de FC27 eran diecinueve pantallas de móvil, plegado son
+dos y media. Plegar esconde pero no desmonta, que un regulador desmontado deja
+de enviarse y su valor se perdería en silencio.
+
+### 19/09 · El canal de YouTube en el perfil
+
+Junto a la cuenta de X. Se guarda la URL entera y no un identificador porque un
+canal se puede señalar de cuatro formas (`@handle`, `/channel/UC…`, `/c/…`,
+`/user/…`) y quedarse con el handle dejaría fuera a los canales antiguos. Se
+puede pegar el enlace tal cual, con o sin `https`, con `www` o con `m.`, con
+subruta o con parámetros: se normaliza solo y la ficha de arriba enseña al
+momento cómo ha quedado. El enlace de un vídeo se rechaza con su motivo — es un
+vídeo, no un canal. La validación la escribió Sonnet con el encargo cerrado, y
+son 43 comprobaciones.
 
 ---
 
