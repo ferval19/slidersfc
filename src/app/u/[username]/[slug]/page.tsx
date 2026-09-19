@@ -9,7 +9,7 @@ import { ShareSet } from '@/components/share-set';
 import { SliderTable } from '@/components/slider-table';
 import { getGames, getSetDetail, getUsernameAfterRename } from '@/lib/queries';
 import { buildSetView } from '@/lib/set-view';
-import { consolePath, profilePath, setPath } from '@/lib/paths';
+import { comparePickerPath, consolePath, profilePath, setPath } from '@/lib/paths';
 import { publicSiteUrl } from '@/lib/site-url';
 import { getCurrentUser } from '@/lib/supabase/server';
 
@@ -138,6 +138,18 @@ export default async function SetDetailPage({ params }: { params: Params }) {
           {detail.set.is_published ? (
             <ShareSet url={shareUrl} title={detail.set.title} gameName={detail.game.name} />
           ) : null}
+
+          {/* La pregunta que se hace quien llega aquí desde otro set no es qué
+              valores tiene éste, sino en qué se diferencia del suyo. */}
+          <Link
+            href={comparePickerPath({
+              username: detail.owner.username,
+              slug: detail.set.slug ?? '',
+            })}
+            className="btn btn-quiet"
+          >
+            Comparar
+          </Link>
 
           {isOwner ? (
             <SetOwnerActions

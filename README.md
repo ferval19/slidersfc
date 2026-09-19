@@ -174,7 +174,8 @@ npm run dev
 | `npm run test:sql` | Ejecuta migraciones y seeds contra un Postgres en memoria y comprueba el resultado |
 | `npm run test:import` | Prueba el importador de texto pegado contra el catálogo real |
 | `npm run test:profile` | Prueba la validación del perfil |
-| `npm test` | Los tres anteriores, en orden |
+| `npm run test:compare` | Prueba el modelo de comparar dos sets |
+| `npm test` | Los cuatro anteriores, en orden |
 
 ## Estructura
 
@@ -434,6 +435,33 @@ Cada quien escribe sólo dentro de su carpeta del almacén, y sólo se acepta un
 URL de ahí: un avatar remoto le enseñaría la IP de cada visitante a un
 servidor ajeno. La única excepción es la foto de X de quien entró con X, que
 ya estaba guardada y pasa tal cual.
+
+### 19/09 · Comparar dos sets
+
+La marca de fábrica contestaba «qué ha tocado esta persona». Faltaba la
+pregunta que se acaba haciendo todo el mundo: **en qué se diferencia de lo que
+yo tengo puesto**. Eso es `/comparar`.
+
+Cada slider sale con las dos muescas en el mismo carril y **la distancia
+dibujada entre ellas**, que es lo que se lee antes que los números. Cuando
+coinciden, una sola muesca partida en dos colores: ahí no hay nada que
+discutir. El titular lo resume — «Se separan en 23 de 61» — y hay dos mandos:
+el orden del menú del juego (por defecto, porque lo primero que hace uno es
+sentarse a meterlos) y el orden por diferencia, que explica el otro set en diez
+segundos. Más un filtro para esconder lo que coincide.
+
+El color cambia de significado aquí y es deliberado: en una ficha dice el
+ámbito, al comparar dice de quién es el valor. El ámbito pasa a ir escrito a la
+izquierda de cada carril.
+
+Sólo se compara dentro del mismo juego. FC26 y FC27 no son dos versiones de la
+misma lista sino listas distintas, así que el selector ni siquiera ofrece la
+mezcla. El enlace va en la ruta —`/comparar/<usuario>/<set>/<usuario>/<set>`—
+porque una comparación es justo de lo que se pega en un grupo.
+
+Reparto del trabajo: el modelo (`src/lib/compare.ts`) y sus 16 comprobaciones
+los escribió Sonnet con el encargo cerrado; el diseño, la interfaz y las rutas,
+Opus. Es la primera vez que se aplica la regla de trabajo del mapa del código.
 
 ---
 

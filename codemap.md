@@ -43,6 +43,7 @@ scripts/build-seed.mjs           catalog.mjs → 01_catalog.sql
 scripts/test-sql.mjs             toda la cadena SQL contra Postgres en memoria
 scripts/test-import.mjs          el importador de texto contra el catálogo real
 scripts/test-profile.mjs         la validación del perfil
+scripts/test-compare.mjs         el modelo de la comparación
 docs/                            dirección visual · hoja de ruta
 ```
 
@@ -52,6 +53,7 @@ docs/                            dirección visual · hoja de ruta
 | --- | --- |
 | `queries.ts` | Todas las lecturas. Cada una envuelta en `safeRead`: si Supabase no responde, la página se queda vacía en vez de caerse |
 | `set-view.ts` | Convierte el detalle de un set en algo plano y serializable para los Client Components |
+| `compare.ts` | El modelo de comparar dos sets: deltas, spread y orden. Puro, para poder probarlo |
 | `profile.ts` | Validación del perfil. Puro: lo comparten el formulario y la acción de servidor, con las mismas reglas |
 | `avatar-storage.ts` | Dónde vive cada avatar. El formato de la carpeta lo exige la política de Storage |
 | `image.ts` | Recorta y reduce la foto a 512 px en el navegador antes de subirla |
@@ -181,6 +183,24 @@ seeds van en un único bloque `do`, que es atómico.
 **En el modo consola el progreso va abajo.** Arriba desaparecía tras la
 cabecera del sitio, que también es fija y tiene más z-index.
 
+**En la comparación el color cambia de significado.** En la ficha de un set
+dice el ámbito (usuario / CPU); al comparar dos sets dice **de quién es el
+valor**, porque es lo único que se pregunta ahí. El ámbito se rotula fuera, a
+la izquierda de cada carril, en vez de pelearse por el mismo canal, y la
+leyenda se queda pegada arriba porque con sesenta y un sliders se baja muy
+lejos de ella.
+
+**El orden por defecto al comparar es el del menú del juego, no el de mayor
+diferencia**, aunque «por diferencia» sea lo que mejor explica el otro set. Lo
+primero que hace cualquiera con unos sliders es sentarse a metérselos, y para
+eso el orden tiene que ser el de la pantalla que tiene delante. El otro orden
+está a un clic.
+
+**Comparar sólo funciona dentro del mismo juego.** FC26 y FC27 no son dos
+versiones de la misma lista, son listas distintas: enfrentarlas valor a valor
+no diría nada. El selector directamente no ofrece la mezcla, y la ruta directa
+lo explica en vez de enseñar una tabla vacía.
+
 **Cambiar de nombre de usuario no rompe los enlaces.** El nombre está en la
 URL de todo lo que alguien comparte, así que `username_history` guarda los
 liberados y `/u/<viejo>` y sus sets redirigen (301) al actual. Escribe sólo un
@@ -231,12 +251,13 @@ npm run seed:build   # catalog.mjs → 01_catalog.sql
 npm run test:sql     # migraciones y seeds contra Postgres en memoria (PGlite)
 npm run test:import  # el importador de texto contra el catálogo real
 npm run test:profile # la validación del perfil
-npm test             # los tres de arriba
+npm run test:compare # el modelo de la comparación
+npm test             # los cuatro de arriba
 ```
 
 Antes de dar algo por bueno: `typecheck`, `lint`, **`build`** y, si has tocado
-SQL, `test:sql`; si has tocado el importador, el catálogo o el perfil,
-`npm test`, que los pasa todos.
+SQL, `test:sql`; y si has tocado el importador, el catálogo, el perfil o la
+comparación, `npm test`, que los pasa todos.
 
 ---
 

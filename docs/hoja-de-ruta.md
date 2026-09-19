@@ -36,12 +36,13 @@ de la comparación existe desde el primer día.
 
 **Sigue sin hacerse**: acceso con X, analítica, editar perfil.
 
-**Hecho después del corte**: el importador de texto pegado y **editar el
-perfil**, los dos de *Siguiente*. El importador, porque quita el peaje de
+**Hecho después del corte**: el importador de texto pegado, **editar el
+perfil** y **comparar dos sets**, los tres de *Siguiente*. El importador, porque quita el peaje de
 publicar. El perfil, porque es lo que hace que unos valores se lean como los
 de alguien que juega de una manera concreta y no como treinta números sueltos
 — y de paso trae el historial de nombres, que es lo que permite cambiar de
-nombre sin romper los enlaces que ya circulan.
+nombre sin romper los enlaces que ya circulan. La comparación, porque es la
+pregunta que se hace todo el que llega a un set ajeno teniendo ya el suyo.
 
 ---
 
@@ -59,7 +60,6 @@ nombre sin romper los enlaces que ya circulan.
 
 | # | Qué | Por qué |
 | --- | --- | --- |
-| 8 | **Comparar dos sets cualesquiera** | Extensión natural de (4) |
 | 9 | **Copia de seguridad de los datos** | Un script que vuelca sets y comentarios a JSON. Higiene de proyecto personal: que el contenido no sea rehén de un plan gratuito |
 | 10 | **Límite de ritmo en comentarios** | Sólo cuando llegue el primer comentario de un desconocido. Antes es resolver un problema que no existe |
 

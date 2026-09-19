@@ -3,6 +3,57 @@ import type { SliderScope } from '@/lib/database.types';
 
 export type ScaleMark = { scope: SliderScope; value: number };
 
+/** Los dos rotuladores de una comparación: A y B. */
+export const COMPARE_INK = { a: '#ffd24a', b: '#7fe0c8' } as const;
+
+function positionIn(min: number, max: number) {
+  const span = max - min || 1;
+  return (value: number) => Math.min(100, Math.max(0, ((value - min) / span) * 100));
+}
+
+/**
+ * El carril con sus marcas cada 25 y, detrás de todo, lo que trae el juego de
+ * fábrica. Lo comparten el regulador de un set y el de una comparación: cuando
+ * esto estaba copiado en dos sitios, era cuestión de tiempo que uno se
+ * desviara del otro.
+ */
+function ScaleRail({
+  min,
+  max,
+  reference,
+}: {
+  min: number;
+  max: number;
+  reference?: number | null;
+}) {
+  const position = positionIn(min, max);
+
+  return (
+    <>
+      <div className="chalk-rule absolute inset-x-0 top-1/2 -translate-y-1/2" />
+
+      {[0, 25, 50, 75, 100].map((tick) => (
+        <span
+          key={tick}
+          className="absolute top-1/2 w-px -translate-x-1/2 -translate-y-1/2 bg-chalk"
+          style={{
+            left: `${tick}%`,
+            height: tick === 0 || tick === 100 ? 15 : 8,
+            opacity: tick === 0 || tick === 100 ? 0.42 : 0.18,
+          }}
+        />
+      ))}
+
+      {reference !== null && reference !== undefined ? (
+        <span
+          className="absolute top-1/2 w-[2px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-chalk"
+          style={{ left: `${position(reference)}%`, height: 29, opacity: 0.45 }}
+        />
+      ) : null}
+    </>
+  );
+}
+
 /**
  * El regulador: un valor no se lee como un número en una caja, sino como una
  * posición en una escala de 0 a 100. Las muescas de los distintos ámbitos
@@ -29,36 +80,11 @@ export function ScaleTrack({
   reference?: number | null;
   className?: string;
 }) {
-  const position = (value: number) => {
-    const span = max - min || 1;
-    return Math.min(100, Math.max(0, ((value - min) / span) * 100));
-  };
+  const position = positionIn(min, max);
 
   return (
     <div className={`relative h-7 ${className}`} aria-hidden>
-      {/* Carril */}
-      <div className="chalk-rule absolute inset-x-0 top-1/2 -translate-y-1/2" />
-
-      {/* Marcas cada 25 */}
-      {[0, 25, 50, 75, 100].map((tick) => (
-        <span
-          key={tick}
-          className="absolute top-1/2 w-px -translate-x-1/2 -translate-y-1/2 bg-chalk"
-          style={{
-            left: `${tick}%`,
-            height: tick === 0 || tick === 100 ? 15 : 8,
-            opacity: tick === 0 || tick === 100 ? 0.42 : 0.18,
-          }}
-        />
-      ))}
-
-      {/* Lo que trae el juego, detrás de todo */}
-      {reference !== null && reference !== undefined ? (
-        <span
-          className="absolute top-1/2 w-[2px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-chalk"
-          style={{ left: `${position(reference)}%`, height: 29, opacity: 0.45 }}
-        />
-      ) : null}
+      <ScaleRail min={min} max={max} reference={reference} />
 
       {/* Muescas. Los ámbitos que coinciden en el mismo valor comparten
           muesca y se reparten su altura, en vez de taparse entre ellos —
@@ -78,6 +104,90 @@ export function ScaleTrack({
           ))}
         </span>
       ))}
+    </div>
+  );
+}
+
+/**
+ * El regulador de una comparación: las dos muescas y, entre ellas, el hueco
+ * dibujado.
+ *
+ * El color cambia de significado a propósito. En la ficha de un set dice el
+ * ámbito (usuario / CPU); aquí dice **de quién es el valor**, porque es lo
+ * único que se está preguntando. El ámbito se rotula fuera, a la izquierda de
+ * cada carril, en vez de pelearse por el mismo canal.
+ *
+ * El segmento entre las dos es la pieza que hace el trabajo: se lee la
+ * distancia antes que los números.
+ */
+export function DuoTrack({
+  min,
+  max,
+  a,
+  b,
+  reference,
+  className = '',
+}: {
+  min: number;
+  max: number;
+  a: number | null;
+  b: number | null;
+  reference?: number | null;
+  className?: string;
+}) {
+  const position = positionIn(min, max);
+
+  if (a === null && b === null) {
+    return (
+      <div className={`relative h-7 ${className}`} aria-hidden>
+        <ScaleRail min={min} max={max} reference={reference} />
+      </div>
+    );
+  }
+
+  const left = a !== null && b !== null ? Math.min(position(a), position(b)) : null;
+  const right = a !== null && b !== null ? Math.max(position(a), position(b)) : null;
+  const same = a !== null && b !== null && a === b;
+
+  return (
+    <div className={`relative h-7 ${className}`} aria-hidden>
+      <ScaleRail min={min} max={max} reference={reference} />
+
+      {/* El hueco. Se pinta debajo de las muescas para que no les coma el
+          borde cuando la diferencia es de uno o dos puntos. */}
+      {left !== null && right !== null && !same ? (
+        <span
+          className="absolute top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-chalk/35"
+          style={{ left: `${left}%`, width: `${right - left}%` }}
+        />
+      ) : null}
+
+      {/* Si coinciden, una sola muesca partida en dos: no hay nada que
+          discutir en ese slider y se ve de un vistazo. */}
+      {same ? (
+        <span
+          className="absolute top-1/2 flex w-[3px] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-full"
+          style={{ left: `${position(a)}%`, height: 19 }}
+        >
+          <span className="flex-1" style={{ backgroundColor: COMPARE_INK.a }} />
+          <span className="flex-1" style={{ backgroundColor: COMPARE_INK.b }} />
+        </span>
+      ) : (
+        <>
+          {a !== null ? (
+            <span
+              className="absolute top-1/2 w-[3px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{ left: `${position(a)}%`, height: 19, backgroundColor: COMPARE_INK.a }}
+            />
+          ) : null}
+          {b !== null ? (
+            <span
+              className="absolute top-1/2 w-[3px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{ left: `${position(b)}%`, height: 19, backgroundColor: COMPARE_INK.b }}
+            />
+          ) : null}
+        </>
+      )}
     </div>
   );
 }

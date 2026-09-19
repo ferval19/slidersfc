@@ -28,6 +28,22 @@ export function consolePath(username: string, slug: string) {
   return `/u/${username}/${slug}/consola`;
 }
 
+export type SetRef = { username: string; slug: string };
+
+/**
+ * La comparación de dos sets. Va en la ruta y no en la query para que el
+ * enlace se pueda pegar en un grupo y se entienda leyéndolo: comparar dos
+ * sets es justo lo que la gente comparte.
+ */
+export function comparePath(a: SetRef, b: SetRef) {
+  return `/comparar/${a.username}/${a.slug}/${b.username}/${b.slug}`;
+}
+
+/** El selector. Con `a` deja ya elegido el primero. */
+export function comparePickerPath(a?: SetRef) {
+  return a ? `/comparar?a=${encodeURIComponent(`${a.username}/${a.slug}`)}` : '/comparar';
+}
+
 /**
  * Camino de un set tolerante a datos incompletos: si falta el slug o el
  * usuario (por ejemplo, con la migración de slugs sin aplicar), cae en la URL
