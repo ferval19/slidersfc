@@ -11,11 +11,13 @@
     "seed:build": "node scripts/build-seed.mjs",
     "db:reset": "supabase db reset",
     "db:push": "supabase db push",
+    "backup": "node scripts/backup.mjs",
     "test:sql": "node scripts/test-sql.mjs",
     "test:import": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-import.mjs",
     "test:profile": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-profile.mjs",
     "test:compare": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-compare.mjs",
-    "test": "npm run test:sql && npm run test:import && npm run test:profile && npm run test:compare"
+    "test:backup": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-backup.mjs",
+    "test": "npm run test:sql && npm run test:import && npm run test:profile && npm run test:compare && npm run test:backup"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

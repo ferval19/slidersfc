@@ -177,7 +177,9 @@ npm run dev
 | `npm run test:import` | Prueba el importador de texto pegado contra el catálogo real |
 | `npm run test:profile` | Prueba la validación del perfil |
 | `npm run test:compare` | Prueba el modelo de comparar dos sets |
-| `npm test` | Los cuatro anteriores, en orden |
+| `npm run test:backup` | Vuelca, repone en una base vacía y comprueba que ha vuelto todo |
+| `npm test` | Los cinco anteriores, en orden |
+| `npm run backup` | Copia de seguridad a `copias/`: JSON + SQL de reposición |
 
 ## Estructura
 
@@ -500,6 +502,32 @@ subruta o con parámetros: se normaliza solo y la ficha de arriba enseña al
 momento cómo ha quedado. El enlace de un vídeo se rechaza con su motivo — es un
 vídeo, no un canal. La validación la escribió Sonnet con el encargo cerrado, y
 son 43 comprobaciones.
+
+### 19/09 · Que el contenido no sea rehén de un plan gratuito
+
+`npm run backup` deja dos ficheros en `copias/`. El JSON es el archivo: las
+siete tablas tal cual están. El `.sql` es lo que lo hace útil, porque una copia
+que no sabes reponer no es una copia — y el camino de reposición de este
+proyecto ya existe y es conocido: pegar SQL en el editor de Supabase.
+
+Repone perfiles, sets, valores y comentarios. Los juegos y el catálogo de
+sliders no, a propósito: son código, y reponerlos desde un volcado sería
+quedarse con una foto vieja del catálogo.
+
+Los sets y los comentarios conservan su UUID, así que las URLs por id siguen
+valiendo. Pero el dueño va por nombre de usuario, el juego por slug y cada
+valor por (slug del slider, ámbito), porque los ids de `profiles` vienen de
+`auth.users` y los de `games` y `slider_definitions` son series: en otro
+proyecto no coincidirían y la copia serviría de adorno.
+
+Sin la clave de servicio la copia sólo lleva lo que vería cualquiera —RLS se
+aplica igual— y el script lo avisa por pantalla. Una copia incompleta que se
+cree completa es peor que no tener ninguna.
+
+Y lo que lo sostiene: `npm run test:backup` hace el viaje entero contra un
+Postgres en memoria. Vuelca, genera el SQL, lo aplica en una base vacía y
+comprueba que ha vuelto todo, incluido que los valores caen en la definición
+correcta pese a que los ids no coinciden.
 
 ---
 

@@ -44,6 +44,9 @@ scripts/test-sql.mjs             toda la cadena SQL contra Postgres en memoria
 scripts/test-import.mjs          el importador de texto contra el catálogo real
 scripts/test-profile.mjs         la validación del perfil
 scripts/test-compare.mjs         el modelo de la comparación
+scripts/backup.mjs               volcado de la base a JSON + SQL de reposición
+scripts/backup-sql.mjs           el generador del SQL de reposición (puro)
+scripts/test-backup.mjs          vuelca, repone en una base vacía y comprueba
 docs/                            dirección visual · hoja de ruta
 ```
 
@@ -183,6 +186,24 @@ seeds van en un único bloque `do`, que es atómico.
 **En el modo consola el progreso va abajo.** Arriba desaparecía tras la
 cabecera del sitio, que también es fija y tiene más z-index.
 
+**La copia de seguridad genera SQL, no sólo JSON.** El JSON es el archivo; el
+SQL es lo que la hace útil, porque el camino de reposición de este proyecto ya
+existe y es conocido: pegar SQL en el editor de Supabase. Una copia que no
+sabes reponer no es una copia.
+
+**Lo que la copia repone y lo que no.** Sets, valores, comentarios y perfiles,
+sí. Juegos y catálogo de sliders, no: son código, y reponerlos desde un volcado
+sería quedarse con una foto vieja del catálogo. Los sets y comentarios
+conservan su UUID (las URLs por id siguen valiendo), pero el dueño va por
+nombre de usuario, el juego por slug y cada valor por (slug del slider,
+ámbito), porque los ids de `profiles` vienen de `auth.users` y los de `games` y
+`slider_definitions` son series: en otro proyecto no coinciden.
+
+**Sin la clave de servicio, la copia está incompleta y lo dice.** RLS se aplica
+a la clave pública igual que a cualquiera, así que los borradores se quedan
+fuera. El script avisa por pantalla: una copia incompleta que se cree completa
+es peor que no tener ninguna.
+
 **Los valores se ponen arrastrando, con un `input type="range"` nativo.**
 Nativo y no un arrastre propio: así vienen gratis el teclado, el lector de
 pantalla y el gesto que más importa en el móvil — tocar en cualquier punto del
@@ -280,12 +301,14 @@ npm run test:sql     # migraciones y seeds contra Postgres en memoria (PGlite)
 npm run test:import  # el importador de texto contra el catálogo real
 npm run test:profile # la validación del perfil
 npm run test:compare # el modelo de la comparación
-npm test             # los cuatro de arriba
+npm run test:backup  # vuelca, repone en una base vacía y comprueba
+npm run backup       # copia de seguridad a copias/ (JSON + SQL)
+npm test             # los cinco de arriba
 ```
 
 Antes de dar algo por bueno: `typecheck`, `lint`, **`build`** y, si has tocado
-SQL, `test:sql`; y si has tocado el importador, el catálogo, el perfil o la
-comparación, `npm test`, que los pasa todos.
+SQL, `test:sql`; y si has tocado el importador, el catálogo, el perfil, la
+comparación o la copia de seguridad, `npm test`, que los pasa todos.
 
 ---
 

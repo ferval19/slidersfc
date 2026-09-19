@@ -46,3 +46,6 @@ next-env.d.ts
 
 # Plantilla de entorno (sí se versiona)
 !.env.example
+
+# copias de seguridad de la base (contienen datos, no van al repositorio)
+/copias

@@ -82,3 +82,51 @@ Dos cosas del menú de FC27 que conviene saber:
 El SQL generado **sí borra** los sliders de un juego que ya no estén en
 `catalog.mjs`, para que renombrar un slug no deje filas huérfanas en la UI. Ojo:
 borrar un slider se lleva en cascada sus valores y comentarios.
+
+## Copia de seguridad
+
+```bash
+npm run backup
+```
+
+Deja en `copias/` (que no va al repositorio) dos ficheros:
+
+- `slidersfc-<fecha>.json` — el volcado entero, tal cual está en las tablas.
+  Es la copia de archivo.
+- `slidersfc-<fecha>.sql` — el SQL con el que reponerlo. Una copia que no
+  sabes reponer no es una copia.
+
+**La clave importa.** Con `SUPABASE_SERVICE_ROLE_KEY` (panel de Supabase →
+Project Settings → API) se copia todo, borradores incluidos. Sin ella se usa la
+clave pública y RLS se aplica igual: la copia sólo lleva lo que vería
+cualquiera. El script lo avisa por pantalla, porque una copia incompleta que se
+cree completa es peor que no tener ninguna. **Esa clave no se sube al
+repositorio**: ponla en `.env.local` o pásala por delante del comando.
+
+### Reponer
+
+En este orden:
+
+1. Las migraciones y `supabase/seed/01_catalog.sql`.
+2. Que cada persona haya entrado una vez en la aplicación, para que exista su
+   cuenta en `auth.users`. Un perfil no se puede crear sin ella.
+3. El `.sql` de la copia.
+
+Los juegos y el catálogo de sliders **no** se reponen desde la copia a
+propósito: son código (`supabase/seed/catalog.mjs`), y reponerlos desde un
+volcado sería quedarse con una foto vieja del catálogo.
+
+El SQL conserva el UUID de cada set y de cada comentario, así que las URLs por
+id siguen valiendo. En cambio el dueño va por nombre de usuario, el juego por
+slug y cada valor por (slug del slider, ámbito): los ids de `profiles` vienen de
+`auth.users` y los de `games` y `slider_definitions` son series, y en otro
+proyecto no coinciden.
+
+Cada bloque `do` es atómico y se puede reejecutar. Si sólo quieres recuperar un
+set, pega su bloque y nada más. Los valores se reponen enteros —es una
+instantánea, no un parche— y los comentarios sólo se añaden: lo que ya esté
+escrito no se pisa.
+
+`npm run test:backup` hace el viaje de ida y vuelta contra un Postgres en
+memoria: vuelca, genera el SQL, lo aplica en una base vacía y comprueba que ha
+vuelto todo.
