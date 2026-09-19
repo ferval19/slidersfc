@@ -61,7 +61,7 @@ Editor del dashboard, o con la CLI (`supabase db push`):
    nombre de usuario no rompa los enlaces ya compartidos
 10. `supabase/migrations/20260919180000_profile_youtube.sql` — el canal de
    YouTube en el perfil
-11. `supabase/storage/01_avatars.sql` — almacén de las fotos de perfil. Va
+12. `supabase/storage/01_avatars.sql` — almacén de las fotos de perfil. Va
     aparte de las migraciones porque es configuración de Storage y
     `npm run test:sql` no puede probarla
 
@@ -180,8 +180,9 @@ npm run dev
 | `npm run test:import` | Prueba el importador de texto pegado contra el catálogo real |
 | `npm run test:profile` | Prueba la validación del perfil |
 | `npm run test:compare` | Prueba el modelo de comparar dos sets |
+| `npm run test:conditions` | Prueba la validación de dificultad, duración y cámara |
 | `npm run test:backup` | Vuelca, repone en una base vacía y comprueba que ha vuelto todo |
-| `npm test` | Los cinco anteriores, en orden |
+| `npm test` | Los seis anteriores, en orden |
 | `npm run backup` | Copia de seguridad a `copias/`: JSON + SQL de reposición |
 
 ## Estructura
@@ -594,6 +595,35 @@ De paso, las dos pruebas de SQL compartían una copia de la lista de migraciones
 y se desviaron en cuanto entró una nueva. Ahora sale de un solo sitio
 (`scripts/schema-files.mjs`), que además es donde está escrito por qué el
 catálogo va en medio y no al final.
+
+### 20/09 · Cómo lo juegas
+
+La descripción llevaba desde el principio un recordatorio en el hueco de
+escribir: «dificultad, duración de los tiempos, cámara y controles». Pedirlo en
+texto libre significaba que unos lo ponían y otros no, y que no se podía
+enseñar igual en ningún sitio. Ahora son campos, debajo de la descripción:
+**dificultad**, **duración de cada tiempo** y **cámara** con su altura y su
+zoom, cada uno con su dibujo de tiza — el de la cámara es nuevo.
+
+Todo opcional. Un set sin esto sigue siendo un set; con esto es un set que
+alguien puede reproducir. En la ficha salen arriba, junto al título, porque es
+lo primero que hay que saber: los mismos valores en otra dificultad no dan el
+mismo partido. Y en el modo consola van en la cabecera, que la dificultad y los
+tiempos también se ponen en el menú.
+
+La duración se guarda como **texto y no como número** a propósito: mucha gente
+juega «7 u 8 minutos», y obligar a un solo número les haría mentir. Se acepta
+escrito de seis formas distintas (`8`, `8 minutos`, `7-8`, `7 – 8`, `7 a 8`,
+`7/8`) y se guarda normalizado; un rango al revés o con los dos números iguales
+se rechaza.
+
+La cámara es texto libre con sugerencias, no una lista cerrada: no me consta
+cómo se llaman exactamente todas en el menú en español, y ya nos costó una vez
+inventar nombres del juego. Lo que sí se exige es que si pones altura o zoom
+haya una cámara: unos números sueltos sin saber de qué cámara no dicen nada.
+
+La validación y sus 32 comprobaciones las escribió Sonnet con el encargo
+cerrado.
 
 ---
 

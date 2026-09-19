@@ -4,6 +4,7 @@ import { notFound, permanentRedirect } from 'next/navigation';
 
 import { Avatar } from '@/components/avatar';
 import { CommentComposer, CommentList } from '@/components/comment-thread';
+import { SetConditions } from '@/components/set-conditions';
 import { SetOwnerActions } from '@/components/set-owner-actions';
 import { ShareSet } from '@/components/share-set';
 import { SliderTable } from '@/components/slider-table';
@@ -123,6 +124,8 @@ export default async function SetDetailPage({ params }: { params: Params }) {
             {detail.set.description}
           </p>
         ) : null}
+
+        <SetConditions set={detail.set} />
 
         {/* «Meter en la consola» es la acción principal: es para lo que se
             abre un set. Compartir va para todo el mundo y no sólo para el

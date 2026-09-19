@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { planCopy } from '@/lib/game-migration';
+import { validateConditions, type SetConditions } from '@/lib/set-conditions';
 import { editSetPath, setPath } from '@/lib/paths';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { CpuBehaviour, SliderDefinition } from '@/lib/database.types';
@@ -17,6 +18,7 @@ type ParsedForm = {
   description: string | null;
   gameId: number;
   cpuBehaviour: CpuBehaviour;
+  conditions: SetConditions;
   publish: boolean;
   values: Map<number, number>;
 };
@@ -44,6 +46,15 @@ function parseForm(formData: FormData): ParsedForm | { error: string } {
   const cpuBehaviour: CpuBehaviour =
     rawBehaviour === 'tactical' || rawBehaviour === 'dynamic' ? rawBehaviour : 'custom';
 
+  const conditions = validateConditions({
+    difficulty: String(formData.get('difficulty') ?? ''),
+    halfLength: String(formData.get('half_length') ?? ''),
+    camera: String(formData.get('camera') ?? ''),
+    cameraHeight: String(formData.get('camera_height') ?? ''),
+    cameraZoom: String(formData.get('camera_zoom') ?? ''),
+  });
+  if ('error' in conditions) return { error: conditions.error };
+
   const values = new Map<number, number>();
   for (const [key, raw] of formData.entries()) {
     if (!key.startsWith(VALUE_PREFIX)) continue;
@@ -64,6 +75,7 @@ function parseForm(formData: FormData): ParsedForm | { error: string } {
     description: rawDescription === '' ? null : rawDescription,
     gameId,
     cpuBehaviour,
+    conditions: conditions.fields,
     publish: formData.get('intent') === 'publish',
     values,
   };
@@ -123,6 +135,7 @@ export async function createSet(
       title: parsed.title,
       description: parsed.description,
       cpu_behaviour: parsed.cpuBehaviour,
+      ...parsed.conditions,
       is_published: parsed.publish,
     })
     .select('id, slug, profiles!inner ( username )')
@@ -212,6 +225,7 @@ export async function updateSet(
       title: parsed.title,
       description: parsed.description,
       cpu_behaviour: parsed.cpuBehaviour,
+      ...parsed.conditions,
       is_published: parsed.publish || existing.is_published,
       version: nextVersion,
     })
@@ -301,7 +315,7 @@ export async function copySetToGame(setId: string, targetGameSlug: string) {
 
   const { data: source } = await supabase
     .from('slider_sets')
-    .select('id, owner_id, title, description, game_id, cpu_behaviour')
+    .select('id, owner_id, title, description, game_id, cpu_behaviour, difficulty, half_length, camera, camera_height, camera_zoom')
     .eq('id', setId)
     .maybeSingle();
 
@@ -344,6 +358,13 @@ export async function copySetToGame(setId: string, targetGameSlug: string) {
       title: `${source.title} (${targetGame.name})`,
       description: source.description,
       cpu_behaviour: source.cpu_behaviour,
+      // Las condiciones no cambian porque cambie el juego: sigues jugando en
+      // la misma dificultad, con los mismos tiempos y la misma cámara.
+      difficulty: source.difficulty,
+      half_length: source.half_length,
+      camera: source.camera,
+      camera_height: source.camera_height,
+      camera_zoom: source.camera_zoom,
       is_published: false,
     })
     .select('id, slug, profiles!inner ( username )')

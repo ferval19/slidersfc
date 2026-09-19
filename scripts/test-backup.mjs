@@ -166,8 +166,10 @@ const setTitle = 'Set de prueba para la copia';
 const setDescription = 'Descripción de prueba para el viaje de ida y vuelta.';
 
 await origin.exec(`
-  insert into public.slider_sets (id, owner_id, game_id, title, description, is_published, cpu_behaviour)
-  values (${q(setId)}, ${q(profile.id)}, ${game.id}, ${q(setTitle)}, ${q(setDescription)}, true, 'dynamic')
+  insert into public.slider_sets (id, owner_id, game_id, title, description, is_published, cpu_behaviour,
+    difficulty, half_length, camera, camera_height, camera_zoom)
+  values (${q(setId)}, ${q(profile.id)}, ${game.id}, ${q(setTitle)}, ${q(setDescription)}, true, 'dynamic',
+    'legendary', '7-8', 'EA Sports', 0, 3)
 `);
 
 await origin.exec(`
@@ -220,7 +222,9 @@ check(
 
 const restoredSet = await one(
   target,
-  `select id, title, slug, description, is_published, cpu_behaviour from public.slider_sets where id = ${q(setId)}`,
+  `select id, title, slug, description, is_published, cpu_behaviour,
+          difficulty, half_length, camera, camera_height, camera_zoom
+   from public.slider_sets where id = ${q(setId)}`,
 );
 check(
   'el set vuelve con el mismo uuid, título, slug, descripción, is_published y comportamiento de la CPU',
@@ -231,6 +235,22 @@ check(
     restoredSet?.is_published === true &&
     restoredSet?.cpu_behaviour === 'dynamic',
   JSON.stringify(restoredSet),
+);
+
+check(
+  'vuelven las condiciones en las que se probó: dificultad, duración y cámara',
+  restoredSet?.difficulty === 'legendary' &&
+    restoredSet?.half_length === '7-8' &&
+    restoredSet?.camera === 'EA Sports' &&
+    restoredSet?.camera_height === 0 &&
+    restoredSet?.camera_zoom === 3,
+  JSON.stringify({
+    difficulty: restoredSet?.difficulty,
+    half_length: restoredSet?.half_length,
+    camera: restoredSet?.camera,
+    camera_height: restoredSet?.camera_height,
+    camera_zoom: restoredSet?.camera_zoom,
+  }),
 );
 
 check(

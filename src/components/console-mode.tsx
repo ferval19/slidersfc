@@ -24,6 +24,7 @@ export function ConsoleMode({
   setId,
   title,
   setHref,
+  conditions = [],
   scopes,
   blocks,
   cpuBehaviour = 'custom',
@@ -32,6 +33,8 @@ export function ConsoleMode({
   setId: string;
   title: string;
   setHref: string;
+  /** Dificultad, duración y cámara, ya en frases cortas. */
+  conditions?: string[];
   scopes: SliderScope[];
   blocks: CategoryBlockView[];
   cpuBehaviour?: CpuBehaviour;
@@ -121,7 +124,14 @@ export function ConsoleMode({
         <Link href={setHref} className="btn btn-quiet shrink-0 px-3 py-2" title="Volver al set">
           ←
         </Link>
-        <p className="min-w-0 flex-1 truncate text-sm font-semibold">{title}</p>
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="truncate text-sm font-semibold">{title}</span>
+          {/* La dificultad y los tiempos también se ponen en el menú, y si no
+              coinciden los valores de abajo no dan el mismo partido. */}
+          {conditions.length > 0 ? (
+            <span className="eyebrow truncate">{conditions.join(' · ')}</span>
+          ) : null}
+        </span>
       </header>
 
       {steps.map((block) => {

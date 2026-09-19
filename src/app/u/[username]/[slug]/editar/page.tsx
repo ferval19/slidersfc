@@ -58,6 +58,11 @@ export default async function EditSetPage({
             description: detail.set.description ?? '',
             isPublished: detail.set.is_published,
         cpuBehaviour: detail.set.cpu_behaviour,
+        difficulty: detail.set.difficulty ?? '',
+        halfLength: detail.set.half_length ?? '',
+        camera: detail.set.camera ?? '',
+        cameraHeight: detail.set.camera_height === null ? '' : String(detail.set.camera_height),
+        cameraZoom: detail.set.camera_zoom === null ? '' : String(detail.set.camera_zoom),
             values,
           }}
         />

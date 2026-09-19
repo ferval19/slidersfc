@@ -61,6 +61,20 @@ export type SliderSet = {
   slug: string;
   description: string | null;
   cpu_behaviour: CpuBehaviour;
+  /**
+   * Las condiciones en las que se probó. Todo opcional.
+   *
+   * `difficulty` se queda en `string` y no en la unión estrecha a propósito:
+   * si algún día la base trae un valor que la aplicación no conoce, la ficha
+   * se limita a no ponerle etiqueta en vez de romperse. La unión buena, con
+   * sus etiquetas, vive en `src/lib/set-conditions.ts`.
+   */
+  difficulty: string | null;
+  /** «8» o «7-8». Texto porque mucha gente juega con un rango. */
+  half_length: string | null;
+  camera: string | null;
+  camera_height: number | null;
+  camera_zoom: number | null;
   version: number;
   is_published: boolean;
   created_at: string;
@@ -147,6 +161,11 @@ export type Database = {
           | 'slug'
           | 'description'
           | 'cpu_behaviour'
+          | 'difficulty'
+          | 'half_length'
+          | 'camera'
+          | 'camera_height'
+          | 'camera_zoom'
           | 'version'
           | 'is_published'
           | 'created_at'

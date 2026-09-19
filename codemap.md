@@ -57,6 +57,7 @@ docs/                            dirección visual · hoja de ruta
 | --- | --- |
 | `queries.ts` | Todas las lecturas. Cada una envuelta en `safeRead`: si Supabase no responde, la página se queda vacía en vez de caerse |
 | `set-view.ts` | Convierte el detalle de un set en algo plano y serializable para los Client Components |
+| `set-conditions.ts` | Dificultad, duración y cámara: validación y etiquetas. Puro |
 | `compare.ts` | El modelo de comparar dos sets: deltas, spread y orden. Puro, para poder probarlo |
 | `profile.ts` | Validación del perfil. Puro: lo comparten el formulario y la acción de servidor, con las mismas reglas |
 | `avatar-storage.ts` | Dónde vive cada avatar. El formato de la carpeta lo exige la política de Storage |
@@ -186,6 +187,22 @@ seeds van en un único bloque `do`, que es atómico.
 
 **En el modo consola el progreso va abajo.** Arriba desaparecía tras la
 cabecera del sitio, que también es fija y tiene más z-index.
+
+**La duración de los tiempos se guarda como texto.** Mucha gente juega «7 u 8
+minutos» y un entero les obligaría a mentir. El CHECK de la base lo mantiene
+con forma de número o de rango (`^[0-9]{1,2}(-[0-9]{1,2})?$`) y la aplicación
+lo normaliza antes de guardar, así que sigue siendo comparable de un vistazo
+aunque no sea aritmética.
+
+**La cámara es texto libre con sugerencias, no una lista cerrada.** No consta
+cómo se llaman exactamente todas en el menú en español, y ya se pagó una vez
+inventar nombres del juego. Lo único que se exige es que haya cámara si hay
+altura o zoom: unos números sueltos sin saber de qué cámara no dicen nada, y
+eso va tanto en la validación como en un CHECK.
+
+**`difficulty` es `string` en los tipos, no la unión estrecha.** La unión buena
+vive en `set-conditions.ts`; la columna se lee como texto para que un valor
+que esta versión no conozca deje la ficha sin etiqueta en vez de romperla.
 
 **El comportamiento de la CPU esconde sus sliders, no los borra.** En FC27 se
 elige entre táctico, dinámico y personalizado, y sólo en el último se usan los
@@ -342,9 +359,10 @@ npm run test:sql     # migraciones y seeds contra Postgres en memoria (PGlite)
 npm run test:import  # el importador de texto contra el catálogo real
 npm run test:profile # la validación del perfil
 npm run test:compare # el modelo de la comparación
+npm run test:conditions # dificultad, duración y cámara
 npm run test:backup  # vuelca, repone en una base vacía y comprueba
 npm run backup       # copia de seguridad a copias/ (JSON + SQL)
-npm test             # los cinco de arriba
+npm test             # los seis de arriba
 ```
 
 Antes de dar algo por bueno: `typecheck`, `lint`, **`build`** y, si has tocado

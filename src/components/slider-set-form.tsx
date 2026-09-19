@@ -1,21 +1,32 @@
-'use client';
+"use client";
 
-import { memo, useActionState, useCallback, useMemo, useState } from 'react';
+import { memo, useActionState, useCallback, useMemo, useState } from "react";
 
-import type { SetFormState } from '@/app/actions/sets';
-import { CATEGORY_DRAWINGS } from '@/components/chalk';
-import { ImportPanel } from '@/components/import-panel';
-import { SliderControl } from '@/components/slider-control';
-import { ScaleLegend } from '@/components/slider-scale';
+import type { SetFormState } from "@/app/actions/sets";
+import {
+  CATEGORY_DRAWINGS,
+  ChalkCamera,
+  ChalkShield,
+  ChalkStopwatch,
+} from "@/components/chalk";
+import { ImportPanel } from "@/components/import-panel";
+import { SliderControl } from "@/components/slider-control";
+import { ScaleLegend } from "@/components/slider-scale";
 import {
   categoryLabel,
   CPU_BEHAVIOURS,
   SCOPE_INK,
   SCOPE_LABELS,
   sortScopes,
-} from '@/lib/constants';
-import { orderCategories } from '@/lib/category-order';
-import type { CpuBehaviour, Game, SliderDefinition, SliderScope } from '@/lib/database.types';
+} from "@/lib/constants";
+import { orderCategories } from "@/lib/category-order";
+import { DIFFICULTIES } from "@/lib/set-conditions";
+import type {
+  CpuBehaviour,
+  Game,
+  SliderDefinition,
+  SliderScope,
+} from "@/lib/database.types";
 
 type Props = {
   action: (state: SetFormState, formData: FormData) => Promise<SetFormState>;
@@ -27,6 +38,11 @@ type Props = {
     description: string;
     isPublished: boolean;
     cpuBehaviour: CpuBehaviour;
+    difficulty: string;
+    halfLength: string;
+    camera: string;
+    cameraHeight: string;
+    cameraZoom: string;
     values: Record<string, number>;
   };
   /** En edición el juego no se puede cambiar: los valores cuelgan de él. */
@@ -42,18 +58,20 @@ export function SliderSetForm({
   definitionsByGame,
   initial,
   lockGame = false,
-  submitLabel = 'Publicar set',
+  submitLabel = "Publicar set",
 }: Props) {
   const [state, formAction, pending] = useActionState(action, initialState);
 
-  const [gameId, setGameId] = useState<number>(initial?.gameId ?? games[0]?.id ?? 0);
+  const [gameId, setGameId] = useState<number>(
+    initial?.gameId ?? games[0]?.id ?? 0,
+  );
   const [folded, setFolded] = useState<ReadonlySet<string>>(new Set());
   const [cpuBehaviour, setCpuBehaviour] = useState<CpuBehaviour>(
-    initial?.cpuBehaviour ?? 'tactical',
+    initial?.cpuBehaviour ?? "tactical",
   );
   const [values, setValues] = useState<Record<string, number>>(() => {
     if (initial) return initial.values;
-    return defaultsFor(definitionsByGame[String(games[0]?.id ?? '')] ?? []);
+    return defaultsFor(definitionsByGame[String(games[0]?.id ?? "")] ?? []);
   });
 
   const definitions = useMemo(
@@ -61,7 +79,10 @@ export function SliderSetForm({
     [definitionsByGame, gameId],
   );
 
-  const { scopes, blocks } = useMemo(() => buildBlocks(definitions), [definitions]);
+  const { scopes, blocks } = useMemo(
+    () => buildBlocks(definitions),
+    [definitions],
+  );
 
   /**
    * Si el juego trae preajuste de fábrica. Cuando todos los valores por
@@ -69,14 +90,16 @@ export function SliderSetForm({
    * sería inventársela.
    */
   const hasReference = useMemo(
-    () => new Set(definitions.map((definition) => definition.default_value)).size > 1,
+    () =>
+      new Set(definitions.map((definition) => definition.default_value)).size >
+      1,
     [definitions],
   );
 
   const game = games.find((candidate) => candidate.id === gameId);
   // FC26 no tiene selector: allí los sliders de CPU van siempre.
   const hasCpuBehaviour = game?.has_cpu_behaviour ?? false;
-  const cpuIsCustom = !hasCpuBehaviour || cpuBehaviour === 'custom';
+  const cpuIsCustom = !hasCpuBehaviour || cpuBehaviour === "custom";
 
   const changeGame = (nextGameId: number) => {
     setGameId(nextGameId);
@@ -92,7 +115,11 @@ export function SliderSetForm({
   return (
     <form action={formAction} className="flex flex-col gap-10">
       <input type="hidden" name="game_id" value={gameId} />
-      <input type="hidden" name="cpu_behaviour" value={hasCpuBehaviour ? cpuBehaviour : 'custom'} />
+      <input
+        type="hidden"
+        name="cpu_behaviour"
+        value={hasCpuBehaviour ? cpuBehaviour : "custom"}
+      />
 
       {/* Metadatos del set */}
       <section className="panel flex flex-col gap-5 p-5 sm:p-6">
@@ -138,10 +165,117 @@ export function SliderSetForm({
               rows={5}
               maxLength={2000}
               defaultValue={initial?.description}
-              placeholder="Dificultad, duración de los tiempos, cámara y controles. Sin eso, tus valores no significan lo mismo para quien los copie."
+              placeholder="Cómo se comporta el partido con estos valores, y qué controles usas. Lo de la dificultad, los tiempos y la cámara va aquí abajo."
               className="field resize-y"
             />
           </label>
+        </div>
+
+        <div className="chalk-rule" />
+
+        {/* Las condiciones en las que se probó. Son opcionales, pero son lo
+            que separa «unos valores» de «unos valores que puedes reproducir»:
+            los mismos sliders en otra dificultad no dan el mismo partido. */}
+        <div className="flex flex-col gap-5">
+          <div>
+            <p className="eyebrow">Cómo lo juegas</p>
+            <p className="mt-1.5 text-xs text-chalk-dim">
+              Opcional, pero es lo que hace que tus valores signifiquen lo mismo
+              para quien los copie.
+            </p>
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            <label className="flex flex-col gap-1.5">
+              <span className="eyebrow flex items-center gap-2">
+                <ChalkShield className="size-5 text-chalk-dim" />
+                Dificultad
+              </span>
+              <select
+                name="difficulty"
+                defaultValue={initial?.difficulty ?? ""}
+                className="field"
+              >
+                <option value="">Sin especificar</option>
+                {DIFFICULTIES.map((difficulty) => (
+                  <option key={difficulty.value} value={difficulty.value}>
+                    {difficulty.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className="eyebrow flex items-center gap-2">
+                <ChalkStopwatch className="size-5 text-chalk-dim" />
+                Duración de cada tiempo
+              </span>
+              <input
+                name="half_length"
+                defaultValue={initial?.halfLength}
+                placeholder="8"
+                inputMode="numeric"
+                className="field font-mono"
+              />
+              <span className="text-xs text-chalk-dim">
+                En minutos. Si juegas con un rango, ponlo: 7-8.
+              </span>
+            </label>
+
+            <div className="flex flex-col gap-1.5 sm:col-span-2">
+              <span className="eyebrow flex items-center gap-2">
+                <ChalkCamera className="size-5 text-chalk-dim" />
+                Cámara
+              </span>
+              {/* En el móvil la altura y el zoom van juntos en una línea: son dos
+                  cifras cortas y apiladas quedaban desparejadas. */}
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <input
+                  name="camera"
+                  defaultValue={initial?.camera}
+                  list="camaras"
+                  maxLength={40}
+                  placeholder="EA Sports"
+                  aria-label="Cámara"
+                  className="field sm:flex-1"
+                />
+                <datalist id="camaras">
+                  <option value="EA Sports" />
+                  <option value="Tradicional" />
+                </datalist>
+
+                <div className="flex gap-3">
+                  <label className="flex flex-1 items-center gap-2 sm:flex-none">
+                    <span className="eyebrow shrink-0">Altura</span>
+                    <input
+                      name="camera_height"
+                      defaultValue={initial?.cameraHeight}
+                      type="number"
+                      inputMode="numeric"
+                      min={0}
+                      max={20}
+                      placeholder="0"
+                      className="field value-pill w-16 px-1 text-center"
+                    />
+                  </label>
+
+                  <label className="flex flex-1 items-center gap-2 sm:flex-none">
+                    <span className="eyebrow shrink-0">Zoom</span>
+                    <input
+                      name="camera_zoom"
+                      defaultValue={initial?.cameraZoom}
+                      type="number"
+                      inputMode="numeric"
+                      min={0}
+                      max={20}
+                      placeholder="0"
+                      className="field value-pill w-16 px-1 text-center"
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -151,7 +285,8 @@ export function SliderSetForm({
           <div>
             <h2 className="display text-4xl">Valores</h2>
             <p className="mt-2 text-xs text-chalk-dim">
-              {definitions.length} sliders. Lo que no toques se queda en su valor por defecto.
+              {definitions.length} sliders. Lo que no toques se queda en su
+              valor por defecto.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-5">
@@ -167,7 +302,7 @@ export function SliderSetForm({
               }
               className="btn btn-quiet"
             >
-              {folded.size === blocks.length ? 'Desplegar todo' : 'Plegar todo'}
+              {folded.size === blocks.length ? "Desplegar todo" : "Plegar todo"}
             </button>
             <button
               type="button"
@@ -181,11 +316,14 @@ export function SliderSetForm({
 
         <ImportPanel
           definitions={definitions}
-          onApply={(imported) => setValues((previous) => ({ ...previous, ...imported }))}
+          onApply={(imported) =>
+            setValues((previous) => ({ ...previous, ...imported }))
+          }
         />
 
         {blocks.map((block) => {
-          const Drawing = CATEGORY_DRAWINGS[block.category as keyof typeof CATEGORY_DRAWINGS];
+          const Drawing =
+            CATEGORY_DRAWINGS[block.category as keyof typeof CATEGORY_DRAWINGS];
           const isFolded = folded.has(block.category);
 
           return (
@@ -202,19 +340,30 @@ export function SliderSetForm({
                 aria-expanded={!isFolded}
                 className="flex w-full items-center gap-3 border-b border-chalk-line pb-3 text-left transition-colors hover:text-ink-user"
               >
-                {Drawing ? <Drawing className="size-7 shrink-0 text-chalk-dim" /> : null}
-                <h3 className="display text-2xl">{categoryLabel(block.category)}</h3>
+                {Drawing ? (
+                  <Drawing className="size-7 shrink-0 text-chalk-dim" />
+                ) : null}
+                <h3 className="display text-2xl">
+                  {categoryLabel(block.category)}
+                </h3>
                 <span className="eyebrow ml-auto">{block.rows.length}</span>
-                <span aria-hidden className={`text-xs transition-transform ${isFolded ? '' : 'rotate-90'}`}>
+                <span
+                  aria-hidden
+                  className={`text-xs transition-transform ${isFolded ? "" : "rotate-90"}`}
+                >
                   ▶
                 </span>
               </button>
 
-              {block.category === 'cpu_controls' && hasCpuBehaviour ? (
-                <div hidden={isFolded} className="border-b border-chalk-line/60 py-4">
+              {block.category === "cpu_controls" && hasCpuBehaviour ? (
+                <div
+                  hidden={isFolded}
+                  className="border-b border-chalk-line/60 py-4"
+                >
                   <p className="text-sm text-chalk-dim">
-                    Cómo se comporta la CPU. Los sliders de abajo sólo se usan en
-                    «Personalizado»; en los otros dos los ajusta el juego según los equipos.
+                    Cómo se comporta la CPU. Los sliders de abajo sólo se usan
+                    en «Personalizado»; en los otros dos los ajusta el juego
+                    según los equipos.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {CPU_BEHAVIOURS.map((behaviour) => (
@@ -223,14 +372,18 @@ export function SliderSetForm({
                         type="button"
                         onClick={() => setCpuBehaviour(behaviour.value)}
                         aria-pressed={cpuBehaviour === behaviour.value}
-                        className={`chip ${cpuBehaviour === behaviour.value ? 'chip-active' : ''}`}
+                        className={`chip ${cpuBehaviour === behaviour.value ? "chip-active" : ""}`}
                       >
                         {behaviour.label}
                       </button>
                     ))}
                   </div>
                   <p className="mt-2.5 text-xs text-chalk-dim">
-                    {CPU_BEHAVIOURS.find((behaviour) => behaviour.value === cpuBehaviour)?.hint}
+                    {
+                      CPU_BEHAVIOURS.find(
+                        (behaviour) => behaviour.value === cpuBehaviour,
+                      )?.hint
+                    }
                   </p>
                 </div>
               ) : null}
@@ -239,7 +392,12 @@ export function SliderSetForm({
                   esconde, no desmonta: un regulador desmontado deja de enviarse
                   con el formulario y su valor se perdería. Así, si se vuelve a
                   «Personalizado», los valores siguen donde estaban. */}
-              <ul hidden={isFolded || (block.category === 'cpu_controls' && !cpuIsCustom)}>
+              <ul
+                hidden={
+                  isFolded ||
+                  (block.category === "cpu_controls" && !cpuIsCustom)
+                }
+              >
                 {block.rows.map((row) => (
                   <SliderRow
                     key={row.slug}
@@ -273,7 +431,7 @@ export function SliderSetForm({
           className="btn btn-primary"
           disabled={pending}
         >
-          {pending ? 'Guardando…' : submitLabel}
+          {pending ? "Guardando…" : submitLabel}
         </button>
         {!initial?.isPublished ? (
           <button
@@ -286,7 +444,9 @@ export function SliderSetForm({
             Guardar borrador
           </button>
         ) : null}
-        <p className="text-xs text-chalk-dim">Un borrador sólo lo ves tú hasta que lo publiques.</p>
+        <p className="text-xs text-chalk-dim">
+          Un borrador sólo lo ves tú hasta que lo publiques.
+        </p>
       </div>
     </form>
   );
@@ -317,7 +477,9 @@ const SliderRow = memo(
   }) {
     return (
       <li className="grid gap-x-6 gap-y-1.5 border-b border-chalk-line/60 py-3.5 last:border-b-0 sm:grid-cols-[minmax(8rem,12rem)_1fr]">
-        <span className="pt-1 text-sm leading-tight font-semibold">{row.name}</span>
+        <span className="pt-1 text-sm leading-tight font-semibold">
+          {row.name}
+        </span>
 
         <div className="flex flex-col gap-1.5">
           {scopes.map((scope) => {
@@ -330,7 +492,9 @@ const SliderRow = memo(
                 name={`v_${definition.id}`}
                 label={SCOPE_LABELS[scope]}
                 ariaLabel={`${row.name} — ${SCOPE_LABELS[scope]}`}
-                value={values[String(definition.id)] ?? definition.default_value}
+                value={
+                  values[String(definition.id)] ?? definition.default_value
+                }
                 min={definition.min_value}
                 max={definition.max_value}
                 reference={hasReference ? definition.default_value : null}
@@ -350,7 +514,8 @@ const SliderRow = memo(
     previous.onChange === next.onChange &&
     Object.values(previous.row.byScope).every(
       (definition) =>
-        previous.values[String(definition.id)] === next.values[String(definition.id)],
+        previous.values[String(definition.id)] ===
+        next.values[String(definition.id)],
     ),
 );
 
@@ -373,19 +538,26 @@ function buildBlocks(definitions: SliderDefinition[]) {
   const byCategory = new Map<string, Map<string, FormRow>>();
 
   for (const definition of definitions) {
-    if (!byCategory.has(definition.category)) byCategory.set(definition.category, new Map());
+    if (!byCategory.has(definition.category))
+      byCategory.set(definition.category, new Map());
     const rows = byCategory.get(definition.category)!;
 
     if (!rows.has(definition.slug)) {
-      rows.set(definition.slug, { slug: definition.slug, name: definition.name, byScope: {} });
+      rows.set(definition.slug, {
+        slug: definition.slug,
+        name: definition.name,
+        byScope: {},
+      });
     }
     rows.get(definition.slug)!.byScope[definition.applies_to] = definition;
   }
 
-  const blocks = orderCategories(definitions, [...byCategory.keys()]).map((category) => ({
-    category,
-    rows: [...byCategory.get(category)!.values()],
-  }));
+  const blocks = orderCategories(definitions, [...byCategory.keys()]).map(
+    (category) => ({
+      category,
+      rows: [...byCategory.get(category)!.values()],
+    }),
+  );
 
   return { scopes, blocks };
 }

@@ -26,6 +26,7 @@ export const MIGRATIONS_DESPUES = [
   'supabase/migrations/20260912140000_set_slugs.sql',
   'supabase/migrations/20260919160000_username_history.sql',
   'supabase/migrations/20260919180000_profile_youtube.sql',
+  'supabase/migrations/20260920140000_set_conditions.sql',
 ];
 
 export const STARTER_SET = 'supabase/seed/02_set_full_manual_fg.sql';

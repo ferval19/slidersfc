@@ -142,6 +142,22 @@ export function ChalkStopwatch({ className = '' }: { className?: string }) {
   );
 }
 
+/** Cámara de televisión. Para la cámara con la que se probó un set. */
+export function ChalkCamera({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} aria-hidden>
+      <g className="chalk-stroke" stroke="currentColor" strokeWidth="2">
+        {/* Cuerpo */}
+        <path d="M8 18 Q8 16 10 16 L29 16 Q31 16 31 18 L31 32 Q31 34 29 34 L10 34 Q8 34 8 32 Z" />
+        {/* Objetivo */}
+        <path d="M31 22 L40 18 Q41 17 41 19 L41 31 Q41 33 40 32 L31 28" />
+        {/* Bobina */}
+        <path d="M16 16 Q16 11 20 11 Q24 11 24 16" strokeWidth="1.8" />
+      </g>
+    </svg>
+  );
+}
+
 /** Guante de portero. */
 export function ChalkGlove({ className = '' }: { className?: string }) {
   return (

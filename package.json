@@ -17,7 +17,8 @@
     "test:profile": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-profile.mjs",
     "test:compare": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-compare.mjs",
     "test:backup": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-backup.mjs",
-    "test": "npm run test:sql && npm run test:import && npm run test:profile && npm run test:compare && npm run test:backup"
+    "test:conditions": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-conditions.mjs",
+    "test": "npm run test:sql && npm run test:import && npm run test:profile && npm run test:compare && npm run test:conditions && npm run test:backup"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

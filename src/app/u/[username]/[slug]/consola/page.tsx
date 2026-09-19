@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { ConsoleMode } from '@/components/console-mode';
 import { getSetDetail } from '@/lib/queries';
 import { buildSetView } from '@/lib/set-view';
+import { conditionsSummary } from '@/lib/set-conditions';
 import { setPath } from '@/lib/paths';
 
 type Params = Promise<{ username: string; slug: string }>;
@@ -31,6 +32,7 @@ export default async function ConsolePage({ params }: { params: Params }) {
       blocks={view.blocks}
       cpuBehaviour={view.cpuBehaviour}
       hasCpuBehaviour={view.hasCpuBehaviour}
+      conditions={conditionsSummary(detail.set)}
     />
   );
 }
