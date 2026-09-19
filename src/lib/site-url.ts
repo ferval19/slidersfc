@@ -5,13 +5,32 @@ const FALLBACK_ORIGIN = 'http://localhost:3000';
 /**
  * Origen público del sitio para metadatos, sitemap y robots.
  *
- * Ojo: se comprueba que no esté vacío, no sólo que esté definido. En un
- * `.env` recién copiado la variable existe con valor '', y `??` no lo
- * captura — eso hacía que `new URL('')` tumbase el layout entero.
+ * El orden importa y sale de un fallo real: al compartir un set por WhatsApp
+ * no salía la imagen, porque sin `NEXT_PUBLIC_SITE_URL` esto devolvía
+ * localhost y el `og:image` apuntaba al ordenador de quien lo publicó.
+ *
+ * Por eso ahora Vercel entra en la cadena: sus variables están puestas solas,
+ * así que en producción funciona aunque nadie configure nada. La variable
+ * explícita sigue mandando, para dominios propios.
+ *
+ * Ojo también con las cadenas vacías: en un `.env` recién copiado la variable
+ * existe con valor '', y `??` no lo captura — eso llegó a tumbar el layout
+ * entero con `new URL('')`.
  */
 export function publicSiteUrl() {
-  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  return (configured ? configured : FALLBACK_ORIGIN).replace(/\/$/, '');
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (explicit) return explicit.replace(/\/$/, '');
+
+  // Dominio estable del proyecto en Vercel, antes que el de cada despliegue.
+  const vercel =
+    process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL?.trim() ||
+    process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim() ||
+    process.env.NEXT_PUBLIC_VERCEL_URL?.trim() ||
+    process.env.VERCEL_URL?.trim();
+
+  if (vercel) return `https://${vercel.replace(/^https?:\/\//, '').replace(/\/$/, '')}`;
+
+  return FALLBACK_ORIGIN;
 }
 
 /**

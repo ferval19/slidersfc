@@ -188,3 +188,91 @@ export function ShareCard({ data }: { data: ShareCardData }) {
     </div>
   );
 }
+/**
+ * Tarjeta por defecto, para todo lo que no es la ficha de un set: portada,
+ * páginas de juego y perfiles. Sin ella, compartir cualquiera de esas páginas
+ * no enseñaba imagen ninguna.
+ */
+export function BrandCard({ subtitle }: { subtitle: string }) {
+  // Tres filas de muescas, como guiño al regulador de la web. Valores reales
+  // del preajuste realista de FC27.
+  const rows: { user: number; cpu: number }[] = [
+    { user: 35, cpu: 35 },
+    { user: 52, cpu: 52 },
+    { user: 65, cpu: 65 },
+  ];
+
+  return (
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        backgroundColor: BOARD,
+        color: CHALK,
+        padding: '64px 72px',
+        fontFamily: 'Plex',
+      }}
+    >
+      <div style={{ display: 'flex', fontFamily: 'Display', fontSize: 132, lineHeight: 1 }}>
+        <span>SLIDERS</span>
+        <span style={{ color: INK.user }}>FC</span>
+      </div>
+
+      <div style={{ display: 'flex', marginTop: 10, fontSize: 24, color: CHALK_DIM }}>
+        BY FULL MANUAL FG
+      </div>
+
+      <div style={{ display: 'flex', marginTop: 34, fontSize: 32, color: CHALK, maxWidth: 900 }}>
+        {subtitle}
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', marginTop: 46 }}>
+        {rows.map((row, index) => (
+          <div
+            key={index}
+            style={{ display: 'flex', alignItems: 'center', width: 720, height: 30 }}
+          >
+            <div
+              style={{
+                position: 'relative',
+                display: 'flex',
+                width: 720,
+                height: 24,
+                alignItems: 'center',
+              }}
+            >
+              <div
+                style={{ display: 'flex', width: '100%', height: 2, backgroundColor: '#f2efe433' }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  left: `${row.user}%`,
+                  top: 1,
+                  width: 4,
+                  height: 11,
+                  borderRadius: 2,
+                  backgroundColor: INK.user,
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  left: `${row.cpu}%`,
+                  top: 12,
+                  width: 4,
+                  height: 11,
+                  borderRadius: 2,
+                  backgroundColor: INK.cpu,
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

@@ -26,6 +26,14 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 NEXT_PUBLIC_SITE_URL=            # vacío en local
 ```
 
+En Vercel no hace falta ponerla: el origen sale de las variables que Vercel
+inyecta solo (`VERCEL_PROJECT_PRODUCTION_URL`). Ponla sólo cuando uses un
+dominio propio, y entonces manda ella.
+
+De ese origen dependen los enlaces absolutos de las metaetiquetas: si está mal,
+el `og:image` apunta a un sitio que nadie puede descargar y al compartir un
+enlace no sale la imagen.
+
 ### 3. Esquema y datos
 
 Los ficheros están en `supabase/`. Aplícalos **en este orden** desde el SQL
