@@ -13,7 +13,7 @@ import {
 } from '@/components/chalk';
 import { ScaleLegend, ScaleTrack } from '@/components/slider-scale';
 import { CPU_BEHAVIOURS, SCOPE_LABELS } from '@/lib/constants';
-import { DIFFICULTIES } from '@/lib/set-conditions';
+import { CAMERAS, DIFFICULTIES } from '@/lib/set-conditions';
 
 export const metadata: Metadata = {
   title: 'Qué lleva un set',
@@ -85,8 +85,9 @@ export default function GuidePage() {
           6 minutos se desmontan a 15.
         </Field>
         <Field name="Cámara" icon={ChalkCamera}>
-          El nombre y, si los ajustas, su altura y su zoom. Es texto libre a propósito: cada
-          quien la llama como la ve en su menú. Lo único que se pide es que si pones altura o
+          El nombre y, si los ajustas, su altura y su zoom —las dos van de 0 a 20—. El campo
+          sugiere las del juego ({CAMERAS.slice(0, 4).join(', ')}…) pero admite cualquier cosa,
+          porque cada menú las llama a su manera. Lo único que se pide es que si pones altura o
           zoom digas de qué cámara, porque unos números sueltos no dicen nada.
         </Field>
       </Block>

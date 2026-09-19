@@ -20,7 +20,7 @@ import {
   sortScopes,
 } from "@/lib/constants";
 import { orderCategories } from "@/lib/category-order";
-import { DIFFICULTIES } from "@/lib/set-conditions";
+import { CAMERAS, DIFFICULTIES } from "@/lib/set-conditions";
 import type {
   CpuBehaviour,
   Game,
@@ -235,13 +235,16 @@ export function SliderSetForm({
                   defaultValue={initial?.camera}
                   list="camaras"
                   maxLength={40}
-                  placeholder="EA Sports"
+                  placeholder="Co-op"
                   aria-label="Cámara"
                   className="field sm:flex-1"
                 />
+                {/* Sugerencias, no una lista cerrada: quien tenga otra la
+                    escribe. Ver el comentario de CAMERAS. */}
                 <datalist id="camaras">
-                  <option value="EA Sports" />
-                  <option value="Tradicional" />
+                  {CAMERAS.map((camera) => (
+                    <option key={camera} value={camera} />
+                  ))}
                 </datalist>
 
                 <div className="flex gap-3">

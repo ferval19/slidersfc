@@ -38,6 +38,34 @@ export const DIFFICULTIES: { value: Difficulty; label: string }[] = (
   ['beginner', 'semi_pro', 'professional', 'world_class', 'legendary', 'ultimate'] as const
 ).map((value) => ({ value, label: DIFFICULTY_LABELS[value] }));
 
+/**
+ * Las cámaras del juego, como sugerencias.
+ *
+ * NO es una lista cerrada, y eso es deliberado: el campo sigue siendo texto
+ * libre. Estos nombres salen de guías de FC 26 y FC 27 (el menú de FC 27
+ * hereda la lista), no de haberlos leído en el menú en español, y ya se pagó
+ * una vez en este proyecto inventar nombres del juego. Si alguno no coincide
+ * con el menú, se corrige aquí y nadie pierde nada: los sets guardan el texto
+ * que escribió su autor.
+ *
+ * «Tradicional» va aparte porque es como la llama Fernando en sus sets.
+ */
+export const CAMERAS = [
+  'Co-op',
+  'Tele Broadcast',
+  'Tele',
+  'Broadcast',
+  'EA Sports GameCam',
+  'Classic',
+  'Tradicional',
+  'Legacy',
+  'Dynamic',
+  'End to End',
+  'Tactical',
+  'Tactical Focus',
+  'Pro',
+] as const;
+
 export const CAMERA_MAX = 40; // largo máximo del nombre de la cámara
 export const CAMERA_SETTING_MIN = 0; // altura y zoom
 export const CAMERA_SETTING_MAX = 20;

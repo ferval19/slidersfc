@@ -617,10 +617,13 @@ escrito de seis formas distintas (`8`, `8 minutos`, `7-8`, `7 – 8`, `7 a 8`,
 `7/8`) y se guarda normalizado; un rango al revés o con los dos números iguales
 se rechaza.
 
-La cámara es texto libre con sugerencias, no una lista cerrada: no me consta
-cómo se llaman exactamente todas en el menú en español, y ya nos costó una vez
-inventar nombres del juego. Lo que sí se exige es que si pones altura o zoom
-haya una cámara: unos números sueltos sin saber de qué cámara no dicen nada.
+La cámara es texto libre con sugerencias, no una lista cerrada. El campo sugiere
+las trece del juego —Co-op, Tele Broadcast, Tele, Broadcast, EA Sports GameCam,
+Classic, Tradicional, Legacy, Dynamic, End to End, Tactical, Tactical Focus y
+Pro— pero admite cualquier cosa, porque esos nombres salen de guías y no de
+haberlos leído en el menú en español. Lo que sí se exige es que si pones altura
+o zoom haya una cámara: unos números sueltos sin saber de qué cámara no dicen
+nada.
 
 La validación y sus 32 comprobaciones las escribió Sonnet con el encargo
 cerrado.

@@ -207,11 +207,14 @@ con forma de número o de rango (`^[0-9]{1,2}(-[0-9]{1,2})?$`) y la aplicación
 lo normaliza antes de guardar, así que sigue siendo comparable de un vistazo
 aunque no sea aritmética.
 
-**La cámara es texto libre con sugerencias, no una lista cerrada.** No consta
-cómo se llaman exactamente todas en el menú en español, y ya se pagó una vez
-inventar nombres del juego. Lo único que se exige es que haya cámara si hay
-altura o zoom: unos números sueltos sin saber de qué cámara no dicen nada, y
-eso va tanto en la validación como en un CHECK.
+**La cámara es texto libre con sugerencias, no una lista cerrada.** El campo
+sugiere las trece cámaras del juego (`CAMERAS` en `set-conditions.ts`), pero
+esos nombres salen de guías, no de haberlos leído en el menú en español, y ya
+se pagó una vez inventar nombres del juego. Al ser sugerencias y no
+restricción, un nombre equivocado no rompe nada: se corrige en ese array y los
+sets guardan el texto que escribió su autor. Lo único que se exige es que haya
+cámara si hay altura o zoom: unos números sueltos sin saber de qué cámara no
+dicen nada, y eso va tanto en la validación como en un CHECK.
 
 **`difficulty` es `string` en los tipos, no la unión estrecha.** La unión buena
 vive en `set-conditions.ts`; la columna se lee como texto para que un valor
