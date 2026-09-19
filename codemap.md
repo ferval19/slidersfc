@@ -38,9 +38,11 @@ src/proxy.ts                     refresco de sesión y rutas protegidas
 supabase/migrations/             esquema, RLS, triggers
 supabase/seed/catalog.mjs        catálogo de sliders: FUENTE DE VERDAD
 supabase/seed/0*.sql             generado + sets de inicio
+supabase/storage/                configuración de Storage (aparte: PGlite no la prueba)
 scripts/build-seed.mjs           catalog.mjs → 01_catalog.sql
 scripts/test-sql.mjs             toda la cadena SQL contra Postgres en memoria
 scripts/test-import.mjs          el importador de texto contra el catálogo real
+scripts/test-profile.mjs         la validación del perfil
 docs/                            dirección visual · hoja de ruta
 ```
 
@@ -50,6 +52,9 @@ docs/                            dirección visual · hoja de ruta
 | --- | --- |
 | `queries.ts` | Todas las lecturas. Cada una envuelta en `safeRead`: si Supabase no responde, la página se queda vacía en vez de caerse |
 | `set-view.ts` | Convierte el detalle de un set en algo plano y serializable para los Client Components |
+| `profile.ts` | Validación del perfil. Puro: lo comparten el formulario y la acción de servidor, con las mismas reglas |
+| `avatar-storage.ts` | Dónde vive cada avatar. El formato de la carpeta lo exige la política de Storage |
+| `image.ts` | Recorta y reduce la foto a 512 px en el navegador antes de subirla |
 | `import-sliders.ts` | Lee un set pegado en texto. Módulo **puro** (sólo importa tipos) para poder probarlo con `node` sin levantar la aplicación |
 | `category-order.ts` | Ordena las categorías por `sort_order`. Módulo aparte **sin nada del servidor**: lo usan la ficha (servidor) y el formulario (cliente) |
 | `constants.ts` | Etiquetas, ámbitos y el color de cada rotulador |
@@ -176,6 +181,28 @@ seeds van en un único bloque `do`, que es atómico.
 **En el modo consola el progreso va abajo.** Arriba desaparecía tras la
 cabecera del sitio, que también es fija y tiene más z-index.
 
+**Cambiar de nombre de usuario no rompe los enlaces.** El nombre está en la
+URL de todo lo que alguien comparte, así que `username_history` guarda los
+liberados y `/u/<viejo>` y sus sets redirigen (301) al actual. Escribe sólo un
+trigger `security definer`: la tabla no tiene políticas de escritura. Dos
+detalles que parecen de más y no lo son: al cambiar, primero se **borra** el
+alias del nombre que se acaba de coger (si no, quien lo tomó de otro acabaría
+redirigido al anterior dueño), y volver al nombre de siempre retira su propio
+alias, que si no se redirigiría a sí mismo.
+
+**La configuración de Storage vive fuera de `migrations/`.** PGlite no tiene
+el esquema `storage`, así que `npm run test:sql` no la puede ejecutar; si
+estuviera en la lista de migraciones, la prueba entera dejaría de correr. Está
+en `supabase/storage/01_avatars.sql`, es idempotente y se aplica a mano una
+vez. La carpeta de cada foto es el id del usuario porque la política se apoya
+en ella: `(storage.foldername(name))[1] = auth.uid()`.
+
+**El avatar sólo puede apuntar a nuestro almacén**, menos el que ya estuviera
+guardado. Quien entra con X trae la foto de `pbs.twimg.com`, y guardar el
+perfil sin tocarla no puede fallar por eso; pero una URL nueva y ajena sí se
+rechaza, porque un avatar remoto le enseña la IP de cada visitante a un
+servidor de otro.
+
 **El importador de texto busca el nombre más largo primero.** «Velocidad» es
 prefijo de «Velocidad de tiros de calidad»; si se busca por orden de catálogo,
 media lista de FC27 cae en el slider equivocado sin avisar. Otras tres reglas
@@ -203,10 +230,13 @@ npm run lint         # eslint
 npm run seed:build   # catalog.mjs → 01_catalog.sql
 npm run test:sql     # migraciones y seeds contra Postgres en memoria (PGlite)
 npm run test:import  # el importador de texto contra el catálogo real
+npm run test:profile # la validación del perfil
+npm test             # los tres de arriba
 ```
 
 Antes de dar algo por bueno: `typecheck`, `lint`, **`build`** y, si has tocado
-SQL, `test:sql`; si has tocado el importador o el catálogo, `test:import`.
+SQL, `test:sql`; si has tocado el importador, el catálogo o el perfil,
+`npm test`, que los pasa todos.
 
 ---
 

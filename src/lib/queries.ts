@@ -129,6 +129,30 @@ export async function getProfileByUsername(username: string): Promise<Profile | 
   );
 }
 
+/**
+ * ¿Este nombre de usuario es el de antes de alguien? Devuelve el nombre actual.
+ *
+ * Sirve para que /u/<nombre viejo> y los sets que cuelgan de él no den un 404
+ * después de un cambio de nombre: el enlace que alguien compartió en un grupo
+ * hace dos meses sigue llevando al sitio.
+ */
+export async function getUsernameAfterRename(username: string): Promise<string | null> {
+  return safeRead(
+    'getUsernameAfterRename',
+    async (supabase) => {
+      const { data } = await supabase
+        .from('username_history')
+        .select('profiles ( username )')
+        .eq('username', username.toLowerCase())
+        .maybeSingle();
+
+      const profile = data?.profiles as { username: string } | null | undefined;
+      return profile?.username ?? null;
+    },
+    null,
+  );
+}
+
 export type SetDetail = {
   set: SliderSet;
   game: Game;

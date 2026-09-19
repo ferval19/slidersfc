@@ -12,7 +12,9 @@
     "db:reset": "supabase db reset",
     "db:push": "supabase db push",
     "test:sql": "node scripts/test-sql.mjs",
-    "test:import": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-import.mjs"
+    "test:import": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-import.mjs",
+    "test:profile": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-profile.mjs",
+    "test": "npm run test:sql && npm run test:import && npm run test:profile"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

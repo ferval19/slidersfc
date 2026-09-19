@@ -54,6 +54,11 @@ Editor del dashboard, o con la CLI (`supabase db push`):
 7. `supabase/seed/03_set_fc27_realista.sql` — valores por defecto de FC27
    (requiere haber entrado una vez con `ferval19@gmail.com`; ver
    [supabase/README.md](supabase/README.md))
+8. `supabase/migrations/20260919160000_username_history.sql` — que cambiar de
+   nombre de usuario no rompa los enlaces ya compartidos
+9. `supabase/storage/01_avatars.sql` — almacén de las fotos de perfil. Va
+   aparte de las migraciones porque es configuración de Storage y
+   `npm run test:sql` no puede probarla
 
 El seed es idempotente: se puede volver a aplicar sin duplicar nada.
 
@@ -168,6 +173,8 @@ npm run dev
 | `npm run seed:build` | Regenera `supabase/seed/01_catalog.sql` desde `supabase/seed/catalog.mjs` |
 | `npm run test:sql` | Ejecuta migraciones y seeds contra un Postgres en memoria y comprueba el resultado |
 | `npm run test:import` | Prueba el importador de texto pegado contra el catálogo real |
+| `npm run test:profile` | Prueba la validación del perfil |
+| `npm test` | Los tres anteriores, en orden |
 
 ## Estructura
 
@@ -400,6 +407,33 @@ El análisis es un módulo sin UI, y `npm run test:import` lo prueba contra el
 catálogo de verdad: las cuatro formas de pegar, que el nombre largo gane al
 corto que lo prefija, que un «8 minutos» no se cuele como valor y que los 61
 sliders de FC27 se reconozcan enteros.
+
+### 19/09 · La ficha: editar el perfil
+
+Hasta hoy el perfil lo escribía el trigger al registrarte y ahí se quedaba:
+ni foto, ni biografía, ni cambiar el nombre. Y el perfil no es adorno en esto:
+quien abre un set quiere saber quién lo firma y **cómo juega**, porque unos
+valores sin saber la dificultad, la duración de los tiempos o la cámara no
+significan lo mismo.
+
+La página se ordena alrededor de una **ficha en vivo**: arriba, tal como te
+van a ver, con la foto que se cambia pinchándola y el nombre y la biografía
+actualizándose mientras escribes. Debajo, los campos. El nombre de usuario se
+escribe dentro de su propia URL —`slidersfc.vercel.app/u/…`— y se normaliza al
+vuelo: «Pepé García» se queda en `pepe_garcia` según lo tecleas, en vez de
+rechazártelo al guardar.
+
+Lo que hace que cambiar de nombre no dé miedo es una tabla: **`username_history`**.
+El nombre está en la URL de todo lo que has compartido, así que al cambiarlo el
+viejo queda como alias y `/u/<viejo>` y sus sets redirigen al nuevo. El enlace
+que pegaste en un grupo hace dos meses sigue funcionando.
+
+La foto se recorta en cuadrado y se reduce a 512 px **en el navegador** antes
+de subir: la misma foto de móvil pasa de cuatro megas a unas decenas de kilos.
+Cada quien escribe sólo dentro de su carpeta del almacén, y sólo se acepta una
+URL de ahí: un avatar remoto le enseñaría la IP de cada visitante a un
+servidor ajeno. La única excepción es la foto de X de quien entró con X, que
+ya estaba guardada y pasa tal cual.
 
 ---
 

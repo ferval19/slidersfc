@@ -11,6 +11,11 @@ export function profilePath(username: string) {
   return `/u/${username}`;
 }
 
+/** El formulario de editar el perfil, junto a /cuenta/contrasena. */
+export function editProfilePath() {
+  return '/cuenta/perfil';
+}
+
 export function setPath(username: string, slug: string) {
   return `/u/${username}/${slug}`;
 }

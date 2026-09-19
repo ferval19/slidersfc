@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import { notFound, permanentRedirect } from 'next/navigation';
 
 import { Avatar } from '@/components/avatar';
 import { EmptyState } from '@/components/empty-state';
 import { SetCard } from '@/components/set-card';
 import { SignOutButton } from '@/components/sign-out-button';
-import { getProfileByUsername, getSetsByOwner } from '@/lib/queries';
+import { getProfileByUsername, getSetsByOwner, getUsernameAfterRename } from '@/lib/queries';
+import { editProfilePath, profilePath } from '@/lib/paths';
 import { getCurrentUser } from '@/lib/supabase/server';
 
 export async function generateMetadata({
@@ -39,7 +41,14 @@ export default async function ProfilePage({
   const { username } = await params;
 
   const profile = await getProfileByUsername(username);
-  if (!profile) notFound();
+
+  if (!profile) {
+    // Puede ser el nombre de antes de alguien: los enlaces que ya circulan no
+    // tienen por qué morir porque se haya cambiado el nombre.
+    const current = await getUsernameAfterRename(username);
+    if (current) permanentRedirect(profilePath(current));
+    notFound();
+  }
 
   const [sets, user] = await Promise.all([getSetsByOwner(profile.id), getCurrentUser()]);
   const isMe = user?.id === profile.id;
@@ -75,7 +84,14 @@ export default async function ProfilePage({
           {profile.bio ? <p className="mt-3 max-w-prose text-sm text-chalk/90">{profile.bio}</p> : null}
         </div>
 
-        {isMe ? <SignOutButton /> : null}
+        {isMe ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href={editProfilePath()} className="btn btn-quiet">
+              Editar perfil
+            </Link>
+            <SignOutButton />
+          </div>
+        ) : null}
       </header>
 
       <section className="py-8">

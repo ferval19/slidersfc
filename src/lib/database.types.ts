@@ -6,6 +6,13 @@
 
 export type SliderScope = 'user' | 'cpu' | 'cpu_opponent' | 'cpu_teammate';
 
+/** Nombres de usuario liberados, para que los enlaces viejos sigan yendo al sitio. */
+export type UsernameHistory = {
+  username: string;
+  profile_id: string;
+  released_at: string;
+};
+
 export type Profile = {
   id: string;
   username: string;
@@ -84,6 +91,20 @@ export type Database = {
         >;
         Update: Partial<Profile>;
         Relationships: [];
+      };
+      username_history: {
+        Row: UsernameHistory;
+        Insert: Insert<UsernameHistory, 'released_at'>;
+        Update: Partial<UsernameHistory>;
+        Relationships: [
+          {
+            foreignKeyName: 'username_history_profile_id_fkey';
+            columns: ['profile_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       games: {
         Row: Game;

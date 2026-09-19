@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 
 import { Avatar } from '@/components/avatar';
 import { CommentComposer, CommentList } from '@/components/comment-thread';
 import { SetOwnerActions } from '@/components/set-owner-actions';
 import { ShareSet } from '@/components/share-set';
 import { SliderTable } from '@/components/slider-table';
-import { getGames, getSetDetail } from '@/lib/queries';
+import { getGames, getSetDetail, getUsernameAfterRename } from '@/lib/queries';
 import { buildSetView } from '@/lib/set-view';
 import { consolePath, profilePath, setPath } from '@/lib/paths';
 import { publicSiteUrl } from '@/lib/site-url';
@@ -59,7 +59,13 @@ export default async function SetDetailPage({ params }: { params: Params }) {
     getCurrentUser(),
     getGames(),
   ]);
-  if (!detail) notFound();
+  if (!detail) {
+    // Igual que en el perfil: un enlace compartido con el nombre de antes
+    // sigue llevando al set.
+    const current = await getUsernameAfterRename(username);
+    if (current) permanentRedirect(setPath(current, slug));
+    notFound();
+  }
 
   const view = buildSetView(detail, user?.id ?? null);
   const isOwner = user?.id === detail.owner.id;

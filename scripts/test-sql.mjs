@@ -27,6 +27,7 @@ const MIGRATIONS = [
   'supabase/migrations/20260911120200_profiles_trigger.sql',
   'supabase/migrations/20260912090000_drop_mode.sql',
   'supabase/migrations/20260912140000_set_slugs.sql',
+  'supabase/migrations/20260919160000_username_history.sql',
 ];
 const CATALOG = 'supabase/seed/01_catalog.sql';
 const STARTER_SET = 'supabase/seed/02_set_full_manual_fg.sql';
@@ -321,6 +322,58 @@ await (await expectFailure(
   await db.close();
 }
 
+// --- Historial de nombres de usuario ---------------------------------------
+{
+  const db = await freshDatabase({ withCatalog: false });
+  const uid = async (email) =>
+    (await db.query(`select id from auth.users where email = '${email}'`)).rows[0].id;
+  const me = await uid(EMAIL);
+
+  await db.exec(`update public.profiles set username = 'nuevonombre' where id = '${me}'`);
+
+  const alias = await db.query(`select username, profile_id from public.username_history`);
+  check(
+    'al cambiar de nombre, el viejo queda como alias',
+    alias.rows.length === 1 && alias.rows[0].profile_id === me,
+    alias.rows.map((row) => row.username).join(', '),
+  );
+
+  const antiguo = alias.rows[0]?.username;
+
+  // Volver al de siempre tiene que liberar el alias, o el nombre viejo
+  // apuntaría a sí mismo dando una redirección en bucle.
+  await db.exec(`update public.profiles set username = '${antiguo}' where id = '${me}'`);
+  check(
+    'volver al nombre de antes retira su alias',
+    0 === (await count(db, `select count(*)::int as n from public.username_history where username = '${antiguo}'`)),
+  );
+
+  // Otro usuario toma el nombre que el primero ha dejado libre.
+  await db.exec(`insert into auth.users (email) values ('otro@ejemplo.com')`);
+  const otro = await uid('otro@ejemplo.com');
+  await db.exec(`update public.profiles set username = 'renombrado' where id = '${me}'`);
+  await db.exec(`update public.profiles set username = '${antiguo}' where id = '${otro}'`);
+
+  const tras = await db.query(
+    `select profile_id from public.username_history where username = '${antiguo}'`,
+  );
+  check(
+    'si otro toma el nombre liberado, manda quien lo tiene ahora',
+    tras.rows.length === 0,
+    tras.rows.length ? 'el alias sigue apuntando al anterior' : '',
+  );
+
+  // Cambiar otra cosa del perfil no debe ensuciar el historial.
+  const antes = await count(db, `select count(*)::int as n from public.username_history`);
+  await db.exec(`update public.profiles set bio = 'hola' where id = '${me}'`);
+  check(
+    'tocar la biografía no toca el historial',
+    antes === (await count(db, `select count(*)::int as n from public.username_history`)),
+  );
+
+  await db.close();
+}
+
 // --- RLS ------------------------------------------------------------------
 {
   const db = await freshDatabase();
@@ -332,7 +385,7 @@ await (await expectFailure(
   const without = rows.filter((row) => !row.relrowsecurity).map((row) => row.relname);
   check(
     `RLS activada en las ${rows.length} tablas`,
-    rows.length === 6 && without.length === 0,
+    rows.length === 7 && without.length === 0,
     without.join(', '),
   );
   await db.close();
