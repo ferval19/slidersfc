@@ -108,6 +108,16 @@ const fc27 = [
   { slug: 'acceleration',  name: 'Aceleración', category: 'speed', default: 48 },
 
   // TIRO
+  // Los cuatro maestros. Escalan el grupo entero: el juego pide dejarlos en 50
+  // y tocar sólo los de cada tipo de tiro o de pase. Son los mismos que en
+  // FC26 eran los únicos que había, antes de que EA los desdoblara por tipo.
+  //
+  // OJO: los nombres en español están reconstruidos a partir de la tarjeta de
+  // @WilsdorfAndreas y de cómo se llamaban en FC26; no se han leído del menú.
+  // Si en el juego se llaman de otra forma, se corrigen aquí y se regenera.
+  { slug: 'master_shot_error',         name: 'Error de tiro (general)',              category: 'shooting', default: 50 },
+  { slug: 'master_shot_speed',         name: 'Velocidad y altura de tiro (general)', category: 'shooting', default: 50 },
+
   { slug: 'shot_error',                name: 'Error en tiros normales',              category: 'shooting', default: 52 },
   { slug: 'shot_speed',                name: 'Velocidad de tiros normales',          category: 'shooting', default: 48 },
   { slug: 'finesse_shot_error',        name: 'Error en tiros de calidad',            category: 'shooting', default: 55 },
@@ -121,6 +131,9 @@ const fc27 = [
   { slug: 'header_shot_error',         name: 'Fallo al rematar de cabeza',           category: 'shooting', default: 40 },
 
   // PASE
+  { slug: 'master_pass_error',             name: 'Error de pase (general)',               category: 'passing', default: 50 },
+  { slug: 'master_pass_speed',             name: 'Velocidad y altura de pase (general)',  category: 'passing', default: 50 },
+
   { slug: 'pass_error',                    name: 'Error en pases rasos normales',         category: 'passing', default: 55 },
   { slug: 'pass_speed',                    name: 'Velocidad de pases rasos normales',     category: 'passing', default: 45 },
   { slug: 'header_pass_error',             name: 'Fallo al pasar con la cabeza',          category: 'passing', default: 60 },

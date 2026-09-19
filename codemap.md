@@ -186,6 +186,22 @@ seeds van en un único bloque `do`, que es atómico.
 **En el modo consola el progreso va abajo.** Arriba desaparecía tras la
 cabecera del sitio, que también es fija y tiene más z-index.
 
+**Los cuatro maestros de tiro y pase son sliders normales del catálogo.** Son
+`master_shot_error`, `master_shot_speed`, `master_pass_error` y
+`master_pass_speed`: escalan su grupo entero, el juego pide dejarlos en 50 y
+tocar sólo los de cada tipo. No se modelan de forma especial a propósito —
+nada en la aplicación sabe que son «maestros»— porque la marca gris de fábrica
+ya hace el trabajo: si alguien mueve un maestro, se ve al instante que se ha
+separado del 50, que es justo lo que hay que notar. Van a la cabeza de su
+categoría, no en una categoría propia.
+
+**Sus nombres en español están reconstruidos, no leídos del menú.** Salen de la
+tarjeta de @WilsdorfAndreas (en inglés) y de cómo se llamaban en FC26, donde
+eran los únicos cuatro que había antes de que EA los desdoblara por tipo de
+tiro y de pase. Si en el juego se llaman de otra forma, se cambian en
+`catalog.mjs`, `npm run seed:build` y a reaplicar: es un minuto y no toca
+datos, porque los sets referencian el slug y no el nombre.
+
 **La copia de seguridad genera SQL, no sólo JSON.** El JSON es el archivo; el
 SQL es lo que la hace útil, porque el camino de reposición de este proyecto ya
 existe y es conocido: pegar SQL en el editor de Supabase. Una copia que no

@@ -81,7 +81,10 @@ begin
       -- Velocidad
       ('sprint_speed'::text, 'user'::text, 35::int), ('sprint_speed', 'cpu_opponent', 35),
       ('acceleration', 'user', 48), ('acceleration', 'cpu_opponent', 48),
-      -- Tiro
+      -- Tiro. Los dos maestros van en 50: el juego pide dejarlos ahí y tocar
+      -- sólo los de cada tipo, así que 50 es su valor de fábrica.
+      ('master_shot_error',     'user', 50), ('master_shot_error',     'cpu_opponent', 50),
+      ('master_shot_speed',     'user', 50), ('master_shot_speed',     'cpu_opponent', 50),
       ('shot_error',            'user', 52), ('shot_error',            'cpu_opponent', 52),
       ('shot_speed',            'user', 48), ('shot_speed',            'cpu_opponent', 48),
       ('finesse_shot_error',    'user', 55), ('finesse_shot_error',    'cpu_opponent', 55),
@@ -93,7 +96,9 @@ begin
       ('power_shot_error',      'user', 55), ('power_shot_error',      'cpu_opponent', 55),
       ('power_shot_speed',      'user', 48), ('power_shot_speed',      'cpu_opponent', 48),
       ('header_shot_error',     'user', 40), ('header_shot_error',     'cpu_opponent', 40),
-      -- Pase
+      -- Pase. Mismo criterio con sus dos maestros.
+      ('master_pass_error',          'user', 50), ('master_pass_error',          'cpu_opponent', 50),
+      ('master_pass_speed',          'user', 50), ('master_pass_speed',          'cpu_opponent', 50),
       ('pass_error',                 'user', 55), ('pass_error',                 'cpu_opponent', 55),
       ('pass_speed',                 'user', 45), ('pass_speed',                 'cpu_opponent', 45),
       ('header_pass_error',          'user', 60), ('header_pass_error',          'cpu_opponent', 60),

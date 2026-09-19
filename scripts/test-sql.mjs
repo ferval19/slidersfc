@@ -85,7 +85,7 @@ const count = async (db, sql) => (await db.query(sql)).rows[0].n;
 
   check('fc26 tiene 50 sliders', 50 === await count(db,
     `select count(*)::int as n from slider_definitions d join games g on g.id = d.game_id where g.slug = 'fc26'`));
-  check('fc27 tiene 121 filas de slider', 121 === await count(db,
+  check('fc27 tiene 129 filas de slider', 129 === await count(db,
     `select count(*)::int as n from slider_definitions d join games g on g.id = d.game_id where g.slug = 'fc27'`));
 
   // FC27 desdobla CPU rival y compañero sólo en los de comportamiento de la
@@ -147,8 +147,8 @@ const count = async (db, sql) => (await db.query(sql)).rows[0].n;
   await db.exec(read(FC27_SET));
 
   check(
-    'el set de FC27 queda publicado con sus 121 valores',
-    121 ===
+    'el set de FC27 queda publicado con sus 129 valores',
+    129 ===
       (await count(
         db,
         `select count(*)::int as n from slider_set_values v

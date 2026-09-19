@@ -529,6 +529,32 @@ Postgres en memoria. Vuelca, genera el SQL, lo aplica en una base vacía y
 comprueba que ha vuelto todo, incluido que los valores caen en la definición
 correcta pese a que los ids no coinciden.
 
+### 19/09 · Los cuatro maestros
+
+Una tarjeta de sliders de FC27 publicada por @WilsdorfAndreas traía arriba del
+todo un aviso que no estábamos recogiendo: *«pon los cuatro maestros a 50
+antes de nada»* — error de tiro, velocidad y altura de tiro, error de pase y
+velocidad y altura de pase, cada uno escalando su grupo entero.
+
+Contados uno a uno, los 45 sliders de jugabilidad de sus tarjetas ya estaban
+todos en el catálogo (y nosotros tenemos 16 más, los de comportamiento de la
+CPU, que sus tarjetas no cubren). Lo único que faltaba eran esos cuatro. Y no
+es cosmético: un set publicado con sus 45 valores pero con un maestro en 60 no
+se comporta igual en quien lo copie con los maestros a 50. Sin ellos, un set
+es ambiguo.
+
+Son sliders normales del catálogo, a la cabeza de Tiro y de Pase. Nada en la
+aplicación sabe que son «maestros», y no hace falta: la marca gris de fábrica
+está en su 50, así que mover uno se ve al instante.
+
+Los nombres en español están reconstruidos a partir de la tarjeta (en inglés) y
+de FC26, donde estos cuatro eran los únicos que había antes de que EA los
+desdoblara por tipo. Si el menú los llama de otra forma se corrigen en
+`catalog.mjs` y se regenera: los sets referencian el slug, no el nombre, así
+que no se toca ningún dato.
+
+FC27 pasa de 61 a 65 sliders, de 121 a 129 filas.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.
