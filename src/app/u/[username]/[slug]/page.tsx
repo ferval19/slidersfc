@@ -7,7 +7,7 @@ import { CommentComposer, CommentList } from '@/components/comment-thread';
 import { SetOwnerActions } from '@/components/set-owner-actions';
 import { ShareSet } from '@/components/share-set';
 import { SliderTable } from '@/components/slider-table';
-import { getSetDetail } from '@/lib/queries';
+import { getGames, getSetDetail } from '@/lib/queries';
 import { buildSetView } from '@/lib/set-view';
 import { consolePath, profilePath, setPath } from '@/lib/paths';
 import { publicSiteUrl } from '@/lib/site-url';
@@ -54,9 +54,10 @@ function formatDate(iso: string) {
 export default async function SetDetailPage({ params }: { params: Params }) {
   const { username, slug } = await params;
 
-  const [detail, user] = await Promise.all([
+  const [detail, user, games] = await Promise.all([
     getSetDetail({ username, slug }),
     getCurrentUser(),
+    getGames(),
   ]);
   if (!detail) notFound();
 
@@ -138,6 +139,9 @@ export default async function SetDetailPage({ params }: { params: Params }) {
               username={detail.owner.username}
               slug={detail.set.slug}
               isPublished={detail.set.is_published}
+              otherGames={games
+                .filter((game) => game.id !== detail.set.game_id)
+                .map((game) => ({ slug: game.slug, name: game.name }))}
             />
           ) : null}
         </div>

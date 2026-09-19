@@ -373,6 +373,15 @@ para no enseñar una referencia falsa.
 Y analítica, que es una línea y la única forma de saber si el 25 entró
 alguien.
 
+### 19/09 · Llevar un set al juego nuevo
+
+Con FC27 a la vuelta, quien tenga un set de FC26 no va a querer meter treinta
+valores otra vez. «Llevar a FC27» empareja por slug, aplica los dos renombres
+de EA y crea un **borrador** que lleva a revisar. Con el set de Full Manual FG
+viajan **49 de 50 valores**; el único que se queda fuera es «Agresividad en las
+entradas», que FC27 parte en dos y elegir una sería inventar. Los 72 sliders
+nuevos arrancan con lo que trae el juego.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

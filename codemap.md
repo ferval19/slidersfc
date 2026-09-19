@@ -123,6 +123,12 @@ tocado el autor. En FC26 no conocemos el preajuste, así que se quedan todos en
 el neutro — y la interfaz lo detecta sola (`hasReference`: si todos los valores
 por defecto son iguales, no enseña una referencia falsa).
 
+**Llevar un set a otro juego empareja por slug**, y los renombres viven en
+`src/lib/game-migration.ts`. Crea un **borrador** y lleva a editarlo: nada se
+publica sin que el autor lo vea. Lo que no encaja se queda fuera de forma
+explícita en vez de adivinar — `cpu_tackle_aggression` de FC26 no se copia
+porque FC27 lo parte en dos.
+
 **El borrado de sincronización del catálogo va por (slug, ámbito)**, no sólo
 por slug. Si un slider deja de existir en un lado, el slug sigue estando y un
 borrado por slug no lo ve: a FC27 le sobrevivieron veinte ámbitos «CPU

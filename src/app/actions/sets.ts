@@ -3,7 +3,8 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { setPath } from '@/lib/paths';
+import { planCopy } from '@/lib/game-migration';
+import { editSetPath, setPath } from '@/lib/paths';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { SliderDefinition } from '@/lib/database.types';
 
@@ -268,4 +269,93 @@ export async function deleteSet(setId: string) {
     : { data: null };
 
   redirect(profile ? `/u/${profile.username}` : '/');
+}
+
+/**
+ * Copia un set a otro juego: al salir una versión nueva, nadie quiere volver a
+ * meter treinta valores a mano.
+ *
+ * Crea un BORRADOR y lleva a editarlo. Lo que no existe en el juego destino se
+ * queda fuera, y lo que el destino tiene de más arranca con lo que trae el
+ * juego de fábrica. Nada se publica sin que el autor lo vea.
+ */
+export async function copySetToGame(setId: string, targetGameSlug: string) {
+  const supabase = await createSupabaseServerClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect('/login');
+
+  const { data: source } = await supabase
+    .from('slider_sets')
+    .select('id, owner_id, title, description, game_id')
+    .eq('id', setId)
+    .maybeSingle();
+
+  if (!source) throw new Error('Este set ya no existe.');
+  if (source.owner_id !== user.id) throw new Error('Sólo el autor puede copiar su set.');
+
+  const { data: targetGame } = await supabase
+    .from('games')
+    .select('id, name')
+    .eq('slug', targetGameSlug)
+    .maybeSingle();
+
+  if (!targetGame) throw new Error('Ese juego no existe.');
+  if (targetGame.id === source.game_id) throw new Error('El set ya es de ese juego.');
+
+  const [{ data: values }, { data: targetDefinitions }] = await Promise.all([
+    supabase
+      .from('slider_set_values')
+      .select('value, slider_definitions!inner (*)')
+      .eq('slider_set_id', setId),
+    supabase.from('slider_definitions').select('*').eq('game_id', targetGame.id),
+  ]);
+
+  const plan = planCopy(
+    ((values ?? []) as unknown as { value: number; slider_definitions: SliderDefinition }[]).map(
+      (row) => ({ definition: row.slider_definitions, value: row.value }),
+    ),
+    targetDefinitions ?? [],
+  );
+
+  if (plan.values.size === 0) {
+    throw new Error('Ningún valor de este set encaja en ese juego.');
+  }
+
+  const { data: created, error: createError } = await supabase
+    .from('slider_sets')
+    .insert({
+      owner_id: user.id,
+      game_id: targetGame.id,
+      title: `${source.title} (${targetGame.name})`,
+      description: source.description,
+      is_published: false,
+    })
+    .select('id, slug, profiles!inner ( username )')
+    .single();
+
+  if (createError || !created) {
+    throw new Error(createError?.message ?? 'No se ha podido crear la copia.');
+  }
+
+  const copy = created as unknown as { id: string; slug: string; profiles: { username: string } };
+
+  const { error: valuesError } = await supabase.from('slider_set_values').insert(
+    [...plan.values].map(([slider_definition_id, value]) => ({
+      slider_set_id: copy.id,
+      slider_definition_id,
+      value,
+    })),
+  );
+
+  if (valuesError) {
+    await supabase.from('slider_sets').delete().eq('id', copy.id);
+    throw new Error(valuesError.message);
+  }
+
+  revalidatePath('/');
+  redirect(editSetPath(copy.profiles.username, copy.slug));
 }
