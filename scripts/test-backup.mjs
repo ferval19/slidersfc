@@ -31,6 +31,8 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { CATALOG, MIGRATIONS_ANTES, MIGRATIONS_DESPUES } from './schema-files.mjs';
+
 import { PGlite } from '@electric-sql/pglite';
 
 import { buildRestoreSql } from './backup-sql.mjs';
@@ -39,16 +41,7 @@ const repo = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (file) =>
   readFileSync(join(repo, file), 'utf8').replace(/create extension if not exists pgcrypto;/, '');
 
-const MIGRATIONS = [
-  'supabase/migrations/20260911120000_init_schema.sql',
-  'supabase/migrations/20260911120100_rls.sql',
-  'supabase/migrations/20260911120200_profiles_trigger.sql',
-  'supabase/migrations/20260912090000_drop_mode.sql',
-  'supabase/migrations/20260912140000_set_slugs.sql',
-  'supabase/migrations/20260919160000_username_history.sql',
-  'supabase/migrations/20260919180000_profile_youtube.sql',
-];
-const CATALOG = 'supabase/seed/01_catalog.sql';
+
 const EMAIL = 'ferval19@gmail.com';
 
 let failures = 0;
@@ -82,7 +75,7 @@ async function freshDatabase({ withUser = true, idOffset = 0 } = {}) {
     create role authenticated;
   `);
 
-  for (const file of MIGRATIONS.slice(0, 3)) await db.exec(read(file));
+  for (const file of MIGRATIONS_ANTES) await db.exec(read(file));
 
   if (idOffset) {
     await db.exec(`select setval(pg_get_serial_sequence('public.games', 'id'), ${idOffset}, false);`);
@@ -92,7 +85,7 @@ async function freshDatabase({ withUser = true, idOffset = 0 } = {}) {
   }
 
   await db.exec(read(CATALOG));
-  for (const file of MIGRATIONS.slice(3)) await db.exec(read(file));
+  for (const file of MIGRATIONS_DESPUES) await db.exec(read(file));
   if (withUser) await db.exec(`insert into auth.users (email) values (${q(EMAIL)});`);
 
   return db;
@@ -173,8 +166,8 @@ const setTitle = 'Set de prueba para la copia';
 const setDescription = 'Descripción de prueba para el viaje de ida y vuelta.';
 
 await origin.exec(`
-  insert into public.slider_sets (id, owner_id, game_id, title, description, is_published)
-  values (${q(setId)}, ${q(profile.id)}, ${game.id}, ${q(setTitle)}, ${q(setDescription)}, true)
+  insert into public.slider_sets (id, owner_id, game_id, title, description, is_published, cpu_behaviour)
+  values (${q(setId)}, ${q(profile.id)}, ${game.id}, ${q(setTitle)}, ${q(setDescription)}, true, 'dynamic')
 `);
 
 await origin.exec(`
@@ -227,15 +220,16 @@ check(
 
 const restoredSet = await one(
   target,
-  `select id, title, slug, description, is_published from public.slider_sets where id = ${q(setId)}`,
+  `select id, title, slug, description, is_published, cpu_behaviour from public.slider_sets where id = ${q(setId)}`,
 );
 check(
-  'el set vuelve con el mismo uuid, título, slug, descripción y is_published',
+  'el set vuelve con el mismo uuid, título, slug, descripción, is_published y comportamiento de la CPU',
   restoredSet?.id === setId &&
     restoredSet?.title === setTitle &&
     restoredSet?.slug === originSlug &&
     restoredSet?.description === setDescription &&
-    restoredSet?.is_published === true,
+    restoredSet?.is_published === true &&
+    restoredSet?.cpu_behaviour === 'dynamic',
   JSON.stringify(restoredSet),
 );
 

@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { planCopy } from '@/lib/game-migration';
 import { editSetPath, setPath } from '@/lib/paths';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import type { SliderDefinition } from '@/lib/database.types';
+import type { CpuBehaviour, SliderDefinition } from '@/lib/database.types';
 
 export type SetFormState = { error?: string };
 
@@ -16,6 +16,7 @@ type ParsedForm = {
   title: string;
   description: string | null;
   gameId: number;
+  cpuBehaviour: CpuBehaviour;
   publish: boolean;
   values: Map<number, number>;
 };
@@ -36,6 +37,13 @@ function parseForm(formData: FormData): ParsedForm | { error: string } {
     return { error: 'Elige un juego válido.' };
   }
 
+  // Lo que llegue que no sea uno de los tres se trata como personalizado, que
+  // es lo que no esconde nada. La base tiene el CHECK por debajo de todas
+  // formas.
+  const rawBehaviour = String(formData.get('cpu_behaviour') ?? 'custom');
+  const cpuBehaviour: CpuBehaviour =
+    rawBehaviour === 'tactical' || rawBehaviour === 'dynamic' ? rawBehaviour : 'custom';
+
   const values = new Map<number, number>();
   for (const [key, raw] of formData.entries()) {
     if (!key.startsWith(VALUE_PREFIX)) continue;
@@ -55,6 +63,7 @@ function parseForm(formData: FormData): ParsedForm | { error: string } {
     title,
     description: rawDescription === '' ? null : rawDescription,
     gameId,
+    cpuBehaviour,
     publish: formData.get('intent') === 'publish',
     values,
   };
@@ -113,6 +122,7 @@ export async function createSet(
       game_id: parsed.gameId,
       title: parsed.title,
       description: parsed.description,
+      cpu_behaviour: parsed.cpuBehaviour,
       is_published: parsed.publish,
     })
     .select('id, slug, profiles!inner ( username )')
@@ -201,6 +211,7 @@ export async function updateSet(
     .update({
       title: parsed.title,
       description: parsed.description,
+      cpu_behaviour: parsed.cpuBehaviour,
       is_published: parsed.publish || existing.is_published,
       version: nextVersion,
     })
@@ -290,7 +301,7 @@ export async function copySetToGame(setId: string, targetGameSlug: string) {
 
   const { data: source } = await supabase
     .from('slider_sets')
-    .select('id, owner_id, title, description, game_id')
+    .select('id, owner_id, title, description, game_id, cpu_behaviour')
     .eq('id', setId)
     .maybeSingle();
 
@@ -332,6 +343,7 @@ export async function copySetToGame(setId: string, targetGameSlug: string) {
       game_id: targetGame.id,
       title: `${source.title} (${targetGame.name})`,
       description: source.description,
+      cpu_behaviour: source.cpu_behaviour,
       is_published: false,
     })
     .select('id, slug, profiles!inner ( username )')

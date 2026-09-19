@@ -29,6 +29,8 @@ export default async function ConsolePage({ params }: { params: Params }) {
       setHref={setPath(detail.owner.username, detail.set.slug)}
       scopes={view.scopes}
       blocks={view.blocks}
+      cpuBehaviour={view.cpuBehaviour}
+      hasCpuBehaviour={view.hasCpuBehaviour}
     />
   );
 }

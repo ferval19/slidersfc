@@ -5,9 +5,9 @@ import { useState } from 'react';
 import { CATEGORY_DRAWINGS } from '@/components/chalk';
 import { CommentComposer, CommentList } from '@/components/comment-thread';
 import { ScaleLegend, ScaleTrack } from '@/components/slider-scale';
-import { categoryLabel, SCOPE_INK, SCOPE_LABELS } from '@/lib/constants';
+import { categoryLabel, CPU_BEHAVIOURS, SCOPE_INK, SCOPE_LABELS } from '@/lib/constants';
 import type { CategoryBlockView, CommentView } from '@/lib/set-view';
-import type { SliderScope } from '@/lib/database.types';
+import type { CpuBehaviour, SliderScope } from '@/lib/database.types';
 
 /** Nombre | escala | valores. La cabecera de columnas usa la misma rejilla. */
 const ROW_GRID = 'sm:grid-cols-[minmax(8rem,13rem)_1fr_auto]';
@@ -31,6 +31,8 @@ export function SliderTable({
   commentsByDefinition,
   canComment,
   hasReference = false,
+  cpuBehaviour = 'custom',
+  hasCpuBehaviour = false,
 }: {
   setId: string;
   scopes: SliderScope[];
@@ -38,6 +40,8 @@ export function SliderTable({
   commentsByDefinition: Record<string, CommentView[]>;
   canComment: boolean;
   hasReference?: boolean;
+  cpuBehaviour?: CpuBehaviour;
+  hasCpuBehaviour?: boolean;
 }) {
   const [openId, setOpenId] = useState<number | null>(null);
 
@@ -69,14 +73,28 @@ export function SliderTable({
       {blocks.map((block) => {
         const Drawing = CATEGORY_DRAWINGS[block.category as keyof typeof CATEGORY_DRAWINGS];
 
+        // Con un comportamiento que no sea personalizado, estos valores están
+        // guardados pero el juego no los usa: enseñarlos sería decir que este
+        // set toca cosas que no toca.
+        const cpuIsAutomatic =
+          block.category === 'cpu_controls' && hasCpuBehaviour && cpuBehaviour !== 'custom';
+        const behaviour = CPU_BEHAVIOURS.find((candidate) => candidate.value === cpuBehaviour);
+
         return (
           <section key={block.category}>
-            <header className="flex items-center gap-3 border-b border-chalk-line pb-3">
-              {Drawing ? <Drawing className="size-7 text-chalk-dim" /> : null}
+            <header className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-chalk-line pb-3">
+              {Drawing ? <Drawing className="size-7 shrink-0 text-chalk-dim" /> : null}
               <h3 className="display text-2xl">{categoryLabel(block.category)}</h3>
+              {block.category === 'cpu_controls' && hasCpuBehaviour && behaviour ? (
+                <span className="chip chip-active ml-auto">{behaviour.label}</span>
+              ) : null}
             </header>
 
-            <ul>
+            {cpuIsAutomatic ? (
+              <p className="py-5 text-sm text-chalk-dim">{behaviour?.hint}</p>
+            ) : null}
+
+            <ul hidden={cpuIsAutomatic}>
               {block.rows.map((row) => {
                 const active = row.cells.find(
                   (cell) => cell.definitionId !== -1 && cell.definitionId === openId,

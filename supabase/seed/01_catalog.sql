@@ -4,11 +4,13 @@
 begin;
 
 -- Juegos ------------------------------------------------------------------
-insert into public.games (slug, name, release_year) values
-  ('fc27', 'EA SPORTS FC 27', 2026),
-  ('fc26', 'EA SPORTS FC 26', 2025)
+insert into public.games (slug, name, release_year, has_cpu_behaviour) values
+  ('fc27', 'EA SPORTS FC 27', 2026, true),
+  ('fc26', 'EA SPORTS FC 26', 2025, false)
 on conflict (slug) do update
-  set name = excluded.name, release_year = excluded.release_year;
+  set name              = excluded.name,
+      release_year      = excluded.release_year,
+      has_cpu_behaviour = excluded.has_cpu_behaviour;
 
 -- Sliders -----------------------------------------------------------------
 insert into public.slider_definitions

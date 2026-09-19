@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { CATEGORY_DRAWINGS } from '@/components/chalk';
-import { categoryLabel, SCOPE_INK, SCOPE_LABELS } from '@/lib/constants';
+import { categoryLabel, CPU_BEHAVIOURS, SCOPE_INK, SCOPE_LABELS } from '@/lib/constants';
 import type { CategoryBlockView } from '@/lib/set-view';
-import type { SliderScope } from '@/lib/database.types';
+import type { CpuBehaviour, SliderScope } from '@/lib/database.types';
 
 /**
  * Modo consola: para tener el móvil en la mano mientras se meten los valores
@@ -26,21 +26,38 @@ export function ConsoleMode({
   setHref,
   scopes,
   blocks,
+  cpuBehaviour = 'custom',
+  hasCpuBehaviour = false,
 }: {
   setId: string;
   title: string;
   setHref: string;
   scopes: SliderScope[];
   blocks: CategoryBlockView[];
+  cpuBehaviour?: CpuBehaviour;
+  hasCpuBehaviour?: boolean;
 }) {
   const storageKey = `slidersfc:consola:${setId}`;
 
   const [done, setDone] = useState<Set<string>>(new Set());
   const [loaded, setLoaded] = useState(false);
 
+  /**
+   * Con la CPU en automático sus sliders no se tocan en el menú, así que la
+   * lista no los lleva: sería mandar a alguien a teclear dieciséis valores que
+   * el juego no va a usar. En su lugar queda un paso, el de poner el selector.
+   */
+  const automatic = hasCpuBehaviour && cpuBehaviour !== 'custom';
+  const behaviour = CPU_BEHAVIOURS.find((candidate) => candidate.value === cpuBehaviour);
+
+  const steps = useMemo(
+    () => (automatic ? blocks.filter((block) => block.category !== 'cpu_controls') : blocks),
+    [blocks, automatic],
+  );
+
   const total = useMemo(
-    () => blocks.reduce((count, block) => count + block.rows.length, 0),
-    [blocks],
+    () => steps.reduce((count, block) => count + block.rows.length, 0) + (automatic ? 1 : 0),
+    [steps, automatic],
   );
 
   // El progreso se lee después del primer render a propósito: en el servidor
@@ -107,7 +124,7 @@ export function ConsoleMode({
         <p className="min-w-0 flex-1 truncate text-sm font-semibold">{title}</p>
       </header>
 
-      {blocks.map((block) => {
+      {steps.map((block) => {
         const Drawing = CATEGORY_DRAWINGS[block.category as keyof typeof CATEGORY_DRAWINGS];
 
         return (
@@ -183,6 +200,42 @@ export function ConsoleMode({
           </section>
         );
       })}
+
+      {automatic && behaviour ? (
+        <section className="mt-8">
+          <header className="flex items-center gap-2.5 px-5 pb-2">
+            <h2 className="display text-2xl">{categoryLabel('cpu_controls')}</h2>
+          </header>
+          <ul>
+            <li>
+              <button
+                type="button"
+                onClick={() => toggle('cpu_behaviour')}
+                aria-pressed={done.has('cpu_behaviour')}
+                className={`flex w-full items-center gap-4 border-b border-chalk-line/60 px-5 py-4 text-left transition-opacity ${
+                  done.has('cpu_behaviour') ? 'opacity-35' : ''
+                }`}
+              >
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm leading-snug font-semibold">
+                    Comportamiento de la CPU
+                  </span>
+                  <span className="mt-2 flex flex-col">
+                    <span className="eyebrow text-[0.625rem]">Ponlo en</span>
+                    <span className={`value-pill ${valueSize} leading-none text-ink-user`}>
+                      {behaviour.label}
+                    </span>
+                  </span>
+                  <span className="mt-2 block text-xs text-chalk-dim">
+                    Sus sliders no hacen falta: el juego los ajusta solo.
+                  </span>
+                </span>
+              </button>
+            </li>
+          </ul>
+        </section>
+      ) : null}
+
 
       {/* El progreso va abajo: al alcance del pulgar con el móvil en la mano,
           y así no se pelea con la cabecera del sitio, que también es fija y

@@ -48,17 +48,20 @@ Editor del dashboard, o con la CLI (`supabase db push`):
 1. `supabase/migrations/20260911120000_init_schema.sql` — tablas y triggers
 2. `supabase/migrations/20260911120100_rls.sql` — Row Level Security
 3. `supabase/migrations/20260911120200_profiles_trigger.sql` — perfil automático al registrarse
-4. `supabase/seed/01_catalog.sql` — juegos y catálogo de sliders
-5. `supabase/migrations/20260912140000_set_slugs.sql` — URLs amigables
-6. `supabase/seed/02_set_full_manual_fg.sql` — set de inicio para FC26
-7. `supabase/seed/03_set_fc27_realista.sql` — valores por defecto de FC27
+4. `supabase/migrations/20260920100000_cpu_behaviour.sql` — comportamiento de
+   la CPU. **Va antes del catálogo**: crea la columna `has_cpu_behaviour` que
+   el catálogo escribe
+5. `supabase/seed/01_catalog.sql` — juegos y catálogo de sliders
+6. `supabase/migrations/20260912140000_set_slugs.sql` — URLs amigables
+7. `supabase/seed/02_set_full_manual_fg.sql` — set de inicio para FC26
+8. `supabase/seed/03_set_fc27_realista.sql` — valores por defecto de FC27
    (requiere haber entrado una vez con `ferval19@gmail.com`; ver
    [supabase/README.md](supabase/README.md))
-8. `supabase/migrations/20260919160000_username_history.sql` — que cambiar de
+9. `supabase/migrations/20260919160000_username_history.sql` — que cambiar de
    nombre de usuario no rompa los enlaces ya compartidos
-9. `supabase/migrations/20260919180000_profile_youtube.sql` — el canal de
+10. `supabase/migrations/20260919180000_profile_youtube.sql` — el canal de
    YouTube en el perfil
-10. `supabase/storage/01_avatars.sql` — almacén de las fotos de perfil. Va
+11. `supabase/storage/01_avatars.sql` — almacén de las fotos de perfil. Va
     aparte de las migraciones porque es configuración de Storage y
     `npm run test:sql` no puede probarla
 
@@ -554,6 +557,43 @@ desdoblara por tipo. Si el menú los llama de otra forma se corrigen en
 que no se toca ningún dato.
 
 FC27 pasa de 61 a 65 sliders, de 121 a 129 filas.
+
+### 20/09 · Cómo se comporta la CPU
+
+En FC27 los sliders de la pestaña de la CPU no siempre se usan: el juego deja
+elegir entre **táctico**, **dinámico** y **personalizado**, y sólo en el último
+significan algo. Los dos primeros los ajusta el juego según los equipos. En el
+menú aparece como *AI behaviour*.
+
+Un set que enseñara dieciséis valores de CPU sin decir en qué modo va estaba
+mintiendo a medias, así que el selector aparece **en la cabecera de su propia
+categoría** —donde manda— y no en los metadatos del set. Al elegir táctico o
+dinámico, esos sliders desaparecen de la ficha y en su lugar queda la frase que
+explica qué hace el juego.
+
+Va **por juego**, no global: FC26 no tiene la opción, así que allí no sale
+selector y sus sliders de CPU van siempre. La bandera vive en el catálogo
+(`games.has_cpu_behaviour`).
+
+Tres detalles con su porqué:
+
+- **Los sets que ya existen se quedan en personalizado.** Ponerles táctico
+  escondería unos valores que su autor sí puso. Lo que nace en táctico es lo
+  nuevo, que es lo que trae el juego.
+- **Cambiar de modo esconde los reguladores, no los borra**: se siguen
+  enviando con el formulario, así que volver a personalizado te devuelve tus
+  valores donde estaban.
+- **El modo consola cambia dieciséis pasos por uno**: «Comportamiento de la
+  CPU → Táctico». Mandar a alguien a teclear valores que el juego no va a usar
+  es lo contrario de para lo que existe esa pantalla.
+
+Y la comparación deja fuera esa pestaña cuando alguno de los dos sets la lleva
+en automático, diciéndolo: serían diferencias que no existen en el campo.
+
+De paso, las dos pruebas de SQL compartían una copia de la lista de migraciones
+y se desviaron en cuanto entró una nueva. Ahora sale de un solo sitio
+(`scripts/schema-files.mjs`), que además es donde está escrito por qué el
+catálogo va en medio y no al final.
 
 ---
 

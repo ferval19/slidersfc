@@ -17,22 +17,18 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import {
+  CATALOG,
+  FC27_SET,
+  MIGRATIONS_ANTES,
+  MIGRATIONS_DESPUES,
+  STARTER_SET,
+} from './schema-files.mjs';
+
 const repo = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (file) =>
   readFileSync(join(repo, file), 'utf8').replace(/create extension if not exists pgcrypto;/, '');
 
-const MIGRATIONS = [
-  'supabase/migrations/20260911120000_init_schema.sql',
-  'supabase/migrations/20260911120100_rls.sql',
-  'supabase/migrations/20260911120200_profiles_trigger.sql',
-  'supabase/migrations/20260912090000_drop_mode.sql',
-  'supabase/migrations/20260912140000_set_slugs.sql',
-  'supabase/migrations/20260919160000_username_history.sql',
-  'supabase/migrations/20260919180000_profile_youtube.sql',
-];
-const CATALOG = 'supabase/seed/01_catalog.sql';
-const STARTER_SET = 'supabase/seed/02_set_full_manual_fg.sql';
-const FC27_SET = 'supabase/seed/03_set_fc27_realista.sql';
 const EMAIL = 'ferval19@gmail.com';
 
 let failures = 0;
@@ -58,11 +54,11 @@ async function freshDatabase({ withUser = true, withCatalog = true } = {}) {
     create role authenticated;
   `);
 
-  // El drop de `mode` y los slugs van después del catálogo, como en la puesta
-  // en marcha real.
-  for (const file of MIGRATIONS.slice(0, 3)) await db.exec(read(file));
+  // Como en la puesta en marcha real: unas migraciones antes del catálogo y
+  // otras después.
+  for (const file of MIGRATIONS_ANTES) await db.exec(read(file));
   if (withCatalog) await db.exec(read(CATALOG));
-  for (const file of MIGRATIONS.slice(3)) await db.exec(read(file));
+  for (const file of MIGRATIONS_DESPUES) await db.exec(read(file));
   if (withUser) await db.exec(`insert into auth.users (email) values ('${EMAIL}');`);
 
   return db;
@@ -371,6 +367,55 @@ await (await expectFailure(
     'tocar la biografía no toca el historial',
     antes === (await count(db, `select count(*)::int as n from public.username_history`)),
   );
+
+  await db.close();
+}
+
+// --- Comportamiento de la CPU ----------------------------------------------
+{
+  const db = await freshDatabase();
+  const me = (await db.query(`select id from auth.users where email = '${EMAIL}'`)).rows[0].id;
+
+  const flags = await db.query(`select slug, has_cpu_behaviour from public.games order by slug`);
+  check(
+    'sólo FC27 trae selector de comportamiento de la CPU',
+    JSON.stringify(flags.rows) ===
+      JSON.stringify([
+        { slug: 'fc26', has_cpu_behaviour: false },
+        { slug: 'fc27', has_cpu_behaviour: true },
+      ]),
+    JSON.stringify(flags.rows),
+  );
+
+  // Los sets que ya existían enseñan sus sliders de CPU; pasarlos a 'tactical'
+  // los escondería.
+  const antiguos = await count(
+    db,
+    `select count(*)::int as n from public.slider_sets where cpu_behaviour <> 'custom'`,
+  );
+  check('los sets que ya existían se quedan en personalizado', antiguos === 0);
+
+  const game = (await db.query(`select id from public.games where slug = 'fc27'`)).rows[0].id;
+  await db.exec(`
+    insert into public.slider_sets (owner_id, game_id, title)
+    values ('${me}', ${game}, 'Set nuevo de prueba')
+  `);
+  const nuevo = (
+    await db.query(
+      `select cpu_behaviour from public.slider_sets where title = 'Set nuevo de prueba'`,
+    )
+  ).rows[0].cpu_behaviour;
+  check('un set nuevo nace en táctico', nuevo === 'tactical', nuevo);
+
+  let rechazado = false;
+  try {
+    await db.exec(
+      `update public.slider_sets set cpu_behaviour = 'inventado' where title = 'Set nuevo de prueba'`,
+    );
+  } catch {
+    rechazado = true;
+  }
+  check('un comportamiento que no existe lo rechaza la base', rechazado);
 
   await db.close();
 }

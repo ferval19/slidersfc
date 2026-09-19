@@ -28,7 +28,10 @@ export const games = [
     release_year: 2026,
     scopes: { user: 'user', cpu: 'cpu_opponent', cpuTeammate: 'cpu_teammate' },
     // FC27 documenta 1-99.
-    range: { min: 1, max: 99, default: 50 } },
+    range: { min: 1, max: 99, default: 50 },
+    // FC27 deja elegir el comportamiento de la CPU (táctico / dinámico /
+    // personalizado). FC26 no: allí los sliders de CPU van siempre.
+    hasCpuBehaviour: true },
   {
     slug: 'fc26',
     name: 'EA SPORTS FC 26',

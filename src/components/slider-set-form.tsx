@@ -7,9 +7,15 @@ import { CATEGORY_DRAWINGS } from '@/components/chalk';
 import { ImportPanel } from '@/components/import-panel';
 import { SliderControl } from '@/components/slider-control';
 import { ScaleLegend } from '@/components/slider-scale';
-import { categoryLabel, SCOPE_INK, SCOPE_LABELS, sortScopes } from '@/lib/constants';
+import {
+  categoryLabel,
+  CPU_BEHAVIOURS,
+  SCOPE_INK,
+  SCOPE_LABELS,
+  sortScopes,
+} from '@/lib/constants';
 import { orderCategories } from '@/lib/category-order';
-import type { Game, SliderDefinition, SliderScope } from '@/lib/database.types';
+import type { CpuBehaviour, Game, SliderDefinition, SliderScope } from '@/lib/database.types';
 
 type Props = {
   action: (state: SetFormState, formData: FormData) => Promise<SetFormState>;
@@ -20,6 +26,7 @@ type Props = {
     title: string;
     description: string;
     isPublished: boolean;
+    cpuBehaviour: CpuBehaviour;
     values: Record<string, number>;
   };
   /** En edición el juego no se puede cambiar: los valores cuelgan de él. */
@@ -41,6 +48,9 @@ export function SliderSetForm({
 
   const [gameId, setGameId] = useState<number>(initial?.gameId ?? games[0]?.id ?? 0);
   const [folded, setFolded] = useState<ReadonlySet<string>>(new Set());
+  const [cpuBehaviour, setCpuBehaviour] = useState<CpuBehaviour>(
+    initial?.cpuBehaviour ?? 'tactical',
+  );
   const [values, setValues] = useState<Record<string, number>>(() => {
     if (initial) return initial.values;
     return defaultsFor(definitionsByGame[String(games[0]?.id ?? '')] ?? []);
@@ -63,6 +73,11 @@ export function SliderSetForm({
     [definitions],
   );
 
+  const game = games.find((candidate) => candidate.id === gameId);
+  // FC26 no tiene selector: allí los sliders de CPU van siempre.
+  const hasCpuBehaviour = game?.has_cpu_behaviour ?? false;
+  const cpuIsCustom = !hasCpuBehaviour || cpuBehaviour === 'custom';
+
   const changeGame = (nextGameId: number) => {
     setGameId(nextGameId);
     setValues(defaultsFor(definitionsByGame[String(nextGameId)] ?? []));
@@ -77,6 +92,7 @@ export function SliderSetForm({
   return (
     <form action={formAction} className="flex flex-col gap-10">
       <input type="hidden" name="game_id" value={gameId} />
+      <input type="hidden" name="cpu_behaviour" value={hasCpuBehaviour ? cpuBehaviour : 'custom'} />
 
       {/* Metadatos del set */}
       <section className="panel flex flex-col gap-5 p-5 sm:p-6">
@@ -194,9 +210,36 @@ export function SliderSetForm({
                 </span>
               </button>
 
-              {/* Plegar esconde, no desmonta: un regulador desmontado deja de
-                  enviarse con el formulario y su valor se perdería. */}
-              <ul hidden={isFolded}>
+              {block.category === 'cpu_controls' && hasCpuBehaviour ? (
+                <div hidden={isFolded} className="border-b border-chalk-line/60 py-4">
+                  <p className="text-sm text-chalk-dim">
+                    Cómo se comporta la CPU. Los sliders de abajo sólo se usan en
+                    «Personalizado»; en los otros dos los ajusta el juego según los equipos.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {CPU_BEHAVIOURS.map((behaviour) => (
+                      <button
+                        key={behaviour.value}
+                        type="button"
+                        onClick={() => setCpuBehaviour(behaviour.value)}
+                        aria-pressed={cpuBehaviour === behaviour.value}
+                        className={`chip ${cpuBehaviour === behaviour.value ? 'chip-active' : ''}`}
+                      >
+                        {behaviour.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-2.5 text-xs text-chalk-dim">
+                    {CPU_BEHAVIOURS.find((behaviour) => behaviour.value === cpuBehaviour)?.hint}
+                  </p>
+                </div>
+              ) : null}
+
+              {/* Plegar (o elegir un comportamiento que no sea personalizado)
+                  esconde, no desmonta: un regulador desmontado deja de enviarse
+                  con el formulario y su valor se perdería. Así, si se vuelve a
+                  «Personalizado», los valores siguen donde estaban. */}
+              <ul hidden={isFolded || (block.category === 'cpu_controls' && !cpuIsCustom)}>
                 {block.rows.map((row) => (
                   <SliderRow
                     key={row.slug}

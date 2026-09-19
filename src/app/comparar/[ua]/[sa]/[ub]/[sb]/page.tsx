@@ -6,6 +6,7 @@ import { Avatar } from '@/components/avatar';
 import { CompareTable } from '@/components/compare-table';
 import { COMPARE_INK } from '@/components/slider-scale';
 import { buildCompareView } from '@/lib/compare';
+import { cpuBehaviourLabel } from '@/lib/constants';
 import { comparePickerPath, setPath } from '@/lib/paths';
 import { getSetDetail, type SetDetail } from '@/lib/queries';
 
@@ -57,8 +58,17 @@ export default async function ComparePage({ params }: { params: Params }) {
     );
   }
 
+  // Si alguno de los dos deja la CPU en automático, sus sliders de esa
+  // pestaña están guardados pero el juego no los usa: compararlos sería
+  // enseñar diferencias que no existen en el campo.
+  const cpuIsComparable =
+    !a.game.has_cpu_behaviour ||
+    (a.set.cpu_behaviour === 'custom' && b.set.cpu_behaviour === 'custom');
+
   const view = buildCompareView({
-    definitions: a.definitions,
+    definitions: cpuIsComparable
+      ? a.definitions
+      : a.definitions.filter((definition) => definition.category !== 'cpu_controls'),
     a: plain(a),
     b: plain(b),
   });
@@ -88,6 +98,17 @@ export default async function ComparePage({ params }: { params: Params }) {
           <SetCard detail={a} color={COMPARE_INK.a} />
           <SetCard detail={b} color={COMPARE_INK.b} />
         </div>
+
+        {a.game.has_cpu_behaviour && !cpuIsComparable ? (
+          <p className="panel p-4 text-sm text-chalk-dim">
+            Los controles de la CPU se quedan fuera de la comparación:{' '}
+            {a.set.cpu_behaviour === 'custom' ? '«' + b.set.title + '»' : '«' + a.set.title + '»'} la
+            lleva en {cpuBehaviourLabel(
+              a.set.cpu_behaviour === 'custom' ? b.set.cpu_behaviour : a.set.cpu_behaviour,
+            ).toLowerCase()}
+            , y ahí esos valores no los usa el juego.
+          </p>
+        ) : null}
       </header>
 
       <CompareTable view={view} aTitle={a.set.title} bTitle={b.set.title} />
@@ -117,6 +138,11 @@ function SetCard({ detail, color }: { detail: SetDetail; color: string }) {
       <span className="mt-1 h-10 w-[3px] shrink-0 rounded-full" style={{ backgroundColor: color }} />
       <div className="min-w-0">
         <p className="leading-tight font-semibold">{detail.set.title}</p>
+        {detail.game.has_cpu_behaviour ? (
+          <span className="eyebrow mt-1 block">
+            CPU: {cpuBehaviourLabel(detail.set.cpu_behaviour)}
+          </span>
+        ) : null}
         <span className="mt-1.5 flex items-center gap-2 text-xs text-chalk-dim">
           <Avatar
             url={detail.owner.avatar_url}

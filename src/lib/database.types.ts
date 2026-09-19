@@ -29,7 +29,15 @@ export type Game = {
   slug: string;
   name: string;
   release_year: number | null;
+  /** Si el juego deja elegir cómo se comporta la CPU. FC27 sí, FC26 no. */
+  has_cpu_behaviour: boolean;
 };
+
+/**
+ * Cómo se comporta la CPU. Sólo en `custom` significan algo los sliders de la
+ * pestaña de controles de la CPU; en los otros dos los ajusta el juego solo.
+ */
+export type CpuBehaviour = 'custom' | 'tactical' | 'dynamic';
 
 export type SliderDefinition = {
   id: number;
@@ -52,6 +60,7 @@ export type SliderSet = {
   /** Lo pone un trigger al insertar y no cambia aunque cambie el título. */
   slug: string;
   description: string | null;
+  cpu_behaviour: CpuBehaviour;
   version: number;
   is_published: boolean;
   created_at: string;
@@ -109,7 +118,7 @@ export type Database = {
       };
       games: {
         Row: Game;
-        Insert: Insert<Game, 'id' | 'release_year'>;
+        Insert: Insert<Game, 'id' | 'release_year' | 'has_cpu_behaviour'>;
         Update: Partial<Game>;
         Relationships: [];
       };
@@ -137,6 +146,7 @@ export type Database = {
           | 'id'
           | 'slug'
           | 'description'
+          | 'cpu_behaviour'
           | 'version'
           | 'is_published'
           | 'created_at'

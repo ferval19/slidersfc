@@ -1,7 +1,7 @@
 import { orderCategories } from '@/lib/category-order';
 import { sortScopes } from '@/lib/constants';
 import { groupDefinitions, type SetDetail } from '@/lib/queries';
-import type { SliderScope } from '@/lib/database.types';
+import type { CpuBehaviour, SliderScope } from '@/lib/database.types';
 
 /**
  * Convierte el detalle de un set (con Maps y filas de Postgres) en una
@@ -44,6 +44,13 @@ export type CommentView = {
 
 export type SetView = {
   scopes: SliderScope[];
+  /** Cómo se comporta la CPU en este set. */
+  cpuBehaviour: CpuBehaviour;
+  /**
+   * Si el juego deja elegirlo. En FC26 no existe la opción, así que los
+   * sliders de la CPU van siempre y no hay nada que contar.
+   */
+  hasCpuBehaviour: boolean;
   /**
    * Si el juego trae un preajuste de fábrica. Se deduce de los datos: cuando
    * todos los valores por defecto son iguales, es el neutro del menú y no
@@ -127,6 +134,8 @@ export function buildSetView(detail: SetDetail, currentUserId: string | null): S
 
   return {
     scopes,
+    cpuBehaviour: set.cpu_behaviour,
+    hasCpuBehaviour: detail.game.has_cpu_behaviour,
     hasReference: new Set(definitions.map((d) => d.default_value)).size > 1,
     blocks,
     commentsByDefinition,

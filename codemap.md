@@ -47,6 +47,7 @@ scripts/test-compare.mjs         el modelo de la comparación
 scripts/backup.mjs               volcado de la base a JSON + SQL de reposición
 scripts/backup-sql.mjs           el generador del SQL de reposición (puro)
 scripts/test-backup.mjs          vuelca, repone en una base vacía y comprueba
+scripts/schema-files.mjs         qué ficheros de SQL hay y EN QUÉ ORDEN van
 docs/                            dirección visual · hoja de ruta
 ```
 
@@ -185,6 +186,30 @@ seeds van en un único bloque `do`, que es atómico.
 
 **En el modo consola el progreso va abajo.** Arriba desaparecía tras la
 cabecera del sitio, que también es fija y tiene más z-index.
+
+**El comportamiento de la CPU esconde sus sliders, no los borra.** En FC27 se
+elige entre táctico, dinámico y personalizado, y sólo en el último se usan los
+sliders de esa pestaña. Al cambiar de modo siguen enviándose con el formulario
+(otra vez `hidden`, no desmontar), así que volver a personalizado devuelve los
+valores donde estaban. El selector va en la cabecera de su categoría, no en los
+metadatos del set: es donde manda.
+
+**Va por juego.** FC26 no tiene la opción, así que enseñar allí un selector
+sería mentir. La bandera es `games.has_cpu_behaviour` y sale del catálogo. Con
+la migración sin aplicar, la columna no existe, la bandera llega `undefined` y
+todo se comporta como antes: el selector no sale y los sliders van siempre.
+
+**Los sets que ya existían se quedan en `custom`, y los nuevos nacen en
+`tactical`.** La migración pone el valor por defecto dos veces a propósito:
+primero `'custom'`, que es lo que rellena las filas que ya había, y luego
+`'tactical'` para lo que venga. Ponerles táctico a los antiguos escondería unos
+valores que su autor sí puso.
+
+**El orden del SQL no es cronológico, y vive en un solo sitio.** El catálogo va
+EN MEDIO de las migraciones: las de antes crean las columnas que el catálogo
+escribe (`has_cpu_behaviour`), las de después trabajan sobre datos que ya tienen
+que estar. Está en `scripts/schema-files.mjs` porque cuando cada prueba tenía
+su copia de la lista, una migración nueva entraba en una y no en la otra.
 
 **Los cuatro maestros de tiro y pase son sliders normales del catálogo.** Son
 `master_shot_error`, `master_shot_speed`, `master_pass_error` y

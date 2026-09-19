@@ -184,6 +184,8 @@ export default async function SetDetailPage({ params }: { params: Params }) {
           commentsByDefinition={view.commentsByDefinition}
           canComment={Boolean(user)}
           hasReference={view.hasReference}
+          cpuBehaviour={view.cpuBehaviour}
+          hasCpuBehaviour={view.hasCpuBehaviour}
         />
       </section>
 

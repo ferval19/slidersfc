@@ -47,10 +47,17 @@ const lines = [
   'begin;',
   '',
   '-- Juegos ------------------------------------------------------------------',
-  'insert into public.games (slug, name, release_year) values',
-  games.map((g) => `  (${q(g.slug)}, ${q(g.name)}, ${g.release_year})`).join(',\n'),
+  'insert into public.games (slug, name, release_year, has_cpu_behaviour) values',
+  games
+    .map(
+      (g) =>
+        `  (${q(g.slug)}, ${q(g.name)}, ${g.release_year}, ${g.hasCpuBehaviour ? 'true' : 'false'})`,
+    )
+    .join(',\n'),
   'on conflict (slug) do update',
-  '  set name = excluded.name, release_year = excluded.release_year;',
+  '  set name              = excluded.name,',
+  '      release_year      = excluded.release_year,',
+  '      has_cpu_behaviour = excluded.has_cpu_behaviour;',
   '',
   '-- Sliders -----------------------------------------------------------------',
 ];

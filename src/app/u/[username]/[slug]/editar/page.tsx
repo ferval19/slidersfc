@@ -57,6 +57,7 @@ export default async function EditSetPage({
             title: detail.set.title,
             description: detail.set.description ?? '',
             isPublished: detail.set.is_published,
+        cpuBehaviour: detail.set.cpu_behaviour,
             values,
           }}
         />
