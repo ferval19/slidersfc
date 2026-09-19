@@ -30,12 +30,14 @@ export function SliderTable({
   blocks,
   commentsByDefinition,
   canComment,
+  hasReference = false,
 }: {
   setId: string;
   scopes: SliderScope[];
   blocks: CategoryBlockView[];
   commentsByDefinition: Record<string, CommentView[]>;
   canComment: boolean;
+  hasReference?: boolean;
 }) {
   const [openId, setOpenId] = useState<number | null>(null);
 
@@ -43,13 +45,15 @@ export function SliderTable({
     <div className="flex flex-col gap-10">
       {/* En móvil la rejilla se apila, así que ahí la leyenda va suelta. */}
       <div className="sm:hidden">
-        <ScaleLegend scopes={scopes} labels={SCOPE_LABELS} />
+        <ScaleLegend scopes={scopes} labels={SCOPE_LABELS} withReference={hasReference} />
       </div>
 
       {/* En pantalla ancha, cada rótulo va sobre su columna de valores. */}
       <div className={`hidden items-end pb-1 sm:grid ${ROW_GRID}`}>
         <span />
-        <span />
+        <span className="self-center">
+          <ScaleLegend scopes={[]} labels={SCOPE_LABELS} withReference={hasReference} />
+        </span>
         <div className="flex items-center gap-1.5">
           {scopes.map((scope) => (
             <span
@@ -86,7 +90,13 @@ export function SliderTable({
                     <div className={`grid items-center gap-x-5 gap-y-1 py-3 ${ROW_GRID}`}>
                       <span className="text-sm leading-tight font-semibold">{row.name}</span>
 
-                      <ScaleTrack min={0} max={100} marks={marks} className="min-w-32" />
+                      <ScaleTrack
+                        min={0}
+                        max={100}
+                        marks={marks}
+                        reference={hasReference ? row.reference : null}
+                        className="min-w-32"
+                      />
 
                       <div className="flex items-center gap-1.5">
                         {row.cells.map((cell) => {

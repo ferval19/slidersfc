@@ -170,7 +170,15 @@ export function SliderSetForm({
                     >
                       <span className="text-sm leading-tight font-semibold">{row.name}</span>
 
-                      <ScaleTrack min={0} max={100} marks={marks} className="min-w-32" />
+                      {/* La misma marca gris que en la ficha: mientras editas
+                          ves cuánto te separas de lo que trae el juego. */}
+                      <ScaleTrack
+                        min={0}
+                        max={100}
+                        marks={marks}
+                        reference={row.byScope.user?.default_value ?? null}
+                        className="min-w-32"
+                      />
 
                       <div className="flex items-center gap-1.5">
                         {scopes.map((scope) => {

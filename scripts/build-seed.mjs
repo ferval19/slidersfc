@@ -14,6 +14,14 @@ const out = join(here, '..', 'supabase', 'seed', '01_catalog.sql');
 
 const q = (value) => `'${String(value).replace(/'/g, "''")}'`;
 
+/**
+ * Valor de fábrica de un slider en un ámbito. Los de comportamiento de la CPU
+ * difieren entre rival y compañero, así que pueden traerlo por ámbito.
+ */
+function defaultFor(slider, scope, game) {
+  return slider.defaults?.[scope] ?? slider.default ?? game.range.default;
+}
+
 /** Los ámbitos concretos de un slider en un juego, según su `sides`. */
 function scopesFor(slider, game) {
   const { user, cpu, cpuTeammate } = game.scopes;
@@ -65,7 +73,7 @@ for (const game of games) {
         `  ((select id from public.games where slug = ${q(game.slug)}), ` +
           `${q(slider.category)}, ${q(scope)}, ${q(slider.name)}, ${q(slider.slug)}, ` +
           `${slider.min ?? game.range.min}, ${slider.max ?? game.range.max}, ` +
-          `${slider.default ?? game.range.default}, ${sortOrder})`,
+          `${defaultFor(slider, scope, game)}, ${sortOrder})`,
       );
       gameRows += 1;
     }

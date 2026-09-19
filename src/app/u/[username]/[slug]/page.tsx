@@ -149,7 +149,9 @@ export default async function SetDetailPage({ params }: { params: Params }) {
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <h2 className="display text-4xl">Valores</h2>
           <p className="max-w-xs text-xs text-chalk-dim">
-            Toca cualquier número para leer y dejar comentarios sobre ese valor concreto.
+            {view.hasReference
+              ? 'La marca gris es lo que trae el juego de fábrica: lo que se separe de ella es lo que ha tocado el autor. Toca un número para comentarlo.'
+              : 'Toca cualquier número para leer y dejar comentarios sobre ese valor concreto.'}
           </p>
         </div>
 
@@ -159,6 +161,7 @@ export default async function SetDetailPage({ params }: { params: Params }) {
           blocks={view.blocks}
           commentsByDefinition={view.commentsByDefinition}
           canComment={Boolean(user)}
+          hasReference={view.hasReference}
         />
       </section>
 

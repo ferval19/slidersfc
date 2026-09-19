@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Analytics } from '@vercel/analytics/next';
 import { Big_Shoulders, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 
 import { AuthRelay } from '@/components/auth-relay';
@@ -60,6 +61,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SetupNotice />
         <main className="flex-1">{children}</main>
         <SiteFooter />
+        {/* Analítica de Vercel: sin cookies y sin datos personales, así que no
+            hace falta banner de consentimiento. */}
+        <Analytics />
       </body>
     </html>
   );

@@ -117,6 +117,17 @@ estética: la gente consulta un set mientras mete los valores en la consola. Ese
 orden vive **sólo** en `catalog.mjs` → `sort_order`, y la aplicación lo deriva
 de ahí. Antes estaba duplicado en las constantes y se desvió sin que se notara.
 
+**`default_value` guarda lo que trae el juego de fábrica**, no un 50 genérico.
+De ahí sale la marca gris de la ficha: lo que se separe de ella es lo que ha
+tocado el autor. En FC26 no conocemos el preajuste, así que se quedan todos en
+el neutro — y la interfaz lo detecta sola (`hasReference`: si todos los valores
+por defecto son iguales, no enseña una referencia falsa).
+
+**El borrado de sincronización del catálogo va por (slug, ámbito)**, no sólo
+por slug. Si un slider deja de existir en un lado, el slug sigue estando y un
+borrado por slug no lo ve: a FC27 le sobrevivieron veinte ámbitos «CPU
+compañero» de una versión preliminar, visibles como sliders fantasma.
+
 **Los cuatro sliders maestros de FC27 no están en el catálogo** («Todos los
 controles de error de tiro» y compañía). No son valores, son atajos que cambian
 de golpe todos los de debajo; guardarlos duplicaría información.

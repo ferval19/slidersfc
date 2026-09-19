@@ -15,11 +15,18 @@ export function ScaleTrack({
   min,
   max,
   marks,
+  reference,
   className = '',
 }: {
   min: number;
   max: number;
   marks: ScaleMark[];
+  /**
+   * Lo que trae el juego de fábrica en este slider. Se pinta como una marca
+   * fina y apagada, más alta que las muescas, para que cuando el valor
+   * coincida se vea asomar por arriba y por abajo: eso es «sin tocar».
+   */
+  reference?: number | null;
   className?: string;
 }) {
   const position = (value: number) => {
@@ -44,6 +51,14 @@ export function ScaleTrack({
           }}
         />
       ))}
+
+      {/* Lo que trae el juego, detrás de todo */}
+      {reference !== null && reference !== undefined ? (
+        <span
+          className="absolute top-1/2 w-[2px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-chalk"
+          style={{ left: `${position(reference)}%`, height: 29, opacity: 0.45 }}
+        />
+      ) : null}
 
       {/* Muescas. Los ámbitos que coinciden en el mismo valor comparten
           muesca y se reparten su altura, en vez de taparse entre ellos —
@@ -71,9 +86,11 @@ export function ScaleTrack({
 export function ScaleLegend({
   scopes,
   labels,
+  withReference = false,
 }: {
   scopes: SliderScope[];
   labels: Record<SliderScope, string>;
+  withReference?: boolean;
 }) {
   return (
     <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
@@ -86,6 +103,13 @@ export function ScaleLegend({
           <span className="eyebrow">{labels[scope]}</span>
         </li>
       ))}
+
+      {withReference ? (
+        <li className="flex items-center gap-2">
+          <span className="h-4 w-[2px] rounded-full bg-chalk opacity-45" />
+          <span className="eyebrow">De fábrica</span>
+        </li>
+      ) : null}
     </ul>
   );
 }

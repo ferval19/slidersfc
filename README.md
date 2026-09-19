@@ -8,6 +8,7 @@ Stack: Next.js 16 (App Router, TypeScript, Tailwind v4) + Supabase (Postgres, Au
 - [Mapa del código](codemap.md) — qué hay dónde y las decisiones que no se deducen leyendo
 - [Dirección visual](docs/direccion-visual.md) — la pizarra del entrenador
 - [Hoja de ruta](docs/hoja-de-ruta.md) — qué viene y en qué orden
+- [Comunicación en X](docs/comunicacion-x.md) — el plan de lanzamiento, con los posts escritos
 - [Historial](#historial) — qué se ha hecho y por qué
 
 ---
@@ -355,6 +356,22 @@ La [hoja de ruta](docs/hoja-de-ruta.md) se rehace con el encuadre de proyecto
 personal: arriba lo que sirve contigo solo, fuera lo que genera cola, y una
 regla explícita — no construir más funciones de comunidad hasta que un
 desconocido comente.
+
+### 19/09 · La marca de fábrica
+
+Los valores que trae FC27 de fábrica pasan al catálogo, a `default_value`, y
+la ficha de un set los dibuja como una marca gris detrás de cada muesca. Con
+eso, un set deja de ser una lista de números y se lee como **qué ha tocado
+esta persona y cuánto**: si la muesca está sobre la marca, no lo ha tocado.
+
+Vive en el catálogo y no en el set de referencia a propósito: así no depende
+de que exista una fila que alguien podría borrar, no añade consultas, y el
+formulario arranca un set nuevo con lo que trae el juego en vez de con
+cincuentas. En FC26 no conocemos el preajuste, y la interfaz lo detecta sola
+para no enseñar una referencia falsa.
+
+Y analítica, que es una línea y la única forma de saber si el 25 entró
+alguien.
 
 ---
 

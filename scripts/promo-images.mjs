@@ -140,17 +140,25 @@ function eyebrow(text, color = DIM) {
   );
 }
 
+/**
+ * Satori colapsa los saltos de línea, así que un `\n` en el texto no parte el
+ * titular: hay que dar cada línea como su propio bloque.
+ */
 function title(text, size = 92) {
-  return flex(
-    {
-      fontFamily: 'Display',
-      fontSize: size,
-      lineHeight: 1.02,
-      textTransform: 'uppercase',
-      maxWidth: W - 144,
-    },
-    text,
-  );
+  const style = {
+    fontFamily: 'Display',
+    fontSize: size,
+    lineHeight: 1.02,
+    textTransform: 'uppercase',
+    maxWidth: W - 144,
+  };
+
+  const lines = text.split('\n');
+  if (lines.length === 1) return flex(style, text);
+
+  return flex({ flexDirection: 'column' }, lines.map((line, i) =>
+    flex({ ...style, key: `l${i}` }, line),
+  ));
 }
 
 /**
@@ -253,6 +261,23 @@ function legend(items) {
 // ---------------------------------------------------------------------------
 
 const cards = {
+  /**
+   * 0 · Post de presentación. Va sin datos a propósito: es el único post
+   * personal de la campaña y los números le quitarían sitio a la frase.
+   */
+  '00-presentacion': () =>
+    board({
+      children: [
+        flex({ key: 'e' }, eyebrow('El documento lleva desde diciembre')),
+        flex({ key: 'sp1', flexGrow: 1 }),
+        title('Cada año\nempezamos\ntodos de cero', 150),
+        flex({ key: 'sp2', height: 40 }),
+        flex({ key: 's', fontSize: 34, color: CHALK, maxWidth: 1150, lineHeight: 1.4 },
+          'Los números se comparten. El porqué se pierde.'),
+        flex({ key: 'sp3', flexGrow: 1 }),
+      ],
+    }),
+
   /** 1 · Post de lanzamiento. La marca y para qué sirve. */
   '01-marca': () =>
     board({
@@ -346,45 +371,47 @@ const cards = {
         flex({ key: 'e' }, eyebrow('El menú de sliders de FC27, entero', MATE)),
         flex({ key: 'sp1', height: 26 }),
         flex({ key: 'nums', alignItems: 'flex-end', width: W - 144 }, [
-          flex({ key: 'n1', flexDirection: 'column', width: 380 }, [
-            flex({ key: 'a', fontFamily: 'Display', fontSize: 190, lineHeight: 0.88, color: USER }, String(totalSliders)),
-            flex({ key: 'b', fontSize: 25, color: DIM, letterSpacing: 2 }, 'SLIDERS'),
+          flex({ key: 'n1', flexDirection: 'column', width: 360 }, [
+            flex({ key: 'a', fontFamily: 'Display', fontSize: 148, lineHeight: 0.88, color: USER }, String(totalSliders)),
+            flex({ key: 'b', fontSize: 24, color: DIM, letterSpacing: 2 }, 'SLIDERS'),
           ]),
           flex({ key: 'n2', flexDirection: 'column', width: 420 }, [
-            flex({ key: 'a', fontFamily: 'Display', fontSize: 190, lineHeight: 0.88, color: CHALK }, String(totalValues)),
-            flex({ key: 'b', fontSize: 25, color: DIM, letterSpacing: 2 }, 'VALORES QUE METER'),
+            flex({ key: 'a', fontFamily: 'Display', fontSize: 148, lineHeight: 0.88, color: CHALK }, String(totalValues)),
+            flex({ key: 'b', fontSize: 24, color: DIM, letterSpacing: 2 }, 'VALORES QUE METER'),
           ]),
-          flex({ key: 'n3', flexDirection: 'column', width: 380 }, [
-            flex({ key: 'a', fontFamily: 'Display', fontSize: 190, lineHeight: 0.88, color: MATE }, String(categoryOrder.length)),
-            flex({ key: 'b', fontSize: 25, color: DIM, letterSpacing: 2 }, 'CATEGORÍAS'),
+          flex({ key: 'n3', flexDirection: 'column', width: 360 }, [
+            flex({ key: 'a', fontFamily: 'Display', fontSize: 148, lineHeight: 0.88, color: MATE }, String(categoryOrder.length)),
+            flex({ key: 'b', fontSize: 24, color: DIM, letterSpacing: 2 }, 'CATEGORÍAS'),
           ]),
         ]),
         flex({ key: 'sp2', flexGrow: 1 }),
+        // Tres columnas: con dos, la lista se lee en zigzag y el orden del
+        // menú —que es lo que se está enseñando— deja de verse.
         flex({ key: 'grid', flexWrap: 'wrap', width: W - 144 }, [
-          ...categoryOrder.map((c) =>
+          ...categoryOrder.map((c, i) =>
             flex(
               {
                 key: c,
-                width: 470,
-                height: 62,
-                marginRight: 25,
-                marginBottom: 14,
+                width: 438,
+                height: 68,
+                marginRight: i % 3 === 2 ? 0 : 20,
+                marginBottom: 16,
                 alignItems: 'center',
-                paddingLeft: 20,
-                paddingRight: 20,
+                paddingLeft: 22,
+                paddingRight: 22,
                 backgroundColor: BOARD_RAISED,
                 borderRadius: 3,
               },
               [
-                flex({ key: 'n', fontSize: 25, color: CHALK }, CATEGORY_LABELS[c]),
+                flex({ key: 'n', fontSize: 24, color: CHALK }, CATEGORY_LABELS[c]),
                 flex({ key: 'sp', flexGrow: 1 }),
-                flex({ key: 'c', fontSize: 27, color: USER }, String(counts[c])),
+                flex({ key: 'c', fontSize: 28, color: USER }, String(counts[c])),
               ],
             ),
           ),
         ]),
-        flex({ key: 'sp3', height: 10 }),
-        flex({ key: 'note', fontSize: 22, color: DIM }, 'En el orden exacto del menú del juego, para que lo sigas con el mando en la mano.'),
+        flex({ key: 'sp3', flexGrow: 1 }),
+        flex({ key: 'note', fontSize: 22, color: DIM, marginBottom: 22 }, 'En el orden exacto del menú del juego, para que lo sigas con el mando en la mano.'),
       ],
     }),
 
@@ -426,12 +453,12 @@ const cards = {
     board({
       accent: MATE,
       children: [
-        flex({ key: 'row', width: W - 144, flexGrow: 1 }, [
+        flex({ key: 'row', width: W - 144, flexGrow: 1, alignItems: 'center' }, [
           flex({ key: 'left', flexDirection: 'column', width: 820 }, [
             flex({ key: 'e' }, eyebrow('Modo consola', MATE)),
             flex({ key: 'sp1', height: 22 }),
-            title('Para meterlos\nsin perder\nla cuenta', 92),
-            flex({ key: 'sp2', height: 34 }),
+            title('Para meterlos sin perder la cuenta', 96),
+            flex({ key: 'sp2', height: 40 }),
             ...[
               'Una columna, en el orden del menú del juego',
               'Números grandes, se leen desde el sofá',
@@ -450,7 +477,7 @@ const cards = {
             {
               key: 'phone',
               width: 420,
-              height: 560,
+              height: 664,
               flexDirection: 'column',
               backgroundColor: '#06170f',
               borderRadius: 3,
@@ -465,6 +492,7 @@ const cards = {
                 ['Error en tiros de calidad', val('finesse_shot_error'), true],
                 ['Velocidad de tiros de calidad', val('finesse_shot_speed'), false],
                 ['Error en vaselina', val('chip_shot_error'), false],
+                ['Altura de vaselina', val('chip_shot_height'), false],
               ].map(([label, value, done]) =>
                 flex(
                   {

@@ -19,6 +19,8 @@ export type SliderRowView = {
   slug: string;
   name: string;
   cells: CellView[];
+  /** Lo que trae el juego de fábrica en este slider, si lo sabemos. */
+  reference: number | null;
 };
 
 export type CategoryBlockView = {
@@ -42,6 +44,12 @@ export type CommentView = {
 
 export type SetView = {
   scopes: SliderScope[];
+  /**
+   * Si el juego trae un preajuste de fábrica. Se deduce de los datos: cuando
+   * todos los valores por defecto son iguales, es el neutro del menú y no
+   * sabemos qué trae el juego, así que no se enseña una referencia falsa.
+   */
+  hasReference: boolean;
   blocks: CategoryBlockView[];
   commentsByDefinition: Record<string, CommentView[]>;
   generalComments: CommentView[];
@@ -106,7 +114,12 @@ export function buildSetView(detail: SetDetail, currentUserId: string | null): S
         };
       });
 
-      return { slug: slider.slug, name: slider.name, cells };
+      // El de fábrica del lado del usuario, o el del primer ámbito que haya:
+      // en los de comportamiento de la CPU no existe lado de usuario.
+      const reference =
+        byScope.get('user')?.default_value ?? slider.scopes[0]?.default_value ?? null;
+
+      return { slug: slider.slug, name: slider.name, cells, reference };
     });
 
     return { category, rows };
@@ -114,6 +127,7 @@ export function buildSetView(detail: SetDetail, currentUserId: string | null): S
 
   return {
     scopes,
+    hasReference: new Set(definitions.map((d) => d.default_value)).size > 1,
     blocks,
     commentsByDefinition,
     generalComments,
