@@ -16,6 +16,21 @@ export const CATEGORY_LABELS: Record<string, string> = {
   cpu_controls: 'Controles de la CPU',
 };
 
+/**
+ * Nombres cortos para las barras de navegación, donde nueve categorías con su
+ * nombre entero no caben en una línea.
+ */
+export const CATEGORY_SHORT_LABELS: Record<string, string> = {
+  ball_control: 'Control',
+  positioning: 'Posición',
+  goalkeeping: 'Portería',
+  cpu_controls: 'CPU',
+};
+
+export function categoryShortLabel(category: string) {
+  return CATEGORY_SHORT_LABELS[category] ?? categoryLabel(category);
+}
+
 export const SCOPE_LABELS: Record<SliderScope, string> = {
   user: 'Usuario',
   cpu: 'CPU',

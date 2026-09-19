@@ -189,6 +189,24 @@ seeds van en un único bloque `do`, que es atómico.
 **En el modo consola el progreso va abajo.** Arriba desaparecía tras la
 cabecera del sitio, que también es fija y tiene más z-index.
 
+**El alto de la cabecera está en una variable, `--header-h`.** Lo necesitan
+las barras que se quedan pegadas debajo de ella y el `scroll-margin` de los
+anclas. Estaba puesto a ojo en dos sitios y en uno de ellos estaba mal por
+diecisiete píxeles: la barra de la comparación se metía debajo de la cabecera.
+
+**La barra pegada de un set aparece con un escuchador de scroll, no con
+IntersectionObserver.** El observador no despertaba de forma fiable en los
+saltos programáticos —y ése es justo el caso de quien abre un enlace con ancla
+a una categoría—, así que la visibilidad se mira con un rAF por gesto de
+scroll. El resaltado de la categoría activa sí usa IntersectionObserver, que
+ahí funciona.
+
+**La barra pegada es sólo de escritorio.** Nueve categorías no caben en 375 px
+sin convertirse en un carrusel horizontal, y en el móvil ya está el modo
+consola, que es la forma buena de recorrer un set con el teléfono en la mano.
+Los nombres de las categorías se acortan (`categoryShortLabel`) porque enteros
+tampoco caben en una línea a 1024 px.
+
 **La portada elige un hero al azar en el servidor, y no es un carrusel.** No
 hay flechas ni temporizador: se elige uno por petición y ahí se queda hasta que
 se recargue. Un carrusel que se mueve solo obliga a leer a su ritmo; así cada

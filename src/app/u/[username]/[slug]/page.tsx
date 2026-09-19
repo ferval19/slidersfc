@@ -5,11 +5,13 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { Avatar } from '@/components/avatar';
 import { CommentComposer, CommentList } from '@/components/comment-thread';
 import { SetConditions } from '@/components/set-conditions';
+import { SetStickyBar } from '@/components/set-sticky-bar';
 import { SetOwnerActions } from '@/components/set-owner-actions';
 import { ShareSet } from '@/components/share-set';
 import { SliderTable } from '@/components/slider-table';
 import { getGames, getSetDetail, getUsernameAfterRename } from '@/lib/queries';
 import { buildSetView } from '@/lib/set-view';
+import { conditionsSummary } from '@/lib/set-conditions';
 import { comparePickerPath, consolePath, profilePath, setPath } from '@/lib/paths';
 import { publicSiteUrl } from '@/lib/site-url';
 import { getCurrentUser } from '@/lib/supabase/server';
@@ -179,6 +181,13 @@ export default async function SetDetailPage({ params }: { params: Params }) {
               : 'Toca cualquier número para leer y dejar comentarios sobre ese valor concreto.'}
           </p>
         </div>
+
+        <SetStickyBar
+          title={detail.set.title}
+          conditions={conditionsSummary(detail.set)}
+          categories={view.blocks.map((block) => block.category)}
+          consoleHref={consolePath(detail.owner.username, detail.set.slug)}
+        />
 
         <SliderTable
           setId={detail.set.id}

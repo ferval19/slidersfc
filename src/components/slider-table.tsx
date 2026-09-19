@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { CATEGORY_DRAWINGS } from '@/components/chalk';
 import { CommentComposer, CommentList } from '@/components/comment-thread';
 import { ScaleLegend, ScaleTrack } from '@/components/slider-scale';
+import { categoryAnchor } from '@/components/set-sticky-bar';
 import { categoryLabel, CPU_BEHAVIOURS, SCOPE_INK, SCOPE_LABELS } from '@/lib/constants';
 import type { CategoryBlockView, CommentView } from '@/lib/set-view';
 import type { CpuBehaviour, SliderScope } from '@/lib/database.types';
@@ -81,7 +82,13 @@ export function SliderTable({
         const behaviour = CPU_BEHAVIOURS.find((candidate) => candidate.value === cpuBehaviour);
 
         return (
-          <section key={block.category}>
+          // `scroll-mt` descuenta la cabecera y la barra pegada: sin él, al
+          // saltar a una categoría su título queda debajo de las dos.
+          <section
+            key={block.category}
+            id={categoryAnchor(block.category)}
+            className="scroll-mt-[calc(var(--header-h)+4.5rem)]"
+          >
             <header className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-chalk-line pb-3">
               {Drawing ? <Drawing className="size-7 shrink-0 text-chalk-dim" /> : null}
               <h3 className="display text-2xl">{categoryLabel(block.category)}</h3>

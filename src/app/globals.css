@@ -58,6 +58,17 @@ body::after {
   outline-offset: 3px;
 }
 
+/*
+ * Alto de la cabecera del sitio, que es fija. Lo necesitan las barras que se
+ * quedan pegadas debajo de ella (la ficha de un set, la comparación) y el
+ * `scroll-margin` de los destinos de ancla, para que al saltar a una sección
+ * no quede tapada. Estaba puesto a ojo en dos sitios y en uno de ellos estaba
+ * mal por diecisiete píxeles.
+ */
+:root {
+  --header-h: 73px;
+}
+
 @layer components {
   /* --- Tipografía ---------------------------------------------------- */
 
@@ -179,6 +190,13 @@ body::after {
     color: var(--color-chalk);
     border-color: #f2efe470;
   }
+  /* Versión apretada, para barras de navegación con muchas categorías. */
+  .chip-tight {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.625rem;
+    letter-spacing: 0.06em;
+  }
+
   .chip-active {
     border-color: var(--color-ink-user);
     color: var(--color-ink-user);

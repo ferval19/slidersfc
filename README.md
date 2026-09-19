@@ -648,6 +648,25 @@ muestra donde se ve la marca de fábrica trabajando—, el comportamiento de la
 CPU, los comentarios, y lo que sale solo sin rellenar nada. Se enlaza desde el
 pie, desde el formulario y desde los heroes.
 
+### 20/09 · Una barra que no te deja perderte en 129 sliders
+
+Un set de FC 27 son nueve categorías y ciento veintinueve valores. Al bajar por
+él se pierde de vista de quién es, en qué condiciones se probó y por dónde vas.
+Ahora, en escritorio, al llegar a los valores se queda pegada arriba una barra
+con el título del set, sus condiciones, **las nueve categorías en un clic** y el
+botón de la consola. La categoría que estás mirando se marca sola.
+
+Sólo escritorio, a propósito: nueve categorías no caben en 375 px sin
+convertirse en un carrusel horizontal, y en el móvil ya está el modo consola,
+que es la forma buena de recorrer un set con el teléfono en la mano.
+
+Dos cosas que salieron por el camino. El alto de la cabecera estaba puesto a
+ojo en dos sitios y en uno estaba mal por diecisiete píxeles, así que la barra
+de la comparación se metía debajo; ahora sale de una variable. Y la barra
+aparece con un escuchador de scroll y no con IntersectionObserver, porque el
+observador no despertaba en los saltos programáticos — que es justo lo que pasa
+al abrir un enlace con ancla a una categoría.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

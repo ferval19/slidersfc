@@ -40,7 +40,7 @@ export function CompareTable({ view, aTitle, bTitle }: Props) {
       {/* La leyenda se queda pegada arriba: con sesenta y un sliders se
           baja muy lejos de ella, y aquí el color no dice el ámbito —eso va
           escrito en cada carril— sino de quién es el valor. */}
-      <div className="z-20 -mx-5 flex flex-wrap sm:sticky sm:top-14 items-center justify-between gap-x-6 gap-y-4 bg-board/95 px-5 py-3 backdrop-blur">
+      <div className="z-20 -mx-5 flex flex-wrap sm:sticky sm:top-[var(--header-h)] items-center justify-between gap-x-6 gap-y-4 bg-board/95 px-5 py-3 backdrop-blur">
         <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
           <Key color={COMPARE_INK.a} label={aTitle} />
           <Key color={COMPARE_INK.b} label={bTitle} />
