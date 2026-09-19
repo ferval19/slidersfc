@@ -15,6 +15,7 @@ export const revalidate = 3600;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const home: MetadataRoute.Sitemap = [
     { url: `${siteUrl}/`, changeFrequency: 'daily', priority: 1 },
+    { url: `${siteUrl}/guia`, changeFrequency: 'monthly', priority: 0.6 },
   ];
 
   let games: { slug: string }[] = [];

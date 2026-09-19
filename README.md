@@ -625,6 +625,26 @@ haya una cámara: unos números sueltos sin saber de qué cámara no dicen nada.
 La validación y sus 32 comprobaciones las escribió Sonnet con el encargo
 cerrado.
 
+### 20/09 · Cuatro portadas y una guía
+
+La portada decía una sola cosa —«publica tus sliders y que te discutan cada
+valor»— y el producto ya hace cuatro. Ahora hay **cuatro heroes y se elige uno
+al azar en cada carga**: el de los comentarios valor a valor, el de la marca de
+fábrica, el del modo consola y el de las condiciones en las que se juega. Cada
+uno con su dibujo de tiza, y tres son nuevos: el regulador a tamaño grande, una
+muesca con su bocadillo colgando, y un mando.
+
+No es un carrusel a propósito. Sin flechas y sin temporizador: se elige en el
+servidor, se queda quieto y cambia al recargar. Un carrusel que se mueve solo
+obliga a leer a su ritmo.
+
+Y hay una página nueva, **[/guia](https://slidersfc.vercel.app/guia)**, que
+explica campo por campo todo lo que se puede contar de un set y por qué importa
+cada cosa: lo básico, las condiciones de juego, los valores —con una escala de
+muestra donde se ve la marca de fábrica trabajando—, el comportamiento de la
+CPU, los comentarios, y lo que sale solo sin rellenar nada. Se enlaza desde el
+pie, desde el formulario y desde los heroes.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

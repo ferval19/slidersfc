@@ -1,6 +1,4 @@
-import Link from 'next/link';
-
-import { PitchDiagram } from '@/components/chalk';
+import { Hero, pickHero } from '@/components/hero';
 import { EmptyState } from '@/components/empty-state';
 import { FilterBar } from '@/components/filter-bar';
 import { SetCard } from '@/components/set-card';
@@ -28,40 +26,14 @@ export default async function HomePage() {
     getCurrentUser(),
   ]);
 
+  const newSetHref = user ? '/sets/nuevo' : '/login?next=/sets/nuevo';
+  // La portada es dinámica (lee la sesión), así que esto se resuelve en cada
+  // petición y cada recarga trae un hero distinto.
+  const hero = pickHero();
+
   return (
     <div className="mx-auto max-w-6xl px-5">
-      <section className="grid items-center gap-10 pt-12 pb-14 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:pt-16">
-        <div>
-          <p className="eyebrow">EA Sports FC 27 y FC 26 · by Full Manual FG</p>
-
-          <h1 className="display mt-5 text-[clamp(3.25rem,11vw,6.5rem)]">
-            Publica tus sliders
-            <br />
-            y que te discutan
-            <br />
-            <span className="text-ink-user">cada valor</span>
-          </h1>
-
-          <p className="mt-7 max-w-prose text-base text-chalk-dim sm:text-lg">
-            Un set no se explica con una captura de pantalla. Aquí cada valor lleva su
-            propio hilo: por qué 35 y no 42, con qué dificultad, y a quién le funciona.
-          </p>
-
-          <div className="mt-9 flex flex-wrap gap-3">
-            <Link
-              href={user ? '/sets/nuevo' : '/login?next=/sets/nuevo'}
-              className="btn btn-primary"
-            >
-              Publicar mi set
-            </Link>
-            <Link href="#sets" className="btn btn-ghost">
-              Ver los sets
-            </Link>
-          </div>
-        </div>
-
-        <PitchDiagram className="mx-auto w-full max-w-[19rem] lg:max-w-none" />
-      </section>
+      <Hero hero={hero} newSetHref={newSetHref} />
 
       {/* La tesis, en funcionamiento */}
       <section className="panel px-5 py-6 sm:px-7">
@@ -113,7 +85,7 @@ export default async function HomePage() {
               title="La pizarra está en blanco"
               body="Todavía no hay ningún set publicado. Si tienes unos valores que te funcionan, súbelos: es exactamente para lo que existe esto."
               action={{
-                href: user ? '/sets/nuevo' : '/login?next=/sets/nuevo',
+                href: newSetHref,
                 label: 'Publicar el primero',
               }}
             />

@@ -27,6 +27,7 @@ src/app/
   auth/callback|confirm/         vuelta de Supabase (servidor)
   auth/finalizar/                vuelta por fragmento (cliente)
   perfil/                        resuelve la sesión a /u/<username>
+  guia/                          qué lleva un set, explicado campo por campo
   icon.tsx apple-icon.tsx        favicon SFC generado
   opengraph-image.tsx            tarjeta por defecto del resto de la web
   actions/                       auth.ts · sets.ts · comments.ts
@@ -187,6 +188,18 @@ seeds van en un único bloque `do`, que es atómico.
 
 **En el modo consola el progreso va abajo.** Arriba desaparecía tras la
 cabecera del sitio, que también es fija y tiene más z-index.
+
+**La portada elige un hero al azar en el servidor, y no es un carrusel.** No
+hay flechas ni temporizador: se elige uno por petición y ahí se queda hasta que
+se recargue. Un carrusel que se mueve solo obliga a leer a su ritmo; así cada
+visita se lleva un ángulo del producto y con el tiempo se cubren todos. Elegir
+en el servidor evita el parpadeo y el salto de maquetación de decidirlo en el
+cliente; funciona porque la portada ya es dinámica (lee la sesión). Si algún
+día se volviera estática, el hero se quedaría congelado.
+
+**Los titulares del hero no pasan de unos veinte caracteres por línea.** En
+ultracondensada a 80 px, una línea más larga se parte sola y el hero se come la
+pantalla entera antes de que se lea una palabra del cuerpo.
 
 **La duración de los tiempos se guarda como texto.** Mucha gente juega «7 u 8
 minutos» y un entero les obligaría a mentir. El CHECK de la base lo mantiene

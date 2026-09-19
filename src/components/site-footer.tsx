@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import { SITE_BYLINE, SITE_NAME } from '@/lib/constants';
 
 export function SiteFooter() {
@@ -8,6 +10,9 @@ export function SiteFooter() {
         <p className="eyebrow">
           {SITE_NAME} · {SITE_BYLINE}
         </p>
+        <Link href="/guia" className="eyebrow hover:text-chalk">
+          Qué lleva un set
+        </Link>
         <p className="max-w-sm text-xs text-chalk-dim">
           Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.
         </p>

@@ -213,6 +213,116 @@ export function ChalkClipboard({ className = '' }: { className?: string }) {
   );
 }
 
+/**
+ * El regulador, a tamaño grande: tres carriles con sus muescas y la marca de
+ * fábrica asomando. Es el producto dibujado — lo que hace esta web es enseñar
+ * un set así en vez de como una lista de cincuenta números.
+ */
+export function ChalkSliderStack({ className = '' }: { className?: string }) {
+  const rows = [
+    { y: 26, ref: 108, user: 74, cpu: 96 },
+    { y: 78, ref: 150, user: 196, cpu: 178 },
+    { y: 130, ref: 96, user: 148, cpu: 148 },
+    { y: 182, ref: 178, user: 132, cpu: 158 },
+  ];
+
+  return (
+    <svg viewBox="0 0 300 210" className={className} aria-hidden>
+      {rows.map((row) => (
+        <g key={row.y}>
+          {/* Carril, con su temblor */}
+          <path
+            className="chalk-stroke"
+            stroke="#f2efe4"
+            strokeOpacity="0.32"
+            strokeWidth="1.8"
+            d={`M24 ${row.y} Q90 ${row.y - 2} 150 ${row.y + 1} T276 ${row.y - 1}`}
+          />
+          {/* Topes */}
+          <path
+            className="chalk-stroke"
+            stroke="#f2efe4"
+            strokeOpacity="0.4"
+            strokeWidth="1.6"
+            d={`M24 ${row.y - 8} L24 ${row.y + 8} M276 ${row.y - 8} L276 ${row.y + 8}`}
+          />
+          {/* Lo que trae el juego */}
+          <path
+            className="chalk-stroke"
+            stroke="#f2efe4"
+            strokeOpacity="0.45"
+            strokeWidth="2"
+            d={`M${row.ref} ${row.y - 13} L${row.ref} ${row.y + 13}`}
+          />
+          {/* Usuario y CPU */}
+          <path
+            className="chalk-stroke"
+            stroke="#ffd24a"
+            strokeWidth="3.4"
+            d={`M${row.user} ${row.y - 10} L${row.user} ${row.y + 10}`}
+          />
+          <path
+            className="chalk-stroke"
+            stroke="#ff5c7a"
+            strokeWidth="3.4"
+            d={`M${row.cpu} ${row.y - 10} L${row.cpu} ${row.y + 10}`}
+          />
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+/**
+ * Una muesca con su bocadillo: el comentario vive pegado al valor del que
+ * habla. Es el diferencial de la web en un dibujo.
+ */
+export function ChalkCommentedValue({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 300 210" className={className} aria-hidden>
+      <g className="chalk-stroke" stroke="#f2efe4" strokeOpacity="0.32" strokeWidth="1.8">
+        <path d="M24 150 Q90 148 150 151 T276 149" />
+      </g>
+      <g className="chalk-stroke" stroke="#f2efe4" strokeOpacity="0.4" strokeWidth="1.6">
+        <path d="M24 140 L24 160 M276 140 L276 160" />
+        <path d="M87 145 L87 155 M150 144 L150 156 M213 145 L213 155" strokeOpacity="0.25" />
+      </g>
+      {/* La muesca de la que se habla */}
+      <g className="chalk-stroke" stroke="#ffd24a" strokeWidth="3.6">
+        <path d="M117 136 L117 164" />
+      </g>
+      {/* Bocadillo, colgando de ella */}
+      <g className="chalk-stroke" stroke="#f2efe4" strokeOpacity="0.62" strokeWidth="1.8">
+        <path d="M58 42 Q57 30 70 29 L216 27 Q230 28 229 41 L230 92 Q229 105 216 104 L136 106 L118 128 L120 106 L70 105 Q57 104 58 92 Z" />
+        <path d="M82 56 Q130 58 190 55" strokeOpacity="0.4" strokeWidth="1.5" />
+        <path d="M82 72 Q120 74 168 71" strokeOpacity="0.4" strokeWidth="1.5" />
+        <path d="M82 88 Q106 90 134 87" strokeOpacity="0.4" strokeWidth="1.5" />
+      </g>
+    </svg>
+  );
+}
+
+/** Mando. Para el modo consola: el móvil en la mano y el juego delante. */
+export function ChalkGamepad({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 300 210" className={className} aria-hidden>
+      <g className="chalk-stroke" stroke="#f2efe4" strokeOpacity="0.5" strokeWidth="2.4">
+        {/* Cuerpo */}
+        <path d="M96 72 Q150 66 204 72 Q236 78 244 116 Q250 146 232 152 Q214 157 196 128 Q150 120 104 128 Q86 157 68 152 Q50 146 56 116 Q64 78 96 72 Z" />
+        {/* Cruceta */}
+        <path d="M100 100 L124 100 M112 88 L112 112" strokeWidth="2" />
+        {/* Botones */}
+        <path d="M186 92 L186.6 92 M204 102 L204.6 102 M186 112 L186.6 112 M168 102 L168.6 102" strokeWidth="5" strokeOpacity="0.7" />
+      </g>
+      {/* La línea de valores que estás metiendo */}
+      <g className="chalk-stroke" stroke="#ffd24a" strokeWidth="2.6" strokeOpacity="0.85">
+        <path d="M74 178 Q150 172 226 178" />
+        <path d="M112 170 L112 186 M168 170 L168 186" />
+      </g>
+    </svg>
+  );
+}
+
 /** Pizarra vacía. Estado vacío. */
 export function EmptyBoardDrawing({ className = '' }: { className?: string }) {
   return (
