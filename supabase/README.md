@@ -60,9 +60,18 @@ La lista de **FC26 es la real**: sale del documento de Full Manual FG, con sus
 nombres en español y sus 29 sliders (incluidos los de cabeza, interceptación,
 desvío, asistencia en entradas y los siete controles de la CPU).
 
-> **Pendiente de verificar para FC27**: se usa la misma lista que FC26, con el
-> desdoble user / cpu_opponent / cpu_teammate. Cuando salga el juego habrá que
-> contrastarla y añadir lo que cambie.
+La de **FC27 también es real**, sacada de las capturas del menú del juego en
+el acceso anticipado (19/09/2026): 61 sliders, 121 filas.
+
+Dos cosas del menú de FC27 que conviene saber:
+
+- Los sliders de jugabilidad viven en la pestaña «Ajustes de tipo de partida»
+  con lado **Usuario** y **CPU**. El desdoble **CPU rival / CPU de tu equipo**
+  está sólo en la pestaña «Controles de la CPU».
+- Hay cuatro **sliders maestros** («Todos los controles de error de tiro»,
+  «...de velocidad y altura», y sus dos equivalentes de pase) que **no** están
+  en el catálogo: no son valores, son atajos que cambian de golpe todos los de
+  debajo, y guardarlos duplicaría información.
 
 El SQL generado **sí borra** los sliders de un juego que ya no estén en
 `catalog.mjs`, para que renombrar un slug no deje filas huérfanas en la UI. Ojo:

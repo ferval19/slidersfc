@@ -8,7 +8,7 @@ export const CATEGORY_LABELS: Record<string, string> = {
   speed: 'Velocidad',
   shooting: 'Tiro',
   passing: 'Pase',
-  ball_control: 'Control de balón',
+  ball_control: 'Control del balón',
   defending: 'Defensa',
   goalkeeping: 'Portería',
   positioning: 'Posición del equipo',

@@ -80,90 +80,101 @@ const fc26 = [
 ];
 
 // ---------------------------------------------------------------------------
-// FC27 — PRELIMINAR. Reconstruido antes del lanzamiento a partir de las Pitch
-// Notes de EA (25 sliders de jugabilidad y 10 de CPU nuevos, y el desdoble
-// CPU rival / CPU compañero) y del listado publicado por fifauteam.
+// FC27 — lista REAL, sacada de las capturas del menú del juego (acceso
+// anticipado, 19/09/2026). Los nombres y el orden son los del menú.
 //
-// Las cuentas cuadran con lo que anuncia EA (+23 y +9 frente a FC26, contra
-// +25 y +10 anunciados), así que la estructura es fiable, pero:
+// Estructura del menú:
+//   Pestaña «Ajustes de tipo de partida» → cada slider con lado Usuario y CPU
+//   Pestaña «Controles de la CPU»        → CPU rival y CPU de tu equipo
 //
-//   ⚠️ HAY QUE CONFIRMAR CON EL JUEGO DELANTE (acceso anticipado, 18/09/2026):
-//      los nombres exactos del menú en español, si falta algún slider, y si
-//      el rango es realmente 1-99.
+// Lo que NO está aquí, y por qué: el menú tiene cuatro sliders maestros
+// («Todos los controles de error de tiro», «...de velocidad y altura»,
+// y sus dos equivalentes de pase). No son valores, son atajos que cambian de
+// golpe todos los de debajo — lo dice su propia descripción en el juego.
+// Guardarlos en un set duplicaría información y daría pie a contradicciones.
 //
-// Los slugs son lo que no conviene cambiar después; los nombres se corrigen en
-// este fichero y se regenera.
+// Rareza del juego: el mismo slider aparece como «Conducciones controladas en
+// carrera» en el lado del usuario y «Conducciones en carrera controladas» en
+// el de la CPU. Se usa la primera.
 // ---------------------------------------------------------------------------
 
 const fc27 = [
-  { slug: 'sprint_speed',   name: 'Velocidad',    category: 'speed' },
-  { slug: 'acceleration',   name: 'Aceleración',  category: 'speed' },
+  // VELOCIDAD
+  { slug: 'sprint_speed',  name: 'Velocidad',   category: 'speed' },
+  { slug: 'acceleration',  name: 'Aceleración', category: 'speed' },
 
-  { slug: 'shot_error',              name: 'Fallo al tirar',                   category: 'shooting' },
-  { slug: 'shot_speed',              name: 'Velocidad de tiro',                category: 'shooting' },
-  { slug: 'finesse_shot_error',      name: 'Fallo en tiro colocado',           category: 'shooting' },
-  { slug: 'finesse_shot_speed',      name: 'Velocidad de tiro colocado',       category: 'shooting' },
-  { slug: 'chip_shot_error',         name: 'Fallo en tiro por elevación',      category: 'shooting' },
-  { slug: 'chip_shot_speed',         name: 'Velocidad de tiro por elevación',  category: 'shooting' },
-  { slug: 'low_driven_shot_error',   name: 'Fallo en tiro raso',               category: 'shooting' },
-  { slug: 'low_driven_shot_speed',   name: 'Velocidad de tiro raso',           category: 'shooting' },
-  { slug: 'power_shot_error',        name: 'Fallo en disparo potente',         category: 'shooting' },
-  { slug: 'power_shot_speed',        name: 'Velocidad de disparo potente',     category: 'shooting' },
-  { slug: 'header_shot_error',       name: 'Fallo al rematar de cabeza',       category: 'shooting' },
+  // TIRO
+  { slug: 'shot_error',                name: 'Error en tiros normales',              category: 'shooting' },
+  { slug: 'shot_speed',                name: 'Velocidad de tiros normales',          category: 'shooting' },
+  { slug: 'finesse_shot_error',        name: 'Error en tiros de calidad',            category: 'shooting' },
+  { slug: 'finesse_shot_speed',        name: 'Velocidad de tiros de calidad',        category: 'shooting' },
+  { slug: 'chip_shot_error',           name: 'Error en vaselina',                    category: 'shooting' },
+  { slug: 'chip_shot_height',          name: 'Altura de vaselina',                   category: 'shooting' },
+  { slug: 'low_driven_shot_error',     name: 'Error en tiros rasos potentes',        category: 'shooting' },
+  { slug: 'low_driven_shot_speed',     name: 'Velocidad de tiros rasos potentes',    category: 'shooting' },
+  { slug: 'power_shot_error',          name: 'Error en zapatazo',                    category: 'shooting' },
+  { slug: 'power_shot_speed',          name: 'Velocidad de zapatazo',                category: 'shooting' },
+  { slug: 'header_shot_error',         name: 'Fallo al rematar de cabeza',           category: 'shooting' },
 
-  { slug: 'pass_error',                    name: 'Fallo al pasar',                          category: 'passing' },
-  { slug: 'pass_speed',                    name: 'Velocidad del pase',                      category: 'passing' },
-  { slug: 'header_pass_error',             name: 'Fallo al pasar de cabeza',                category: 'passing' },
-  { slug: 'through_pass_error',            name: 'Fallo en pase al hueco',                  category: 'passing' },
-  { slug: 'through_pass_speed',            name: 'Velocidad de pase al hueco',              category: 'passing' },
-  { slug: 'lobbed_through_pass_error',     name: 'Fallo en pase bombeado al hueco',         category: 'passing' },
-  { slug: 'lobbed_through_pass_speed',     name: 'Velocidad de pase bombeado al hueco',     category: 'passing' },
-  { slug: 'lob_pass_error',                name: 'Fallo en pase en globo',                  category: 'passing' },
-  { slug: 'lob_pass_speed',                name: 'Velocidad de pase en globo',              category: 'passing' },
-  { slug: 'cross_error',                   name: 'Fallo al centrar',                        category: 'passing' },
-  { slug: 'cross_height',                  name: 'Altura del centro',                       category: 'passing' },
+  // PASE
+  { slug: 'pass_error',                    name: 'Error en pases rasos normales',         category: 'passing' },
+  { slug: 'pass_speed',                    name: 'Velocidad de pases rasos normales',     category: 'passing' },
+  { slug: 'header_pass_error',             name: 'Fallo al pasar con la cabeza',          category: 'passing' },
+  { slug: 'through_pass_error',            name: 'Error en pases rasos al hueco',         category: 'passing' },
+  { slug: 'through_pass_speed',            name: 'Velocidad de pases rasos al hueco',     category: 'passing' },
+  { slug: 'lobbed_through_pass_error',     name: 'Error en pases altos al hueco',         category: 'passing' },
+  { slug: 'lobbed_through_pass_height',    name: 'Altura de pases altos al hueco',        category: 'passing' },
+  { slug: 'lob_pass_error',                name: 'Error en pases altos normales',         category: 'passing' },
+  { slug: 'lob_pass_height',               name: 'Altura de pases altos normales',        category: 'passing' },
+  { slug: 'cross_error',                   name: 'Error en centros',                      category: 'passing' },
+  { slug: 'cross_height',                  name: 'Altura de centros',                     category: 'passing' },
 
-  { slug: 'power_bar',                        name: 'Barra de potencia',                        category: 'ball_control', sides: 'user' },
-  { slug: 'first_touch_error',                name: 'Error de control al primer toque',         category: 'ball_control' },
-  { slug: 'interception_error',               name: 'Fallo al interceptar',                     category: 'ball_control' },
-  { slug: 'deflection_error',                 name: 'Fallo al desviar el balón',                category: 'ball_control' },
-  { slug: 'jog_dribbling_error',              name: 'Fallo al regatear al trote',               category: 'ball_control' },
-  { slug: 'sprint_dribbling_error',           name: 'Fallo al regatear en sprint',              category: 'ball_control' },
-  { slug: 'controlled_sprint_dribbling_error', name: 'Fallo al regatear en sprint controlado',  category: 'ball_control' },
-
-  { slug: 'tackle_assistance',     name: 'Asistencia en entradas',        category: 'defending' },
-  { slug: 'physicality_impact',    name: 'Impacto físico',                category: 'defending' },
-  { slug: 'jockey_speed',          name: 'Velocidad de contención',       category: 'defending' },
-  { slug: 'sprint_jockey_speed',   name: 'Velocidad de contención en sprint', category: 'defending' },
-
-  { slug: 'goalkeeper_ability', name: 'Habilidad del guardameta',      category: 'goalkeeping' },
-  { slug: 'gk_deflection_error', name: 'Fallo al despejar del portero', category: 'goalkeeping' },
-
-  { slug: 'marking',               name: 'Marcaje',                  category: 'positioning' },
-  { slug: 'run_frequency',         name: 'Frecuencia de desmarques', category: 'positioning' },
-  { slug: 'line_height',           name: 'Altura de la línea',       category: 'positioning' },
-  { slug: 'line_length',           name: 'Distancia de la línea',    category: 'positioning' },
-  { slug: 'line_width',            name: 'Ancho de la línea',        category: 'positioning' },
-  { slug: 'defensive_positioning', name: 'Posiciones defensivas',    category: 'positioning' },
-
+  // LESIONES
   { slug: 'injury_frequency', name: 'Frecuencia de lesiones', category: 'injuries' },
   { slug: 'injury_severity',  name: 'Gravedad de la lesión',  category: 'injuries' },
 
-  // Comportamiento de la CPU: aquí sí hay rival y compañero por separado.
-  { slug: 'cpu_defending_aggression',       name: 'Agresividad defensiva',                 category: 'cpu_controls', sides: 'cpu_both' },
-  { slug: 'cpu_stand_tackle_aggression',    name: 'Agresividad en entradas de pie',        category: 'cpu_controls', sides: 'cpu_both' },
-  { slug: 'cpu_slide_tackle_aggression',    name: 'Agresividad en entradas en plancha',    category: 'cpu_controls', sides: 'cpu_both' },
+  // PORTERÍA
+  { slug: 'goalkeeper_ability',  name: 'Habilidad de guardameta', category: 'goalkeeping' },
+  { slug: 'gk_deflection_error', name: 'Error al desviar de POR', category: 'goalkeeping' },
+
+  // POSICIÓN DEL EQUIPO
+  { slug: 'marking',               name: 'Marcaje',                      category: 'positioning' },
+  { slug: 'run_frequency',         name: 'Frecuencia de desmarques',     category: 'positioning' },
+  { slug: 'line_height',           name: 'Altura de la línea',           category: 'positioning' },
+  { slug: 'line_length',           name: 'Distancia de la línea',        category: 'positioning' },
+  { slug: 'line_width',            name: 'Ancho de la línea',            category: 'positioning' },
+  { slug: 'fullback_positioning',  name: 'Posicionamiento de laterales', category: 'positioning' },
+
+  // CONTROL DEL BALÓN
+  { slug: 'power_bar',                 name: 'Barra de potencia',                   category: 'ball_control', sides: 'user' },
+  { slug: 'first_touch_error',         name: 'Error de control al primer toque',    category: 'ball_control' },
+  { slug: 'interception_error',        name: 'Fallo al interceptar',                category: 'ball_control' },
+  { slug: 'deflection_error',          name: 'Error al desviar el balón',           category: 'ball_control' },
+  { slug: 'jog_dribbling',             name: 'Conducción al trote',                 category: 'ball_control' },
+  { slug: 'sprint_dribbling',          name: 'Conducciones en carrera',             category: 'ball_control' },
+  { slug: 'controlled_sprint_dribbling', name: 'Conducciones controladas en carrera', category: 'ball_control' },
+
+  // DEFENSA
+  { slug: 'tackle_assistance',   name: 'Asistencia en entradas',        category: 'defending' },
+  { slug: 'physicality_impact',  name: 'Impacto del físico',            category: 'defending' },
+  { slug: 'jockey_speed',        name: 'Velocidad de brega normal',     category: 'defending' },
+  { slug: 'sprint_jockey_speed', name: 'Velocidad de brega corriendo',  category: 'defending' },
+
+  // CONTROLES DE LA CPU — pestaña aparte, con CPU rival y CPU de tu equipo
+  { slug: 'cpu_defending_aggression',       name: 'Agresividad en defensa',                category: 'cpu_controls', sides: 'cpu_both' },
+  { slug: 'cpu_stand_tackle_frequency',     name: 'Frecuencia de entradas normales',       category: 'cpu_controls', sides: 'cpu_both' },
+  { slug: 'cpu_slide_tackle_frequency',     name: 'Frecuencia de entradas agresivas',      category: 'cpu_controls', sides: 'cpu_both' },
   { slug: 'cpu_professional_frequency',     name: 'Frecuencia de faltas tácticas',         category: 'cpu_controls', sides: 'cpu_both' },
   { slug: 'cpu_buildup_speed',              name: 'Velocidad de creación',                 category: 'cpu_controls', sides: 'cpu_both' },
-  { slug: 'cpu_shot_frequency',             name: 'Frecuencia de tiros',                   category: 'cpu_controls', sides: 'cpu_both' },
-  { slug: 'cpu_chip_shot_frequency',        name: 'Frecuencia de tiros por elevación',     category: 'cpu_controls', sides: 'cpu_both' },
-  { slug: 'cpu_low_driven_shot_frequency',  name: 'Frecuencia de tiros rasos',             category: 'cpu_controls', sides: 'cpu_both' },
-  { slug: 'cpu_finesse_shot_frequency',     name: 'Frecuencia de tiros colocados',         category: 'cpu_controls', sides: 'cpu_both' },
+  { slug: 'cpu_shot_frequency',             name: 'Frecuencia de tiros normales',          category: 'cpu_controls', sides: 'cpu_both' },
+  { slug: 'cpu_chip_shot_frequency',        name: 'Frecuencia de vaselinas',               category: 'cpu_controls', sides: 'cpu_both' },
+  { slug: 'cpu_low_driven_shot_frequency',  name: 'Frecuencia de tiros rasos potentes',    category: 'cpu_controls', sides: 'cpu_both' },
+  { slug: 'cpu_finesse_shot_frequency',     name: 'Frecuencia de tiros de calidad',        category: 'cpu_controls', sides: 'cpu_both' },
   { slug: 'cpu_long_shot_frequency',        name: 'Frecuencia de tiros lejanos',           category: 'cpu_controls', sides: 'cpu_both' },
-  { slug: 'cpu_power_shot_frequency',       name: 'Frecuencia de disparos potentes',       category: 'cpu_controls', sides: 'cpu_both' },
+  { slug: 'cpu_power_shot_frequency',       name: 'Frecuencia de zapatazos',               category: 'cpu_controls', sides: 'cpu_both' },
   { slug: 'cpu_first_touch_pass_frequency', name: 'Frecuencia de pases al primer toque',   category: 'cpu_controls', sides: 'cpu_both' },
-  { slug: 'cpu_cross_frequency',            name: 'Frecuencia de centros',                 category: 'cpu_controls', sides: 'cpu_both' },
-  { slug: 'cpu_early_cross_frequency',      name: 'Frecuencia de centros tempranos',       category: 'cpu_controls', sides: 'cpu_both' },
+  { slug: 'cpu_cross_frequency',            name: 'Frecuencia de centros normales',        category: 'cpu_controls', sides: 'cpu_both' },
+  { slug: 'cpu_early_cross_frequency',      name: 'Frecuencia de centros anticipados',     category: 'cpu_controls', sides: 'cpu_both' },
   { slug: 'cpu_dribble_frequency',          name: 'Frecuencia de regates',                 category: 'cpu_controls', sides: 'cpu_both' },
   { slug: 'cpu_skill_move_frequency',       name: 'Frecuencia de filigranas',              category: 'cpu_controls', sides: 'cpu_both' },
 ];
