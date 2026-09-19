@@ -1,3 +1,6 @@
+import Link from 'next/link';
+
+import { ChalkClipboard } from '@/components/chalk';
 import { Hero, pickHero } from '@/components/hero';
 import { EmptyState } from '@/components/empty-state';
 import { FilterBar } from '@/components/filter-bar';
@@ -70,6 +73,37 @@ export default async function HomePage() {
           comparar cincuenta números a mano. En un set publicado, cada número abre su
           propio hilo de comentarios.
         </p>
+      </section>
+
+      {/* La guía. Va aquí, entre la muestra y el listado: quien acaba de
+          entender cómo se lee un set es justo quien se pregunta qué hace falta
+          para publicar el suyo. */}
+      <section className="panel mt-6 flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:gap-8 sm:p-8">
+        <ChalkClipboard className="mx-auto size-24 shrink-0 text-chalk-dim sm:mx-0 sm:size-28" />
+
+        <div className="min-w-0 flex-1">
+          <p className="eyebrow">La guía</p>
+          <h2 className="display mt-2 text-3xl">Qué lleva un set</h2>
+          <p className="mt-3 max-w-prose text-sm text-chalk-dim">
+            Todo lo que se puede contar de un set aquí, campo por campo, y por qué cada cosa
+            importa. Casi nada es obligatorio, pero cuanto más pongas, más le sirve a quien se lo
+            lleve.
+          </p>
+
+          <ul className="mt-4 flex flex-wrap gap-2">
+            {['Dificultad, tiempos y cámara', 'Los valores y sus lados', 'Comportamiento de la CPU', 'Comentarios valor a valor'].map(
+              (topic) => (
+                <li key={topic} className="chip">
+                  {topic}
+                </li>
+              ),
+            )}
+          </ul>
+
+          <Link href="/guia" className="btn btn-ghost mt-6">
+            Leer la guía
+          </Link>
+        </div>
       </section>
 
       {/* Feed */}
