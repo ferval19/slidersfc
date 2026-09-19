@@ -207,3 +207,42 @@ npm run test:import  # el importador de texto contra el catálogo real
 
 Antes de dar algo por bueno: `typecheck`, `lint`, **`build`** y, si has tocado
 SQL, `test:sql`; si has tocado el importador o el catálogo, `test:import`.
+
+---
+
+## Cómo se trabaja con Claude en este proyecto
+
+**Opus piensa, Sonnet implementa.** El trabajo de decidir —qué construir, cómo
+encaja, qué se rompe— lo hace Opus. Escribir el código de un cambio ya
+decidido lo hace Sonnet, en un subagente (`Agent` con `model: "sonnet"`). El
+motivo es el coste: la parte cara de un cambio en tokens es teclear ficheros,
+y ahí Opus no aporta lo suficiente para lo que cuesta.
+
+Cómo se reparte en la práctica:
+
+| Opus | Sonnet |
+| --- | --- |
+| Entender qué pide Fernando y traducirlo a un cambio concreto | Escribir el código y las pruebas del cambio ya especificado |
+| Decidir dónde vive cada pieza (sobre todo el límite cliente/servidor) | Renombrados, movimientos, repetir un patrón que ya existe |
+| Diseñar SQL, RLS y lo que toca datos de verdad | Redactar la prueba de un módulo puro contra un caso descrito |
+| Revisar lo que vuelve y pasar las comprobaciones | |
+| Actualizar el mapa del código y el historial | |
+
+**Al delegar, el encargo va cerrado**: ficheros a tocar, firma de lo que se
+escribe, y qué comprobación tiene que pasar. Un subagente arranca en frío, sin
+nada de esta conversación; lo que no vaya en el encargo, se lo inventa.
+
+**Economía de tokens**, en orden de lo que más ahorra:
+
+- Leer trozos (`sed -n`, `grep -n`) antes que ficheros enteros; los ficheros
+  enteros sólo cuando se van a reescribir.
+- No releer un fichero después de editarlo: si la edición hubiera fallado, la
+  herramienta habría dado error.
+- Las comprobaciones a fichero y mirar sólo el código de salida y el final;
+  `npm run build` escupe cientos de líneas que no dicen nada.
+- Preferir `read_page` / `get_page_text` a capturas de pantalla, salvo cuando
+  lo que se comprueba es precisamente cómo se ve.
+- Nada de resumir de vuelta lo que ya está escrito en el codemap o el README.
+
+Lo que **no** se delega: aplicar SQL sobre la base real, tocar el catálogo,
+cualquier cosa de autenticación o RLS, y dar un cambio por bueno.
