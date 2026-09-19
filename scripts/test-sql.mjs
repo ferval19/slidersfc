@@ -188,6 +188,23 @@ const count = async (db, sql) => (await db.query(sql)).rows[0].n;
       fc27Value('cpu_skill_move_frequency', 'cpu_teammate') === 65,
   );
 
+  // Un slider que deja de existir en un lado tiene que desaparecer al
+  // reaplicar el catálogo. Antes el borrado miraba sólo el slug, así que
+  // quedaban ámbitos huérfanos: a fc27 le sobraron veinte «cpu_teammate» de
+  // una versión preliminar, visibles como sliders fantasma en la ficha.
+  await db.exec(`
+    insert into slider_definitions (game_id, category, applies_to, name, slug, sort_order)
+    values ((select id from games where slug = 'fc27'), 'speed', 'cpu_teammate',
+            'Velocidad (ámbito fantasma)', 'sprint_speed', 0)
+  `);
+  await db.exec(read(CATALOG));
+  check(
+    'reaplicar el catálogo borra los ámbitos que ya no existen',
+    0 === await count(db,
+      `select count(*)::int as n from slider_definitions d join games g on g.id = d.game_id
+       where g.slug = 'fc27' and d.slug = 'sprint_speed' and d.applies_to = 'cpu_teammate'`),
+  );
+
   const slug = await db.query(`select slug from slider_sets where title = 'Full Manual FG v3.0'`);
   check(
     'el set recibe un slug legible',

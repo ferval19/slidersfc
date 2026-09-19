@@ -91,12 +91,21 @@ lines.push(
   '-- Limpieza: lo que ya no está en el catálogo -------------------------------',
 );
 
+// Se borra por (slug, ámbito), no sólo por slug: si un slider deja de existir
+// en un lado —a FC27 le sobraban veinte ámbitos «CPU compañero» de una versión
+// preliminar del catálogo— el slug sigue estando y un borrado por slug no los
+// ve. Quedaban como sliders fantasma en la ficha del set.
 for (const game of games) {
-  const slugs = (slidersByGame[game.slug] ?? []).map((s) => q(s.slug)).join(', ');
+  const pairs = (slidersByGame[game.slug] ?? []).flatMap((slider) =>
+    scopesFor(slider, game).map((scope) => `(${q(slider.slug)}, ${q(scope)})`),
+  );
+
   lines.push(
     'delete from public.slider_definitions',
     `where game_id = (select id from public.games where slug = ${q(game.slug)})`,
-    `  and slug not in (${slugs});`,
+    '  and (slug, applies_to) not in (',
+    `    ${pairs.join(',\n    ')}`,
+    '  );',
     '',
   );
 }

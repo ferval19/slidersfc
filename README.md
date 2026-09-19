@@ -344,6 +344,18 @@ Vercel, el origen caía a localhost. Ahora sale de una cascada que incluye las
 variables que Vercel pone solas. Y se añade una **imagen por defecto** para
 portada, juegos y perfiles, que no tenían ninguna.
 
+### 19/09 · Sliders fantasma y hoja de ruta de pet project
+
+El borrado de sincronización del catálogo miraba sólo el `slug`, así que
+veinte ámbitos «CPU compañero» de la versión preliminar de FC27 seguían vivos
+en la base de datos: sliders fantasma en la ficha. Ahora se borra por
+**(slug, ámbito)**, con prueba de regresión.
+
+La [hoja de ruta](docs/hoja-de-ruta.md) se rehace con el encuadre de proyecto
+personal: arriba lo que sirve contigo solo, fuera lo que genera cola, y una
+regla explícita — no construir más funciones de comunidad hasta que un
+desconocido comente.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.
