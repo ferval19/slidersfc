@@ -30,6 +30,7 @@ const MIGRATIONS = [
 ];
 const CATALOG = 'supabase/seed/01_catalog.sql';
 const STARTER_SET = 'supabase/seed/02_set_full_manual_fg.sql';
+const FC27_SET = 'supabase/seed/03_set_fc27_realista.sql';
 const EMAIL = 'ferval19@gmail.com';
 
 let failures = 0;
@@ -140,7 +141,54 @@ const count = async (db, sql) => (await db.query(sql)).rows[0].n;
   check('y el perfil pasa a fullmanualfg', 1 === await count(db,
     `select count(*)::int as n from profiles where username = 'fullmanualfg'`));
 
-  const slug = await db.query(`select slug from slider_sets`);
+  // El set de referencia de FC27
+  await db.exec(read(FC27_SET));
+
+  check(
+    'el set de FC27 queda publicado con sus 121 valores',
+    121 ===
+      (await count(
+        db,
+        `select count(*)::int as n from slider_set_values v
+         join slider_sets s on s.id = v.slider_set_id
+         where s.title = 'Jugabilidad realista de FC27'`,
+      )),
+  );
+
+  const fc27Gaps = await db.query(`
+    select d.slug, d.applies_to
+    from slider_definitions d
+    join games g on g.id = d.game_id
+    left join slider_set_values v
+      on v.slider_definition_id = d.id
+     and v.slider_set_id = (select id from slider_sets where title = 'Jugabilidad realista de FC27')
+    where g.slug = 'fc27' and v.id is null
+  `);
+  check(
+    'ningún slider de fc27 se queda sin valor',
+    fc27Gaps.rows.length === 0,
+    JSON.stringify(fc27Gaps.rows.slice(0, 5)),
+  );
+
+  const fc27Spot = await db.query(`
+    select d.slug, d.applies_to, v.value
+    from slider_set_values v
+    join slider_definitions d on d.id = v.slider_definition_id
+    join slider_sets s on s.id = v.slider_set_id
+    where s.title = 'Jugabilidad realista de FC27'
+  `);
+  const fc27Value = (slug, scope) =>
+    fc27Spot.rows.find((r) => r.slug === slug && r.applies_to === scope)?.value;
+  check(
+    'los valores de FC27 son los del menú',
+    fc27Value('sprint_speed', 'user') === 35 &&
+      fc27Value('gk_deflection_error', 'cpu_opponent') === 99 &&
+      fc27Value('power_bar', 'user') === 50 &&
+      fc27Value('cpu_buildup_speed', 'cpu_opponent') === 98 &&
+      fc27Value('cpu_skill_move_frequency', 'cpu_teammate') === 65,
+  );
+
+  const slug = await db.query(`select slug from slider_sets where title = 'Full Manual FG v3.0'`);
   check(
     'el set recibe un slug legible',
     slug.rows[0]?.slug === 'full-manual-fg-v3-0',
@@ -197,12 +245,13 @@ const count = async (db, sql) => (await db.query(sql)).rows[0].n;
   // Reejecutar no debe duplicar
   await db.exec(read(CATALOG));
   await db.exec(read(STARTER_SET));
+  await db.exec(read(FC27_SET));
   check(
     'reejecutar los seeds no duplica',
-    1 ===
+    2 ===
       (await count(
         db,
-        `select count(*)::int as n from slider_sets where title = 'Full Manual FG v3.0'`,
+        `select count(*)::int as n from slider_sets where title in ('Full Manual FG v3.0', 'Jugabilidad realista de FC27')`,
       )) &&
       50 ===
         (await count(

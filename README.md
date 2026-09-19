@@ -37,6 +37,7 @@ Editor del dashboard, o con la CLI (`supabase db push`):
 4. `supabase/seed/01_catalog.sql` — juegos y catálogo de sliders
 5. `supabase/migrations/20260912140000_set_slugs.sql` — URLs amigables
 6. `supabase/seed/02_set_full_manual_fg.sql` — set de inicio para FC26
+7. `supabase/seed/03_set_fc27_realista.sql` — valores por defecto de FC27
    (requiere haber entrado una vez con `ferval19@gmail.com`; ver
    [supabase/README.md](supabase/README.md))
 

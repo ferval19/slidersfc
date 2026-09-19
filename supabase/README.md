@@ -8,6 +8,7 @@ migrations/20260911120100_rls.sql
 migrations/20260911120200_profiles_trigger.sql
 seed/01_catalog.sql
 seed/02_set_full_manual_fg.sql
+seed/03_set_fc27_realista.sql
 ```
 
 `02_set_full_manual_fg.sql` carga el set de inicio «Full Manual FG v3.0» para
@@ -15,7 +16,12 @@ FC26, con los valores del documento público de Full Manual FG (v3.0,
 07/12/2025; los valores son de @Shinogoblin en X, y el crédito va en la
 descripción del set).
 
-**Requisito**: ese fichero busca al usuario por email
+`03_set_fc27_realista.sql` carga «Jugabilidad realista de FC27»: los 121
+valores que el juego trae de fábrica en ese preajuste, leídos del menú en el
+acceso anticipado. No es un set de nadie, es la referencia contra la que se ve
+qué ha tocado cada quien.
+
+**Requisito** (para los dos): el fichero busca al usuario por email
 (`ferval19@gmail.com`) en `auth.users`, así que hay que haber entrado una vez
 en la app con ese correo antes de aplicarlo. No crea cuentas a mano: de eso se
 encarga Supabase Auth. Si el usuario no existe, falla con un mensaje claro en
