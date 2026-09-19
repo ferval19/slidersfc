@@ -34,7 +34,11 @@ arreglado, con prueba de regresión — falta reaplicar el catálogo.
 esperaba a tener volumen; con el set de fábrica ya cargado, el segundo término
 de la comparación existe desde el primer día.
 
-**Sigue sin hacerse**: acceso con X, analítica, importador, editar perfil.
+**Sigue sin hacerse**: acceso con X, analítica, editar perfil.
+
+**Hecho después del corte**: el importador de texto pegado, que estaba en
+*Siguiente*. Se adelantó porque no depende de nadie y quita el peaje de
+publicar: sin él, cada set son quince minutos de teclear.
 
 ---
 
@@ -52,7 +56,6 @@ de la comparación existe desde el primer día.
 
 | # | Qué | Por qué |
 | --- | --- | --- |
-| 6 | **Importar set desde texto pegado** | Baja de 15 minutos a 30 segundos publicar. Te sirve a ti el primero: tus sets viven en Notion |
 | 7 | **Editar perfil** (bio, avatar, handle) | Hoy es imposible: sólo lo pone el trigger |
 | 8 | **Comparar dos sets cualesquiera** | Extensión natural de (4) |
 | 9 | **Copia de seguridad de los datos** | Un script que vuelca sets y comentarios a JSON. Higiene de proyecto personal: que el contenido no sea rehén de un plan gratuito |

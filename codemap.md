@@ -40,6 +40,7 @@ supabase/seed/catalog.mjs        catálogo de sliders: FUENTE DE VERDAD
 supabase/seed/0*.sql             generado + sets de inicio
 scripts/build-seed.mjs           catalog.mjs → 01_catalog.sql
 scripts/test-sql.mjs             toda la cadena SQL contra Postgres en memoria
+scripts/test-import.mjs          el importador de texto contra el catálogo real
 docs/                            dirección visual · hoja de ruta
 ```
 
@@ -49,6 +50,7 @@ docs/                            dirección visual · hoja de ruta
 | --- | --- |
 | `queries.ts` | Todas las lecturas. Cada una envuelta en `safeRead`: si Supabase no responde, la página se queda vacía en vez de caerse |
 | `set-view.ts` | Convierte el detalle de un set en algo plano y serializable para los Client Components |
+| `import-sliders.ts` | Lee un set pegado en texto. Módulo **puro** (sólo importa tipos) para poder probarlo con `node` sin levantar la aplicación |
 | `category-order.ts` | Ordena las categorías por `sort_order`. Módulo aparte **sin nada del servidor**: lo usan la ficha (servidor) y el formulario (cliente) |
 | `constants.ts` | Etiquetas, ámbitos y el color de cada rotulador |
 | `paths.ts` | Rutas en un solo sitio. `resolveSetPath` tolera que falte el slug |
@@ -174,6 +176,21 @@ seeds van en un único bloque `do`, que es atómico.
 **En el modo consola el progreso va abajo.** Arriba desaparecía tras la
 cabecera del sitio, que también es fija y tiene más z-index.
 
+**El importador de texto busca el nombre más largo primero.** «Velocidad» es
+prefijo de «Velocidad de tiros de calidad»; si se busca por orden de catálogo,
+media lista de FC27 cae en el slider equivocado sin avisar. Otras tres reglas
+que parecen arbitrarias y no lo son: un solo número va a los dos lados (es como
+lo escribe casi todo el mundo), «CPU» a secas cae en `cpu_opponent` cuando el
+juego desdobla rival y compañero —quien pega un set de FC26 en FC27 escribe
+«CPU»—, y los números por encima de 100 se descartan, que si no un «8 minutos»
+o un «2026» entran como valor.
+
+**`import-sliders.ts` no importa nada que no sea un tipo.** Así `node` puede
+cargarlo quitando los tipos y `scripts/test-import.mjs` lo prueba contra el
+catálogo real sin levantar Next. El formato de entrada no lo controlamos —cada
+uno pega su set como lo tiene escrito—, así que la prueba es lo único que dice
+si sigue tragando lo que la gente pega.
+
 ---
 
 ## Comandos
@@ -185,7 +202,8 @@ npm run typecheck    # tsc --noEmit
 npm run lint         # eslint
 npm run seed:build   # catalog.mjs → 01_catalog.sql
 npm run test:sql     # migraciones y seeds contra Postgres en memoria (PGlite)
+npm run test:import  # el importador de texto contra el catálogo real
 ```
 
 Antes de dar algo por bueno: `typecheck`, `lint`, **`build`** y, si has tocado
-SQL, `test:sql`.
+SQL, `test:sql`; si has tocado el importador o el catálogo, `test:import`.

@@ -4,6 +4,7 @@ import { useActionState, useMemo, useState } from 'react';
 
 import type { SetFormState } from '@/app/actions/sets';
 import { CATEGORY_DRAWINGS } from '@/components/chalk';
+import { ImportPanel } from '@/components/import-panel';
 import { ScaleLegend, ScaleTrack } from '@/components/slider-scale';
 import { categoryLabel, SCOPE_INK, SCOPE_LABELS, sortScopes } from '@/lib/constants';
 import { orderCategories } from '@/lib/category-order';
@@ -139,6 +140,11 @@ export function SliderSetForm({
             </button>
           </div>
         </div>
+
+        <ImportPanel
+          definitions={definitions}
+          onApply={(imported) => setValues((previous) => ({ ...previous, ...imported }))}
+        />
 
         {blocks.map((block) => {
           const Drawing = CATEGORY_DRAWINGS[block.category as keyof typeof CATEGORY_DRAWINGS];

@@ -11,7 +11,8 @@
     "seed:build": "node scripts/build-seed.mjs",
     "db:reset": "supabase db reset",
     "db:push": "supabase db push",
-    "test:sql": "node scripts/test-sql.mjs"
+    "test:sql": "node scripts/test-sql.mjs",
+    "test:import": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-import.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

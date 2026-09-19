@@ -167,6 +167,7 @@ npm run dev
 | `npm run lint` | ESLint |
 | `npm run seed:build` | Regenera `supabase/seed/01_catalog.sql` desde `supabase/seed/catalog.mjs` |
 | `npm run test:sql` | Ejecuta migraciones y seeds contra un Postgres en memoria y comprueba el resultado |
+| `npm run test:import` | Prueba el importador de texto pegado contra el catálogo real |
 
 ## Estructura
 
@@ -381,6 +382,24 @@ de EA y crea un **borrador** que lleva a revisar. Con el set de Full Manual FG
 viajan **49 de 50 valores**; el único que se queda fuera es «Agresividad en las
 entradas», que FC27 parte en dos y elegir una sería inventar. Los 72 sliders
 nuevos arrancan con lo que trae el juego.
+
+### 19/09 · Pegar un set en vez de teclearlo
+
+Rellenar 61 sliders a mano son quince minutos, y es el peaje que hay entre
+tener un set escrito y publicarlo. Ahora el formulario acepta el texto tal cual
+esté: la tabla de Notion con tabuladores, Notion pegado celda a celda, una
+tabla en Markdown, o el texto corrido de un mensaje con «usuario 65, CPU 70».
+
+Lo que se ve antes de aplicar nada es a propósito: cuántos sliders se han
+reconocido de cuántos hay, con qué valor ha quedado cada uno, qué valores se
+han recortado por salirse del rango del juego y **qué líneas no se han
+entendido**. Un importador que se traga lo que no sabe leer es peor que no
+tenerlo, porque publicas un set con valores que no son los tuyos.
+
+El análisis es un módulo sin UI, y `npm run test:import` lo prueba contra el
+catálogo de verdad: las cuatro formas de pegar, que el nombre largo gane al
+corto que lo prefija, que un «8 minutos» no se cuele como valor y que los 61
+sliders de FC27 se reconozcan enteros.
 
 ---
 
