@@ -353,6 +353,12 @@ de FC27 son diecinueve pantallas de móvil; plegado, dos y media.
 hidden` por valor: con ciento veintidós, repintarlos en cada gesto era la mitad
 del problema.
 
+**La diferencia va en verde si sube y en rojo si baja**, con los rotuladores
+que ya hay: el verde es el mismo del segundo set y eso no estorba —una
+diferencia positiva es justo «el segundo está por encima»—, y el rojo no lo usa
+nada más en esa pantalla, porque los ámbitos van escritos y no pintados. El
+cero no se colorea: que dos sets coincidan no es ni bueno ni malo.
+
 **En la comparación el color cambia de significado.** En la ficha de un set
 dice el ámbito (usuario / CPU); al comparar dos sets dice **de quién es el
 valor**, porque es lo único que se pregunta ahí. El ámbito se rotula fuera, a

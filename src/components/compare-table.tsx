@@ -167,11 +167,7 @@ function Row({
             <div className="flex items-center gap-2">
               <span className="value-pill w-9 text-right text-sm text-ink-user">{cell.a ?? '—'}</span>
               <span className="value-pill w-9 text-right text-sm text-ink-mate">{cell.b ?? '—'}</span>
-              <span
-                className={`value-pill w-10 text-right text-xs ${
-                  cell.delta ? 'text-chalk' : 'text-chalk-dim/50'
-                }`}
-              >
+              <span className={`value-pill w-10 text-right text-xs ${deltaInk(cell.delta)}`}>
                 {formatDelta(cell.delta)}
               </span>
             </div>
@@ -180,6 +176,22 @@ function Row({
       </div>
     </li>
   );
+}
+
+/**
+ * El color de la diferencia: verde si el segundo sube, rojo si baja.
+ *
+ * Se usan los rotuladores que ya hay. El verde coincide con el del segundo set
+ * y eso no estorba, al contrario: una diferencia positiva es justo «el segundo
+ * está por encima». El rojo no lo usa nada más en esta pantalla —los ámbitos
+ * van escritos, no pintados—, así que queda libre para decir «baja».
+ *
+ * El cero no se colorea: que dos sets coincidan no es ni bueno ni malo.
+ */
+function deltaInk(delta: number | null) {
+  if (delta === null) return '';
+  if (delta === 0) return 'text-chalk-dim/50';
+  return delta > 0 ? 'text-ink-mate' : 'text-ink-rival';
 }
 
 /** El signo va delante y en positivo también: se lee «cuánto sube el segundo». */

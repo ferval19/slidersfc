@@ -724,6 +724,19 @@ De paso, el `scroll-margin` de las secciones pasa a depender del tamaño: en
 escritorio descuenta la cabecera y la barra, en el móvil sólo la cabecera. Con
 el valor de escritorio, saltar a una categoría dejaba asomando la anterior.
 
+### 20/09 · La diferencia, en verde y en rojo
+
+En la comparación, la cifra de la derecha decía cuánto sube o baja el segundo
+set pero iba toda del mismo color, así que había que leer el signo uno a uno.
+Ahora va **en verde cuando sube y en rojo cuando baja**, y la columna entera se
+lee de un vistazo.
+
+Sin tocar la paleta: el verde es el mismo del segundo set —una diferencia
+positiva es justo «el segundo está por encima», así que refuerza en vez de
+estorbar— y el rojo estaba libre en esa pantalla, porque ahí los ámbitos van
+escritos y no pintados. El cero se queda apagado: que dos sets coincidan en un
+slider no es ni bueno ni malo.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

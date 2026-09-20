@@ -90,7 +90,7 @@ export default async function ComparePage({ params }: { params: Params }) {
           <p className="mt-4 max-w-prose text-sm text-chalk-dim">
             {view.differing === 0
               ? 'Ni un solo valor distinto entre los dos.'
-              : `En los otros ${view.total - view.differing} coinciden. La barra entre las dos muescas es la distancia.`}
+              : `En los otros ${view.total - view.differing} coinciden. La barra entre las dos muescas es la distancia, y la cifra de la derecha dice cuánto sube o baja el segundo: en verde si sube, en rojo si baja.`}
           </p>
         </div>
 
