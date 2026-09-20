@@ -705,6 +705,25 @@ Con su prueba de regresión: renombrar el set, reaplicar el seed, y comprobar
 que no hay duplicado, que el nombre que puso su autor se respeta y que el set
 sigue completo.
 
+### 20/09 · Lo mismo en el móvil, pero sin copiar la barra
+
+En escritorio hay una barra pegada con las nueve categorías. Portarla al móvil
+habría sido lo fácil y lo peor: la cabecera del sitio ya se lleva 73 px de 812,
+una segunda franja se llevaría otros 44 —un 14% de la pantalla en chrome
+permanente— y aun así no verías las nueve de golpe, sino un carrusel horizontal
+que además pelea con el gesto de la página.
+
+Lo que hay ahora usa lo que ya estaba. **La cabecera de cada categoría se queda
+pegada** mientras la recorres y la empuja la siguiente, como una lista del
+sistema: contesta sola «¿dónde estoy?» y no cuesta un píxel, porque ese título
+iba a pasar por ahí de todas formas. Y **tocándola se abre el índice**: las
+nueve categorías con su dibujo, su número de sliders y la actual marcada. Un
+toque de más a cambio de no pagar sitio en todas las pantallas.
+
+De paso, el `scroll-margin` de las secciones pasa a depender del tamaño: en
+escritorio descuenta la cabecera y la barra, en el móvil sólo la cabecera. Con
+el valor de escritorio, saltar a una categoría dejaba asomando la anterior.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

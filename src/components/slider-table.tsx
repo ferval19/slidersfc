@@ -5,7 +5,8 @@ import { useState } from 'react';
 import { CATEGORY_DRAWINGS } from '@/components/chalk';
 import { CommentComposer, CommentList } from '@/components/comment-thread';
 import { ScaleLegend, ScaleTrack } from '@/components/slider-scale';
-import { categoryAnchor } from '@/components/set-sticky-bar';
+import { categoryAnchor, useActiveCategory } from '@/components/active-category';
+import { CategorySheet } from '@/components/category-sheet';
 import {
   categoryLabel,
   CPU_BEHAVIOURS,
@@ -51,9 +52,21 @@ export function SliderTable({
   hasCpuBehaviour?: boolean;
 }) {
   const [openId, setOpenId] = useState<number | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const active = useActiveCategory(blocks.map((block) => block.category));
 
   return (
     <div className="flex flex-col gap-10">
+      <CategorySheet
+        categories={blocks.map((block) => ({
+          category: block.category,
+          count: block.rows.length,
+        }))}
+        active={active}
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+      />
+
       {/* La leyenda general. Los rótulos de columna ya no van aquí: cada
           categoría lleva los suyos, para no perderlos al bajar. */}
       <div className="sm:-mt-4">
@@ -76,14 +89,33 @@ export function SliderTable({
           <section
             key={block.category}
             id={categoryAnchor(block.category)}
-            className="scroll-mt-[calc(var(--header-h)+4.5rem)]"
+            // El margen de scroll descuenta lo que hay pegado arriba, y eso
+            // cambia con el tamaño: en el móvil sólo la cabecera del sitio,
+            // porque la barra de categorías es de escritorio. Con el margen
+            // de escritorio, al saltar quedaba asomando la cabecera anterior.
+            className="scroll-mt-[calc(var(--header-h)+0.5rem)] sm:scroll-mt-[calc(var(--header-h)+4.5rem)]"
           >
-            <header className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-chalk-line pb-3">
+            {/* En el móvil la cabecera se queda pegada mientras recorres su
+                categoría y la empuja la siguiente, como una lista del sistema:
+                contesta sola «¿dónde estoy?» sin gastar un píxel de más,
+                porque ese título iba a pasar por ahí de todas formas. Y
+                tocándola se abre el índice. */}
+            <header className="relative z-10 flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-chalk-line bg-board pt-2 pb-3 max-sm:sticky max-sm:top-[var(--header-h)]">
               {Drawing ? <Drawing className="size-7 shrink-0 text-chalk-dim" /> : null}
               <h3 className="display text-2xl">{categoryLabel(block.category)}</h3>
               {block.category === 'cpu_controls' && hasCpuBehaviour && behaviour ? (
                 <span className="chip chip-active ml-auto">{behaviour.label}</span>
               ) : null}
+
+              <span aria-hidden className="eyebrow ml-auto sm:hidden">
+                Índice ▾
+              </span>
+              <button
+                type="button"
+                onClick={() => setSheetOpen(true)}
+                aria-label={`${categoryLabel(block.category)} — ir a otra categoría`}
+                className="absolute inset-0 sm:hidden"
+              />
             </header>
 
             {cpuIsAutomatic ? (

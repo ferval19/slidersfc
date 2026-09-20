@@ -221,11 +221,20 @@ a una categoría—, así que la visibilidad se mira con un rAF por gesto de
 scroll. El resaltado de la categoría activa sí usa IntersectionObserver, que
 ahí funciona.
 
-**La barra pegada es sólo de escritorio.** Nueve categorías no caben en 375 px
-sin convertirse en un carrusel horizontal, y en el móvil ya está el modo
-consola, que es la forma buena de recorrer un set con el teléfono en la mano.
-Los nombres de las categorías se acortan (`categoryShortLabel`) porque enteros
-tampoco caben en una línea a 1024 px.
+**La barra pegada es sólo de escritorio; en el móvil manda la cabecera de la
+categoría.** Nueve categorías no caben en 375 px sin volverse un carrusel
+horizontal, y una segunda franja fija le quitaría 44 px a una pantalla donde la
+cabecera del sitio ya se lleva 73. En su lugar, la cabecera de cada categoría
+se queda pegada mientras la recorres y la empuja la siguiente —el patrón de
+lista del sistema— y tocándola se abre una hoja con las nueve y la actual
+marcada. El índice no cuesta nada en reposo y, cuando se pide, se ve entero.
+Los nombres de las categorías se acortan (`categoryShortLabel`) sólo en la
+barra de escritorio, donde enteros no caben en una línea a 1024 px.
+
+**El `scroll-margin` de las secciones cambia con el tamaño.** Descuenta lo que
+haya pegado arriba, y eso no es lo mismo en las dos: en escritorio la cabecera
+del sitio más la barra, en el móvil sólo la cabecera. Con el valor de
+escritorio, saltar a una categoría en el móvil dejaba asomando la anterior.
 
 **La portada elige un hero al azar en el servidor, y no es un carrusel.** No
 hay flechas ni temporizador: se elige uno por petición y ahí se queda hasta que
