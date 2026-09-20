@@ -25,6 +25,14 @@ export type SliderRowView = {
 
 export type CategoryBlockView = {
   category: string;
+  /**
+   * Los ámbitos de ESTA categoría, no los del set.
+   *
+   * Importa: el lado de «CPU compañero» sólo existe en los sliders de
+   * comportamiento de la CPU. Con los ámbitos del set entero, las otras
+   * cuarenta y nueve filas gastaban una columna en pintar un guion.
+   */
+  scopes: SliderScope[];
   rows: SliderRowView[];
 };
 
@@ -105,10 +113,18 @@ export function buildSetView(detail: SetDetail, currentUserId: string | null): S
   const blocks: CategoryBlockView[] = orderCategories(definitions, [...grouped.keys()]).map((category) => {
     const sliders = grouped.get(category)!;
 
+    const blockScopes = sortScopes([
+      ...new Set(
+        [...sliders.values()].flatMap((slider) =>
+          slider.scopes.map((definition) => definition.applies_to),
+        ),
+      ),
+    ]);
+
     const rows: SliderRowView[] = [...sliders.values()].map((slider) => {
       const byScope = new Map(slider.scopes.map((definition) => [definition.applies_to, definition]));
 
-      const cells: CellView[] = scopes.map((scope) => {
+      const cells: CellView[] = blockScopes.map((scope) => {
         const definition = byScope.get(scope);
         if (!definition) {
           return { definitionId: -1, scope, value: null, commentCount: 0 };
@@ -129,7 +145,7 @@ export function buildSetView(detail: SetDetail, currentUserId: string | null): S
       return { slug: slider.slug, name: slider.name, cells, reference };
     });
 
-    return { category, rows };
+    return { category, scopes: blockScopes, rows };
   });
 
   return {

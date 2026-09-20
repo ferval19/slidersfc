@@ -667,6 +667,28 @@ aparece con un escuchador de scroll y no con IntersectionObserver, porque el
 observador no despertaba en los saltos programáticos — que es justo lo que pasa
 al abrir un enlace con ancla a una categoría.
 
+### 20/09 · Repaso de diseño de la ficha
+
+Tres arreglos que cambian cómo se usa la página, no cómo se ve.
+
+**Las cabeceras de columna ya no se pierden.** Había una sola arriba del todo:
+en la fila sesenta de ciento veintinueve estabas leyendo «35 35» sin saber cuál
+era el usuario y cuál la CPU. Ahora cada categoría lleva sus propios rótulos, y
+en el móvil —donde la rejilla se apila y no cabe una cabecera— cada número
+lleva su etiqueta encima.
+
+**Fuera las columnas muertas.** Los ámbitos se calculan por categoría y no por
+set: «CPU compañero» sólo existe en los sliders de comportamiento de la CPU, y
+ésos a su vez no tienen lado de usuario. Antes, cuarenta y nueve filas gastaban
+una columna entera en un guion. El regulador se queda con ese ancho, y en el
+modo consola los números de la mayoría de filas pasan a ir un escalón más
+grandes.
+
+**Los valores llegan antes.** El título de la ficha baja un escalón —los
+titulares enormes son de la portada— y se aprieta el salto hasta «Valores». En
+una pantalla de escritorio, la primera categoría entra ahora en el primer
+vistazo en vez de quedarse debajo del pliegue.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

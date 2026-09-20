@@ -116,6 +116,12 @@ export function ConsoleMode({
 
   const completed = done.size;
   const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+  /**
+   * Por defecto, para los pasos que no son una fila de valores. Cada fila
+   * calcula el suyo: ahora que los ámbitos van por categoría, la mayoría sólo
+   * tiene dos y el número puede ir más grande, que es de lo que va esta
+   * pantalla.
+   */
   const valueSize = scopes.length > 2 ? 'text-3xl' : 'text-4xl';
 
   return (
@@ -147,6 +153,7 @@ export function ConsoleMode({
             <ul>
               {block.rows.map((row) => {
                 const isDone = done.has(row.slug);
+                const rowValueSize = row.cells.length > 2 ? 'text-3xl' : 'text-4xl';
 
                 return (
                   <li key={row.slug}>
@@ -170,7 +177,7 @@ export function ConsoleMode({
                                 {SCOPE_LABELS[cell.scope]}
                               </span>
                               <span
-                                className={`value-pill ${valueSize} leading-none`}
+                                className={`value-pill ${rowValueSize} leading-none`}
                                 style={{
                                   color:
                                     cell.value === null

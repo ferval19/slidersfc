@@ -6,7 +6,13 @@ import { CATEGORY_DRAWINGS } from '@/components/chalk';
 import { CommentComposer, CommentList } from '@/components/comment-thread';
 import { ScaleLegend, ScaleTrack } from '@/components/slider-scale';
 import { categoryAnchor } from '@/components/set-sticky-bar';
-import { categoryLabel, CPU_BEHAVIOURS, SCOPE_INK, SCOPE_LABELS } from '@/lib/constants';
+import {
+  categoryLabel,
+  CPU_BEHAVIOURS,
+  SCOPE_INK,
+  SCOPE_LABELS,
+  SCOPE_SHORT_LABELS,
+} from '@/lib/constants';
 import type { CategoryBlockView, CommentView } from '@/lib/set-view';
 import type { CpuBehaviour, SliderScope } from '@/lib/database.types';
 
@@ -48,27 +54,10 @@ export function SliderTable({
 
   return (
     <div className="flex flex-col gap-10">
-      {/* En móvil la rejilla se apila, así que ahí la leyenda va suelta. */}
-      <div className="sm:hidden">
+      {/* La leyenda general. Los rótulos de columna ya no van aquí: cada
+          categoría lleva los suyos, para no perderlos al bajar. */}
+      <div className="sm:-mt-4">
         <ScaleLegend scopes={scopes} labels={SCOPE_LABELS} withReference={hasReference} />
-      </div>
-
-      {/* En pantalla ancha, cada rótulo va sobre su columna de valores. */}
-      <div className={`hidden items-end pb-1 sm:grid ${ROW_GRID}`}>
-        <span />
-        <span className="self-center">
-          <ScaleLegend scopes={[]} labels={SCOPE_LABELS} withReference={hasReference} />
-        </span>
-        <div className="flex items-center gap-1.5">
-          {scopes.map((scope) => (
-            <span
-              key={scope}
-              className={`${VALUE_COL} text-center font-mono text-[0.625rem] leading-tight font-semibold tracking-[0.08em] uppercase ${SCOPE_INK[scope].text}`}
-            >
-              {SCOPE_LABELS[scope]}
-            </span>
-          ))}
-        </div>
       </div>
 
       {blocks.map((block) => {
@@ -101,6 +90,24 @@ export function SliderTable({
               <p className="py-5 text-sm text-chalk-dim">{behaviour?.hint}</p>
             ) : null}
 
+            {/* Los rótulos de columna van aquí, en cada categoría, y no una
+                sola vez arriba del todo: con ciento veintinueve filas, una
+                cabecera única se pierde de vista a la tercera pantalla. */}
+            <div hidden={cpuIsAutomatic} className={`hidden items-end pt-3 pb-1 sm:grid ${ROW_GRID}`}>
+              <span />
+              <span />
+              <div className="flex items-center gap-1.5">
+                {block.scopes.map((scope) => (
+                  <span
+                    key={scope}
+                    className={`${VALUE_COL} text-center font-mono text-[0.625rem] leading-tight font-semibold tracking-[0.08em] uppercase ${SCOPE_INK[scope].text}`}
+                  >
+                    {SCOPE_LABELS[scope]}
+                  </span>
+                ))}
+              </div>
+            </div>
+
             <ul hidden={cpuIsAutomatic}>
               {block.rows.map((row) => {
                 const active = row.cells.find(
@@ -129,10 +136,13 @@ export function SliderTable({
                             return (
                               <span
                                 key={cell.scope}
-                                className={`${VALUE_COL} text-center text-sm text-chalk-dim/40`}
+                                className={`${VALUE_COL} text-center text-chalk-dim/40`}
                                 title={`${SCOPE_LABELS[cell.scope]}: no aplica`}
                               >
-                                —
+                                <span className="eyebrow block text-[0.5625rem] sm:hidden">
+                                  {SCOPE_SHORT_LABELS[cell.scope]}
+                                </span>
+                                <span className="text-sm">—</span>
                               </span>
                             );
                           }
@@ -153,6 +163,9 @@ export function SliderTable({
                                   : 'border-transparent hover:border-chalk-line'
                               }`}
                             >
+                              <span className="eyebrow block text-[0.5625rem] sm:hidden">
+                                {SCOPE_SHORT_LABELS[cell.scope]}
+                              </span>
                               <span className="value-pill text-base">{cell.value ?? '–'}</span>
                               {cell.commentCount > 0 ? (
                                 <span className="absolute -top-0.5 -right-0.5 font-mono text-[0.625rem] leading-none font-semibold text-chalk">

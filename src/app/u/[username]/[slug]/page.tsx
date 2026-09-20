@@ -89,7 +89,7 @@ export default async function SetDetailPage({ params }: { params: Params }) {
           ) : null}
         </div>
 
-        <h1 className="display text-[clamp(2.5rem,7vw,4.5rem)]">{detail.set.title}</h1>
+        <h1 className="display text-[clamp(2.25rem,5.5vw,3.5rem)]">{detail.set.title}</h1>
 
         <div className="flex flex-wrap items-center gap-2.5 text-sm text-chalk-dim">
           <Avatar
@@ -172,10 +172,12 @@ export default async function SetDetailPage({ params }: { params: Params }) {
 
       <div className="chalk-rule" />
 
-      <section className="py-9">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-          <h2 className="display text-4xl">Valores</h2>
-          <p className="max-w-xs text-xs text-chalk-dim">
+      {/* Aquí se viene a ver los valores, así que llegan pronto: título en un
+          escalón más bajo que el de la portada y sin aire de sobra por medio. */}
+      <section className="pt-6 pb-9">
+        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+          <h2 className="display text-3xl">Valores</h2>
+          <p className="max-w-prose flex-1 text-xs text-chalk-dim">
             {view.hasReference
               ? 'La marca gris es lo que trae el juego de fábrica: lo que se separe de ella es lo que ha tocado el autor. Toca un número para comentarlo.'
               : 'Toca cualquier número para leer y dejar comentarios sobre ese valor concreto.'}

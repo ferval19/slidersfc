@@ -189,6 +189,19 @@ seeds van en un único bloque `do`, que es atómico.
 **En el modo consola el progreso va abajo.** Arriba desaparecía tras la
 cabecera del sitio, que también es fija y tiene más z-index.
 
+**Los ámbitos se calculan por categoría, no por set.** El lado de «CPU
+compañero» sólo existe en los sliders de comportamiento de la CPU, y los de esa
+pestaña no tienen lado de usuario. Con los ámbitos del set entero, cuarenta y
+nueve filas gastaban una columna en pintar un guion y la de la CPU otra. Ahora
+cada bloque lleva los suyos (`CategoryBlockView.scopes`) y el regulador se
+queda con el ancho que sobra.
+
+**Los rótulos de columna van en cada categoría, no una vez arriba.** Con ciento
+veintinueve filas, una cabecera única se pierde de vista a la tercera pantalla
+y a partir de ahí estás leyendo números sin saber de quién son. En el móvil,
+donde la rejilla se apila y no hay cabecera posible, cada número lleva su
+etiqueta encima en micro.
+
 **El alto de la cabecera está en una variable, `--header-h`.** Lo necesitan
 las barras que se quedan pegadas debajo de ella y el `scroll-margin` de los
 anclas. Estaba puesto a ojo en dos sitios y en uno de ellos estaba mal por

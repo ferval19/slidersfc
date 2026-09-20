@@ -38,6 +38,18 @@ export const SCOPE_LABELS: Record<SliderScope, string> = {
   cpu_teammate: 'CPU compañero',
 };
 
+/**
+ * Nombres cortos de los ámbitos. En el móvil cada valor lleva su etiqueta
+ * encima —si no, en la fila sesenta estás leyendo «35 35» sin saber de quién
+ * es cada uno—, y ahí «CPU compañero» no cabe.
+ */
+export const SCOPE_SHORT_LABELS: Record<SliderScope, string> = {
+  user: 'Usuario',
+  cpu: 'CPU',
+  cpu_opponent: 'CPU rival',
+  cpu_teammate: 'Compañero',
+};
+
 export const SCOPE_ORDER: SliderScope[] = ['user', 'cpu', 'cpu_opponent', 'cpu_teammate'];
 
 
