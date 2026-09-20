@@ -48,16 +48,24 @@ begin
 
   select id into target_set
   from public.slider_sets
+    -- Se busca por SLUG y no por título: el título lo puede cambiar su autor
+    -- desde la web (el slug no cambia nunca, se asigna una vez al crear), y
+    -- con el título como clave este fichero creaba un set duplicado en vez de
+    -- actualizar el que ya estaba. Pasó de verdad.
   where owner_id = target_user
     and game_id = target_game
-    and title = 'Jugabilidad realista de FC27';
+    and slug = 'jugabilidad-realista-de-fc27';
 
   if target_set is null then
-    insert into public.slider_sets (owner_id, game_id, title, description, is_published)
+    -- El slug va explícito y no lo pone el trigger: es la clave con la que
+    -- este fichero se reencuentra con su set, así que no puede depender de
+    -- cómo se llame el set en ese momento.
+    insert into public.slider_sets (owner_id, game_id, title, slug, description, is_published)
     values (
       target_user,
       target_game,
       'Jugabilidad realista de FC27',
+      'jugabilidad-realista-de-fc27',
       concat_ws(
         E'\n',
         'Los valores que EA trae de fábrica en el preajuste de jugabilidad realista de FC27, tal cual salen del menú.',

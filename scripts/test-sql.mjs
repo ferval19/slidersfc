@@ -371,6 +371,52 @@ await (await expectFailure(
   await db.close();
 }
 
+// --- Los seeds se reencuentran con su set aunque lo renombren ---------------
+{
+  const db = await freshDatabase();
+  await db.exec(read(STARTER_SET));
+  await db.exec(read(FC27_SET));
+
+  const antes = await count(db, `select count(*)::int as n from public.slider_sets`);
+
+  // Lo primero que hace cualquiera con un set propio es ponerle su nombre.
+  await db.exec(`
+    update public.slider_sets
+    set title = 'Mi set de siempre'
+    where slug = 'jugabilidad-realista-de-fc27'
+  `);
+
+  await db.exec(read(FC27_SET));
+
+  check(
+    'renombrar el set y reaplicar el seed no crea un duplicado',
+    antes === (await count(db, `select count(*)::int as n from public.slider_sets`)),
+    `${antes} → ${await count(db, `select count(*)::int as n from public.slider_sets`)}`,
+  );
+
+  const renombrado = await db.query(
+    `select title from public.slider_sets where slug = 'jugabilidad-realista-de-fc27'`,
+  );
+  check(
+    'y respeta el nombre que le puso su autor',
+    renombrado.rows[0]?.title === 'Mi set de siempre',
+    renombrado.rows[0]?.title,
+  );
+
+  check(
+    'el set sigue completo tras reaplicarlo',
+    129 ===
+      (await count(
+        db,
+        `select count(*)::int as n from public.slider_set_values v
+         join public.slider_sets s on s.id = v.slider_set_id
+         where s.slug = 'jugabilidad-realista-de-fc27'`,
+      )),
+  );
+
+  await db.close();
+}
+
 // --- Comportamiento de la CPU ----------------------------------------------
 {
   const db = await freshDatabase();

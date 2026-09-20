@@ -182,6 +182,13 @@ crecimiento elástico las filas se colapsan y las columnas se salen del lienzo.
 Las fuentes se leen de `public/fonts/` porque `fetch` sobre un `file:` URL no
 está implementado al prerenderizar con Turbopack.
 
+**Los ficheros de inicio se reencuentran con su set por el SLUG, no por el
+título.** El título lo puede cambiar su autor desde la web; el slug se asigna
+una vez al crear y no cambia nunca. Con el título como clave, reaplicar un
+seed sobre un set renombrado no lo actualizaba: creaba un duplicado con el
+slug sufijado. Pasó de verdad, en producción. Por eso el slug también va
+explícito en el `insert`, en vez de dejárselo al trigger.
+
 **El editor SQL de Supabase ejecuta cada sentencia en su propia transacción**,
 así que una tabla temporal con `on commit drop` no sobrevive a la siguiente. Los
 seeds van en un único bloque `do`, que es atómico.

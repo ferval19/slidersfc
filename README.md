@@ -689,6 +689,22 @@ titulares enormes son de la portada— y se aprieta el salto hasta «Valores». 
 una pantalla de escritorio, la primera categoría entra ahora en el primer
 vistazo en vez de quedarse debajo del pliegue.
 
+### 20/09 · Los seeds buscaban su set por el título
+
+Reaplicar `03_set_fc27_realista.sql` no actualizaba el set de fábrica: creaba
+uno nuevo, con el slug sufijado. El motivo es que los ficheros de inicio
+identificaban su set **por el título**, y el título lo puede cambiar su autor
+desde la web — que es exactamente lo que había pasado.
+
+Ahora lo buscan por el **slug**, que se asigna una vez al crear el set y no
+cambia aunque se cambie el título. El slug va además explícito en el `insert`,
+para que la clave con la que el fichero se reencuentra con su set no dependa de
+cómo se llame el set en ese momento.
+
+Con su prueba de regresión: renombrar el set, reaplicar el seed, y comprobar
+que no hay duplicado, que el nombre que puso su autor se respeta y que el set
+sigue completo.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

@@ -57,16 +57,24 @@ begin
   -- duplicarlo al reejecutar.
   select id into target_set
   from public.slider_sets
+    -- Se busca por SLUG y no por título: el título lo puede cambiar su autor
+    -- desde la web (el slug no cambia nunca, se asigna una vez al crear), y
+    -- con el título como clave este fichero creaba un set duplicado en vez de
+    -- actualizar el que ya estaba. Pasó de verdad.
   where owner_id = target_user
     and game_id = target_game
-    and title = 'Full Manual FG v3.0';
+    and slug = 'full-manual-fg-v3-0';
 
   if target_set is null then
-    insert into public.slider_sets (owner_id, game_id, title, description, is_published)
+    -- El slug va explícito y no lo pone el trigger: es la clave con la que
+    -- este fichero se reencuentra con su set, así que no puede depender de
+    -- cómo se llame el set en ese momento.
+    insert into public.slider_sets (owner_id, game_id, title, slug, description, is_published)
     values (
       target_user,
       target_game,
       'Full Manual FG v3.0',
+      'full-manual-fg-v3-0',
       concat_ws(
         E'\n',
         'Sliders y configuración para jugar íntegramente con controles manuales y offline, en Modo Carrera o Partida Rápida.',
