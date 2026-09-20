@@ -6,6 +6,7 @@ import type {
   Profile,
   SliderComment,
   SliderDefinition,
+  SliderScope,
   SliderSet,
 } from '@/lib/database.types';
 
@@ -150,6 +151,74 @@ export async function getUsernameAfterRename(username: string): Promise<string |
       return profile?.username ?? null;
     },
     null,
+  );
+}
+
+export type VersionEntry = {
+  version: number;
+  note: string | null;
+  createdAt: string;
+  changes: { name: string; scope: SliderScope; from: number; to: number }[];
+};
+
+/**
+ * El historial de un set: qué cambió en cada versión y por qué.
+ *
+ * Se resuelve el nombre y el ámbito del slider aquí y no en la vista, para
+ * que lo que llegue a la página sea legible tal cual. La v1 no aparece: no
+ * estrena nada, es el set tal como se publicó.
+ */
+export async function getSetHistory(setId: string): Promise<VersionEntry[]> {
+  return safeRead(
+    'getSetHistory',
+    async (supabase) => {
+      const [versions, changes] = await Promise.all([
+        supabase
+          .from('slider_set_versions')
+          .select('version, note, created_at')
+          .eq('slider_set_id', setId)
+          .order('version', { ascending: false }),
+        supabase
+          .from('slider_set_changes')
+          .select('version, from_value, to_value, slider_definitions ( name, applies_to, sort_order )')
+          .eq('slider_set_id', setId),
+      ]);
+
+      type Row = {
+        version: number;
+        from_value: number;
+        to_value: number;
+        slider_definitions: {
+          name: string;
+          applies_to: SliderScope;
+          sort_order: number;
+        } | null;
+      };
+
+      const byVersion = new Map<number, Row[]>();
+      for (const row of (changes.data ?? []) as unknown as Row[]) {
+        const bucket = byVersion.get(row.version);
+        if (bucket) bucket.push(row);
+        else byVersion.set(row.version, [row]);
+      }
+
+      return (versions.data ?? []).map((version) => ({
+        version: version.version,
+        note: version.note,
+        createdAt: version.created_at,
+        changes: (byVersion.get(version.version) ?? [])
+          // En el orden del menú del juego, como todo lo demás.
+          .sort((a, b) => (a.slider_definitions?.sort_order ?? 0) - (b.slider_definitions?.sort_order ?? 0))
+          .filter((row) => row.slider_definitions !== null)
+          .map((row) => ({
+            name: row.slider_definitions!.name,
+            scope: row.slider_definitions!.applies_to,
+            from: row.from_value,
+            to: row.to_value,
+          })),
+      }));
+    },
+    [],
   );
 }
 

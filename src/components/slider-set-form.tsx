@@ -417,6 +417,28 @@ export function SliderSetForm({
         })}
       </section>
 
+      {/* La nota del cambio. Sólo al editar algo ya publicado: es lo que
+          estrena versión, y en un borrador no hay versión que estrenar. */}
+      {initial?.isPublished ? (
+        <section className="panel flex flex-col gap-1.5 p-5 sm:p-6">
+          <label className="eyebrow" htmlFor="version_note">
+            Qué has cambiado
+          </label>
+          <textarea
+            id="version_note"
+            name="version_note"
+            rows={3}
+            maxLength={500}
+            placeholder="Bajé la velocidad dos puntos: los contragolpes eran imposibles de defender."
+            className="field resize-y"
+          />
+          <span className="text-xs text-chalk-dim">
+            Opcional. Si tocas algún valor, esto queda en el historial del set junto a lo que has
+            cambiado. Es lo que convierte una lista de números en algo que se entiende.
+          </span>
+        </section>
+      ) : null}
+
       {state.error ? (
         <p
           className="border border-ink-rival/50 bg-ink-rival/10 px-3 py-2.5 text-sm text-ink-rival"

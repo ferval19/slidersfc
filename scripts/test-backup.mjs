@@ -10,7 +10,8 @@
  *
  * El viaje, contra PGlite:
  *   1. Se monta una base de origen con un set de prueba (título, slug,
- *      descripción, valores en varios ámbitos y dos comentarios).
+ *      descripción, valores en varios ámbitos, dos comentarios y un
+ *      historial de dos versiones con tres cambios).
  *   2. Se lee todo con `select` y se monta el `dump` con la misma forma que
  *      escribe `scripts/backup.mjs`.
  *   3. Se genera el SQL con `buildRestoreSql(dump)`.
@@ -124,6 +125,8 @@ async function dumpAllTables(db) {
       slider_definitions: await rows(db, `select * from public.slider_definitions`),
       slider_sets: await rows(db, `select * from public.slider_sets`),
       slider_set_values: await rows(db, `select * from public.slider_set_values`),
+      slider_set_versions: await rows(db, `select * from public.slider_set_versions`),
+      slider_set_changes: await rows(db, `select * from public.slider_set_changes`),
       slider_comments: await rows(db, `select * from public.slider_comments`),
     },
   };
@@ -188,6 +191,19 @@ await origin.exec(`
      ${q('Este slider concreto me parece la clave del set.')}),
     (${q(commentGeneralId)}, ${q(setId)}, null, ${q(profile.id)},
      ${q('Comentario general, sin colgar de ningún slider.')})
+`);
+
+await origin.exec(`
+  insert into public.slider_set_versions (slider_set_id, version, note) values
+    (${q(setId)}, 2, ${q('Subí el ritmo, bajé la aceleración de la CPU.')}),
+    (${q(setId)}, 3, null)
+`);
+
+await origin.exec(`
+  insert into public.slider_set_changes (slider_set_id, version, slider_definition_id, from_value, to_value) values
+    (${q(setId)}, 2, ${defSprintUser.id}, 30, 37),
+    (${q(setId)}, 2, ${defSprintCpu.id}, 35, 41),
+    (${q(setId)}, 3, ${defAccelUser.id}, 55, 60)
 `);
 
 const originSlug = (await one(origin, `select slug from public.slider_sets where id = ${q(setId)}`)).slug;
@@ -290,20 +306,67 @@ check(
   JSON.stringify(restoredComments),
 );
 
+const restoredVersions = await rows(
+  target,
+  `select version, note from public.slider_set_versions where slider_set_id = ${q(setId)} order by version`,
+);
+check(
+  'vuelven las dos versiones del historial, con su nota (o sin ella)',
+  restoredVersions.length === 2 &&
+    restoredVersions[0].version === 2 &&
+    restoredVersions[0].note === 'Subí el ritmo, bajé la aceleración de la CPU.' &&
+    restoredVersions[1].version === 3 &&
+    restoredVersions[1].note === null,
+  JSON.stringify(restoredVersions),
+);
+
+const restoredChanges = await rows(
+  target,
+  `select c.version, d.slug, d.applies_to, c.from_value, c.to_value
+   from public.slider_set_changes c
+   join public.slider_definitions d on d.id = c.slider_definition_id
+   where c.slider_set_id = ${q(setId)}
+   order by c.version, d.slug, d.applies_to`,
+);
+const restoredChange = (version, slug, appliesTo) =>
+  restoredChanges.find(
+    (row) => row.version === version && row.slug === slug && row.applies_to === appliesTo,
+  );
+check(
+  'vuelven los tres cambios del historial, cada uno apuntando a la definición correcta por (slug, ámbito) y no por id',
+  restoredChanges.length === 3 &&
+    restoredChange(2, 'sprint_speed', 'user')?.from_value === 30 &&
+    restoredChange(2, 'sprint_speed', 'user')?.to_value === 37 &&
+    restoredChange(2, 'sprint_speed', 'cpu_opponent')?.from_value === 35 &&
+    restoredChange(2, 'sprint_speed', 'cpu_opponent')?.to_value === 41 &&
+    restoredChange(3, 'acceleration', 'user')?.from_value === 55 &&
+    restoredChange(3, 'acceleration', 'user')?.to_value === 60,
+  JSON.stringify(restoredChanges),
+);
+
 // --- 4. Reejecutar no debe duplicar nada -----------------------------------
 
 const valuesBefore = await count(target, `select count(*)::int as n from public.slider_set_values where slider_set_id = ${q(setId)}`);
 const commentsBefore = await count(target, `select count(*)::int as n from public.slider_comments where slider_set_id = ${q(setId)}`);
+const versionsBefore = await count(target, `select count(*)::int as n from public.slider_set_versions where slider_set_id = ${q(setId)}`);
+const changesBefore = await count(target, `select count(*)::int as n from public.slider_set_changes where slider_set_id = ${q(setId)}`);
 
 const secondRun = await tryExec(target, sql);
 check('reejecutar el mismo SQL no lanza error', secondRun.ok, secondRun.message ?? '');
 
 const valuesAfter = await count(target, `select count(*)::int as n from public.slider_set_values where slider_set_id = ${q(setId)}`);
 const commentsAfter = await count(target, `select count(*)::int as n from public.slider_comments where slider_set_id = ${q(setId)}`);
+const versionsAfter = await count(target, `select count(*)::int as n from public.slider_set_versions where slider_set_id = ${q(setId)}`);
+const changesAfter = await count(target, `select count(*)::int as n from public.slider_set_changes where slider_set_id = ${q(setId)}`);
 check(
   'reejecutar el mismo SQL no duplica valores ni comentarios',
   valuesBefore === valuesAfter && commentsBefore === commentsAfter,
   `valores ${valuesBefore} → ${valuesAfter}, comentarios ${commentsBefore} → ${commentsAfter}`,
+);
+check(
+  'reejecutar el mismo SQL no duplica versiones ni cambios',
+  versionsBefore === versionsAfter && changesBefore === changesAfter,
+  `versiones ${versionsBefore} → ${versionsAfter}, cambios ${changesBefore} → ${changesAfter}`,
 );
 
 await origin.close();

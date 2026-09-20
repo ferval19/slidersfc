@@ -61,7 +61,7 @@ Editor del dashboard, o con la CLI (`supabase db push`):
    nombre de usuario no rompa los enlaces ya compartidos
 10. `supabase/migrations/20260919180000_profile_youtube.sql` — el canal de
    YouTube en el perfil
-12. `supabase/storage/01_avatars.sql` — almacén de las fotos de perfil. Va
+13. `supabase/storage/01_avatars.sql` — almacén de las fotos de perfil. Va
     aparte de las migraciones porque es configuración de Storage y
     `npm run test:sql` no puede probarla
 
@@ -763,6 +763,41 @@ En el móvil sólo sale uno: tres trozos en 375 px son dos de más.
 la lista. `SetCard` es un `<li>` y ahí colgaba de un `<div>`: un `li` huérfano
 conserva su `display: list-item` y pinta su punto. Revisado que no quede
 ninguno más.
+
+### 20/09 · Historial de versiones
+
+`slider_sets.version` subía al cambiar valores de un set publicado, pero sólo
+servía para marcar los comentarios viejos como «de la v1»: **los valores de
+antes no se guardaban en ninguna parte**. Ahora sí.
+
+Se guarda el **cambio, no la foto**. Lo que interesa de un set que evoluciona
+no es cómo estaba, es qué tocó su autor y cuánto — y la foto completa de una
+versión vieja se reconstruye desde los valores de hoy hacia atrás. Una copia de
+los 129 valores por versión sería escribir mucho para responder peor a la
+pregunta de verdad. Además sale casi gratis: la acción de guardar **ya
+calculaba ese diff** para decidir si subía la versión, sólo había que
+escribirlo en vez de tirarlo.
+
+Y una **nota por versión**, opcional, que es lo que le da valor: un set no es
+una lista de números, es alguien afinando algo durante una temporada. Leer
+«v3: bajé la velocidad dos puntos, los contragolpes eran imposibles de
+defender» vale más que ver dos cifras.
+
+En la ficha aparece entre los valores y los comentarios — primero qué es el
+set, luego cómo llegó a serlo, después lo que dice la gente — con los mismos
+verdes y rojos de la comparación.
+
+Tres decisiones: sólo para sets publicados (en un borrador no hay versión que
+estrenar), público si el set lo es, y **no editable** — es un registro, no un
+texto más que mantener. La base lo respalda: no hay políticas de UPDATE ni de
+DELETE, sólo de lectura e inserción.
+
+Si guardar el historial falla, el set se guarda igual y el fallo queda en el
+log. Perder una entrada se nota poco; perder lo que la persona acaba de
+guardar, mucho.
+
+El historial entra en la copia de seguridad, con su viaje de ida y vuelta
+comprobado — esa parte la escribió Sonnet con el encargo cerrado.
 
 ---
 

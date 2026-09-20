@@ -5,11 +5,12 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { Avatar } from '@/components/avatar';
 import { CommentComposer, CommentList } from '@/components/comment-thread';
 import { SetConditions } from '@/components/set-conditions';
+import { SetHistory } from '@/components/set-history';
 import { SetStickyBar } from '@/components/set-sticky-bar';
 import { SetOwnerActions } from '@/components/set-owner-actions';
 import { ShareSet } from '@/components/share-set';
 import { SliderTable } from '@/components/slider-table';
-import { getGames, getSetDetail, getUsernameAfterRename } from '@/lib/queries';
+import { getGames, getSetDetail, getSetHistory, getUsernameAfterRename } from '@/lib/queries';
 import { buildSetView } from '@/lib/set-view';
 import { conditionsSummary } from '@/lib/set-conditions';
 import { comparePickerPath, consolePath, profilePath, setPath } from '@/lib/paths';
@@ -69,6 +70,9 @@ export default async function SetDetailPage({ params }: { params: Params }) {
     if (current) permanentRedirect(setPath(current, slug));
     notFound();
   }
+
+  // El historial se pide con el set ya resuelto: necesita su id.
+  const history = await getSetHistory(detail.set.id);
 
   const view = buildSetView(detail, user?.id ?? null);
   const isOwner = user?.id === detail.owner.id;
@@ -202,6 +206,15 @@ export default async function SetDetailPage({ params }: { params: Params }) {
           hasCpuBehaviour={view.hasCpuBehaviour}
         />
       </section>
+
+      {/* El historial va entre los valores y los comentarios: primero qué es
+          el set, luego cómo llegó a serlo, y después lo que dice la gente. */}
+      {history.length > 0 ? (
+        <>
+          <div className="chalk-rule" />
+          <SetHistory entries={history} />
+        </>
+      ) : null}
 
       <div className="chalk-rule" />
 

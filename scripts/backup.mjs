@@ -35,6 +35,8 @@ const TABLES = [
   'slider_definitions',
   'slider_sets',
   'slider_set_values',
+  'slider_set_versions',
+  'slider_set_changes',
   'slider_comments',
 ];
 

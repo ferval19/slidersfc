@@ -19,6 +19,8 @@ type ParsedForm = {
   gameId: number;
   cpuBehaviour: CpuBehaviour;
   conditions: SetConditions;
+  /** «Qué has cambiado y por qué», si se ha escrito. */
+  versionNote: string | null;
   publish: boolean;
   values: Map<number, number>;
 };
@@ -55,6 +57,11 @@ function parseForm(formData: FormData): ParsedForm | { error: string } {
   });
   if ('error' in conditions) return { error: conditions.error };
 
+  const rawNote = String(formData.get('version_note') ?? '').trim();
+  if (rawNote.length > 500) {
+    return { error: 'La nota del cambio no puede pasar de 500 caracteres.' };
+  }
+
   const values = new Map<number, number>();
   for (const [key, raw] of formData.entries()) {
     if (!key.startsWith(VALUE_PREFIX)) continue;
@@ -76,6 +83,7 @@ function parseForm(formData: FormData): ParsedForm | { error: string } {
     gameId,
     cpuBehaviour,
     conditions: conditions.fields,
+    versionNote: rawNote === '' ? null : rawNote,
     publish: formData.get('intent') === 'publish',
     values,
   };
@@ -232,6 +240,13 @@ export async function updateSet(
     .eq('id', setId);
 
   if (updateError) return { error: updateError.message };
+
+  // El historial se escribe aquí porque es donde ya se sabe lo de antes y lo
+  // de ahora. Sólo cuando sube la versión: mientras se afina un borrador, un
+  // registro de cada retoque sería ruido.
+  if (nextVersion > existing.version) {
+    await recordVersion(supabase, setId, nextVersion, parsed.versionNote, current, parsed.values);
+  }
 
   if (valuesChanged) {
     const { error: valuesError } = await supabase.from('slider_set_values').upsert(
@@ -391,4 +406,48 @@ export async function copySetToGame(setId: string, targetGameSlug: string) {
 
   revalidatePath('/');
   redirect(editSetPath(copy.profiles.username, copy.slug));
+}
+
+/**
+ * Guarda qué cambió al pasar de una versión a la siguiente.
+ *
+ * Se guarda el cambio y no una copia de los valores: lo que interesa de un set
+ * que evoluciona es qué tocó su autor y cuánto, y la foto completa de una
+ * versión vieja se reconstruye desde los valores de hoy hacia atrás.
+ *
+ * No hace fallar el guardado si algo va mal. Perder una entrada del historial
+ * se nota poco; perder el set que la persona acaba de guardar, mucho.
+ */
+async function recordVersion(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  setId: string,
+  version: number,
+  note: string | null,
+  before: Map<number, number>,
+  after: Map<number, number>,
+) {
+  try {
+    const changes = [...after]
+      .filter(([id, value]) => before.has(id) && before.get(id) !== value)
+      .map(([slider_definition_id, value]) => ({
+        slider_set_id: setId,
+        version,
+        slider_definition_id,
+        from_value: before.get(slider_definition_id)!,
+        to_value: value,
+      }));
+
+    // La entrada va primero: los cambios cuelgan de ella por clave ajena.
+    const { error: versionError } = await supabase
+      .from('slider_set_versions')
+      .insert({ slider_set_id: setId, version, note });
+
+    if (versionError) throw versionError;
+    if (changes.length === 0) return;
+
+    const { error: changesError } = await supabase.from('slider_set_changes').insert(changes);
+    if (changesError) throw changesError;
+  } catch (error) {
+    console.error('[slidersfc] no se pudo guardar el historial de la versión:', error);
+  }
 }

@@ -88,6 +88,23 @@ export type SliderSetValue = {
   value: number;
 };
 
+/** Una entrada del historial: la versión que estrena, y por qué. */
+export type SetVersion = {
+  slider_set_id: string;
+  version: number;
+  note: string | null;
+  created_at: string;
+};
+
+/** Un valor que cambió al pasar de una versión a la siguiente. */
+export type SetChange = {
+  slider_set_id: string;
+  version: number;
+  slider_definition_id: number;
+  from_value: number;
+  to_value: number;
+};
+
 export type SliderComment = {
   id: string;
   slider_set_id: string;
@@ -203,6 +220,34 @@ export type Database = {
           },
           {
             foreignKeyName: 'slider_set_values_slider_definition_id_fkey';
+            columns: ['slider_definition_id'];
+            isOneToOne: false;
+            referencedRelation: 'slider_definitions';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      slider_set_versions: {
+        Row: SetVersion;
+        Insert: Insert<SetVersion, 'note' | 'created_at'>;
+        Update: Partial<SetVersion>;
+        Relationships: [
+          {
+            foreignKeyName: 'slider_set_versions_slider_set_id_fkey';
+            columns: ['slider_set_id'];
+            isOneToOne: false;
+            referencedRelation: 'slider_sets';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      slider_set_changes: {
+        Row: SetChange;
+        Insert: Insert<SetChange, never>;
+        Update: Partial<SetChange>;
+        Relationships: [
+          {
+            foreignKeyName: 'slider_set_changes_slider_definition_id_fkey';
             columns: ['slider_definition_id'];
             isOneToOne: false;
             referencedRelation: 'slider_definitions';

@@ -371,6 +371,79 @@ await (await expectFailure(
   await db.close();
 }
 
+// --- Historial de versiones ------------------------------------------------
+{
+  const db = await freshDatabase();
+  await db.exec(read(FC27_SET));
+
+  const set = (
+    await db.query(`select id from public.slider_sets where slug = 'jugabilidad-realista-de-fc27'`)
+  ).rows[0].id;
+  const definicion = (
+    await db.query(`select id from public.slider_definitions where slug = 'sprint_speed' limit 1`)
+  ).rows[0].id;
+
+  await db.exec(`
+    insert into public.slider_set_versions (slider_set_id, version, note)
+    values ('${set}', 2, 'Bajé la velocidad: los contragolpes no había quien los defendiera.');
+    insert into public.slider_set_changes
+      (slider_set_id, version, slider_definition_id, from_value, to_value)
+    values ('${set}', 2, ${definicion}, 35, 33);
+  `);
+
+  check(
+    'una versión guarda su nota y su cambio',
+    1 === (await count(db, `select count(*)::int as n from public.slider_set_changes`)),
+  );
+
+  // La v1 no estrena nada: es el set tal como se publicó.
+  let sinV1 = false;
+  try {
+    await db.exec(
+      `insert into public.slider_set_versions (slider_set_id, version) values ('${set}', 1)`,
+    );
+  } catch {
+    sinV1 = true;
+  }
+  check('no se puede registrar una v1', sinV1);
+
+  // Una fila que dice que algo se quedó igual no es un cambio.
+  let sinCambio = false;
+  try {
+    await db.exec(`
+      insert into public.slider_set_versions (slider_set_id, version) values ('${set}', 3);
+      insert into public.slider_set_changes
+        (slider_set_id, version, slider_definition_id, from_value, to_value)
+      values ('${set}', 3, ${definicion}, 40, 40);
+    `);
+  } catch {
+    sinCambio = true;
+  }
+  check('un «cambio» con el mismo valor a los dos lados se rechaza', sinCambio);
+
+  // Un cambio sin su versión no puede existir.
+  let sinVersion = false;
+  try {
+    await db.exec(`
+      insert into public.slider_set_changes
+        (slider_set_id, version, slider_definition_id, from_value, to_value)
+      values ('${set}', 9, ${definicion}, 10, 20)
+    `);
+  } catch {
+    sinVersion = true;
+  }
+  check('un cambio sin su entrada de versión se rechaza', sinVersion);
+
+  await db.exec(`delete from public.slider_sets where id = '${set}'`);
+  check(
+    'al borrar el set se lleva su historial por delante',
+    0 === (await count(db, `select count(*)::int as n from public.slider_set_versions`)) &&
+      0 === (await count(db, `select count(*)::int as n from public.slider_set_changes`)),
+  );
+
+  await db.close();
+}
+
 // --- Los seeds se reencuentran con su set aunque lo renombren ---------------
 {
   const db = await freshDatabase();
@@ -505,7 +578,7 @@ await (await expectFailure(
   const without = rows.filter((row) => !row.relrowsecurity).map((row) => row.relname);
   check(
     `RLS activada en las ${rows.length} tablas`,
-    rows.length === 7 && without.length === 0,
+    rows.length === 9 && without.length === 0,
     without.join(', '),
   );
   await db.close();

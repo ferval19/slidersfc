@@ -20,7 +20,9 @@
  *    en un proyecto nuevo no coinciden.
  * 3. Los valores se resuelven por (slug del slider, ámbito), no por el id de
  *    la definición, que cambia cada vez que se reaplica el catálogo. Es el
- *    mismo apaño que usan los ficheros de inicio.
+ *    mismo apaño que usan los ficheros de inicio. El historial de versiones
+ *    (`slider_set_versions` / `slider_set_changes`) se resuelve igual, y por
+ *    la misma razón.
  *
  * Módulo puro: no toca la red ni el disco, para poder probarlo.
  */
@@ -31,7 +33,8 @@ const qn = (value) => (value === null || value === undefined ? 'null' : q(value)
 /**
  * @param dump El volcado, con la forma que escribe `scripts/backup.mjs`:
  *   `{ generado, origen, tablas: { profiles, games, slider_definitions,
- *      slider_sets, slider_set_values, slider_comments } }`
+ *      slider_sets, slider_set_values, slider_set_versions,
+ *      slider_set_changes, slider_comments } }`
  * @returns El SQL, listo para pegar en el editor de Supabase.
  */
 export function buildRestoreSql(dump) {
@@ -49,6 +52,8 @@ export function buildRestoreSql(dump) {
 
   const valuesBySet = groupBy(tablas.slider_set_values, (row) => row.slider_set_id);
   const commentsBySet = groupBy(tablas.slider_comments, (row) => row.slider_set_id);
+  const versionsBySet = groupBy(tablas.slider_set_versions ?? [], (row) => row.slider_set_id);
+  const changesBySet = groupBy(tablas.slider_set_changes ?? [], (row) => row.slider_set_id);
 
   const lines = [
     '-- Copia de SlidersFC.',
@@ -91,6 +96,8 @@ export function buildRestoreSql(dump) {
         game,
         values: valuesBySet.get(set.id) ?? [],
         comments: commentsBySet.get(set.id) ?? [],
+        versions: versionsBySet.get(set.id) ?? [],
+        changes: changesBySet.get(set.id) ?? [],
         definitionById,
         profileById,
       }),
@@ -137,7 +144,7 @@ function profileBlock(profile) {
   ];
 }
 
-function setBlock({ set, owner, game, values, comments, definitionById, profileById }) {
+function setBlock({ set, owner, game, values, comments, versions, changes, definitionById, profileById }) {
   const lines = [
     `-- Set ${q(set.title)} — @${owner.username}/${set.slug ?? set.id}`,
     'do $$',
@@ -230,6 +237,67 @@ function setBlock({ set, owner, game, values, comments, definitionById, profileB
       '  end if;',
       '',
     );
+  }
+
+  // Los cambios del historial también se resuelven por (slug, ámbito): un id
+  // de definición que no está ni en la propia copia no hay forma de nombrarlo.
+  const changeRows = changes
+    .map((row) => ({ ...row, definition: definitionById.get(row.slider_definition_id) }))
+    .filter((row) => row.definition);
+
+  if (versions.length > 0 || changeRows.length > 0) {
+    if (versions.length > 0) {
+      lines.push(
+        '  -- El historial de versiones es un registro: se añade, no se pisa lo que ya esté.',
+        '  insert into public.slider_set_versions (slider_set_id, version, note, created_at)',
+        '  values',
+        ...versions.map((version, index) => {
+          const row =
+            `    (target_set, ${Number(version.version)}, ${qn(version.note)}, ${q(version.created_at)})`;
+          return index === versions.length - 1 ? row : `${row},`;
+        }),
+        '  on conflict (slider_set_id, version) do nothing;',
+        '',
+      );
+    }
+
+    if (changeRows.length > 0) {
+      lines.push(
+        '  -- Y los cambios de cada versión, por (slug, ámbito) igual que los valores.',
+        '  with incoming (version, slug, applies_to, from_value, to_value) as (values',
+        ...changeRows.map((row, index) => {
+          const line =
+            `    (${Number(row.version)}::int, ${q(row.definition.slug)}::text, ` +
+            `${q(row.definition.applies_to)}::text, ${Number(row.from_value)}::int, ${Number(row.to_value)}::int)`;
+          return index === changeRows.length - 1 ? line : `${line},`;
+        }),
+        '  ),',
+        '  matched as (',
+        '    select i.version, i.slug, i.applies_to, i.from_value, i.to_value, d.id as definition_id',
+        '    from incoming i',
+        '    left join public.slider_definitions d',
+        '      on d.game_id = target_game and d.slug = i.slug and d.applies_to = i.applies_to',
+        '  ),',
+        '  inserted as (',
+        '    insert into public.slider_set_changes',
+        '      (slider_set_id, version, slider_definition_id, from_value, to_value)',
+        '    select target_set, version, definition_id, from_value, to_value',
+        '    from matched where definition_id is not null',
+        '    on conflict (slider_set_id, version, slider_definition_id) do nothing',
+        '    returning 1',
+        '  )',
+        "  select string_agg(format('%s (%s)', slug, applies_to), ', ')",
+        '  into missing',
+        '  from matched where definition_id is null;',
+        '',
+        '  if missing is not null then',
+        '    raise exception',
+        `      'Estos sliders del historial no están en el catálogo de %: %. Aplica supabase/seed/01_catalog.sql.',`,
+        `      ${q(game.slug)}, missing;`,
+        '  end if;',
+        '',
+      );
+    }
   }
 
   const restorable = comments

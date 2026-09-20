@@ -182,6 +182,23 @@ crecimiento elástico las filas se colapsan y las columnas se salen del lienzo.
 Las fuentes se leen de `public/fonts/` porque `fetch` sobre un `file:` URL no
 está implementado al prerenderizar con Turbopack.
 
+**El historial guarda el cambio, no la foto de cada versión.**
+`slider_set_versions` (la versión que se estrena y su nota) y
+`slider_set_changes` (qué valor pasó de cuánto a cuánto). Lo que interesa de un
+set que evoluciona es qué tocó su autor, no cómo estaba; y la foto completa de
+una versión vieja se reconstruye desde los valores de hoy hacia atrás. Se
+escribe en `updateSet`, que es donde ya se calculaba ese diff para decidir si
+subía la versión.
+
+**No hay v1 en el historial, y la base lo impone** (`check (version > 1)`): la
+v1 no estrena nada, es el set tal como se publicó. Tampoco hay políticas de
+UPDATE ni de DELETE, a propósito: es un registro de lo que pasó, no un texto
+más que mantener.
+
+**Si el historial falla, el guardado sigue.** `recordVersion` se traga su error
+y lo registra. Perder una entrada del historial se nota poco; perder el set que
+la persona acaba de guardar, mucho.
+
 **Los ficheros de inicio se reencuentran con su set por el SLUG, no por el
 título.** El título lo puede cambiar su autor desde la web; el slug se asigna
 una vez al crear y no cambia nunca. Con el título como clave, reaplicar un
