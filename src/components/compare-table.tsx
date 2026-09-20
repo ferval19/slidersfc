@@ -181,17 +181,17 @@ function Row({
 /**
  * El color de la diferencia: verde si el segundo sube, rojo si baja.
  *
- * Se usan los rotuladores que ya hay. El verde coincide con el del segundo set
- * y eso no estorba, al contrario: una diferencia positiva es justo «el segundo
- * está por encima». El rojo no lo usa nada más en esta pantalla —los ámbitos
- * van escritos, no pintados—, así que queda libre para decir «baja».
+ * Con dos colores propios, no con los rotuladores. El verde de `ink-mate` ya
+ * dice «el segundo set», y usándolo aquí no se sabía si el número estaba
+ * coloreado por lo que es o por de quién es. Los dos están medidos contra el
+ * fondo; ver el comentario de `--color-delta-up` en globals.css.
  *
  * El cero no se colorea: que dos sets coincidan no es ni bueno ni malo.
  */
 function deltaInk(delta: number | null) {
   if (delta === null) return '';
   if (delta === 0) return 'text-chalk-dim/50';
-  return delta > 0 ? 'text-ink-mate' : 'text-ink-rival';
+  return delta > 0 ? 'text-delta-up' : 'text-delta-down';
 }
 
 /** El signo va delante y en positivo también: se lee «cuánto sube el segundo». */

@@ -19,6 +19,24 @@
   --color-ink-mate: #7fe0c8;
   --color-ink-rival: #ff5c7a;
 
+  /*
+   * Subir y bajar, sólo para la cifra de diferencia de la comparación.
+   *
+   * Van aparte de los rotuladores a propósito. El verde NO es `ink-mate`: ése
+   * ya dice «el segundo set», y con el mismo color no se distinguía si el
+   * número estaba coloreado por lo que es o por de quién es. Éste es un verde
+   * de hierba, más oscuro y más saturado que la menta, así que se separa por
+   * tono Y por claridad.
+   *
+   * Contraste medido sobre `board` (#0b241f), que es donde caen:
+   *   delta-up   7.8:1  · AAA para texto pequeño
+   *   delta-down 6.7:1  · AAA para texto grande, holgado en AA
+   * Sobre `board-raised` bajan a 6.5:1 y 5.5:1, que siguen pasando AA.
+   * Si se cambia alguno, hay que volver a medirlo: la cifra va a 12 px.
+   */
+  --color-delta-up: #5ec96a;
+  --color-delta-down: #ff7d94;
+
   --font-display: var(--font-big-shoulders), "Arial Narrow", sans-serif;
   --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;

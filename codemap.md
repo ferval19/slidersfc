@@ -353,11 +353,19 @@ de FC27 son diecinueve pantallas de móvil; plegado, dos y media.
 hidden` por valor: con ciento veintidós, repintarlos en cada gesto era la mitad
 del problema.
 
-**La diferencia va en verde si sube y en rojo si baja**, con los rotuladores
-que ya hay: el verde es el mismo del segundo set y eso no estorba —una
-diferencia positiva es justo «el segundo está por encima»—, y el rojo no lo usa
-nada más en esa pantalla, porque los ámbitos van escritos y no pintados. El
-cero no se colorea: que dos sets coincidan no es ni bueno ni malo.
+**La diferencia va en verde si sube y en rojo si baja, con dos colores
+propios** (`--color-delta-up` y `--color-delta-down`), no con los rotuladores.
+El verde NO puede ser `ink-mate`: ése ya dice «el segundo set», y con el mismo
+color no se sabe si el número está pintado por lo que es o por de quién es. El
+de la diferencia es un verde de hierba, que se separa de la menta por tono
+(127° contra 166°) y por claridad.
+
+Los dos están **medidos** contra el fondo: 7,8:1 el verde y 6,7:1 el rojo sobre
+`board`; 6,5:1 y 5,5:1 sobre `board-raised`. La cifra va a 12 px, así que si se
+cambia alguno hay que volver a medirlo. El color además nunca es el único
+canal: el signo `+` o `−` está siempre, que es lo que salva a quien no
+distingue el rojo del verde. El cero no se colorea: coincidir no es ni bueno ni
+malo.
 
 **En la comparación el color cambia de significado.** En la ficha de un set
 dice el ámbito (usuario / CPU); al comparar dos sets dice **de quién es el

@@ -731,11 +731,17 @@ set pero iba toda del mismo color, así que había que leer el signo uno a uno.
 Ahora va **en verde cuando sube y en rojo cuando baja**, y la columna entera se
 lee de un vistazo.
 
-Sin tocar la paleta: el verde es el mismo del segundo set —una diferencia
-positiva es justo «el segundo está por encima», así que refuerza en vez de
-estorbar— y el rojo estaba libre en esa pantalla, porque ahí los ámbitos van
-escritos y no pintados. El cero se queda apagado: que dos sets coincidan en un
-slider no es ni bueno ni malo.
+Con **dos colores propios**, no con los rotuladores del sistema. El verde no
+puede ser el de la menta: ése ya dice «el segundo set», y con el mismo color no
+se sabe si el número está pintado por lo que es o por de quién es. El de la
+diferencia es un verde de hierba, que se separa de la menta por tono y por
+claridad.
+
+Los dos están medidos contra el fondo: **7,8:1 el verde y 6,7:1 el rojo**, por
+encima de lo que pide la norma para texto pequeño, y la cifra va a 12 px. El
+color tampoco es nunca el único canal: el signo `+` o `−` está siempre, que es
+lo que salva a quien no distingue el rojo del verde. El cero se queda apagado:
+que dos sets coincidan en un slider no es ni bueno ni malo.
 
 ---
 
