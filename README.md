@@ -743,6 +743,27 @@ color tampoco es nunca el único canal: el signo `+` o `−` está siempre, que 
 lo que salva a quien no distingue el rojo del verde. El cero se queda apagado:
 que dos sets coincidan en un slider no es ni bueno ni malo.
 
+### 20/09 · La pizarra tiene campo dibujado detrás
+
+Tres trozos de campo al fondo, con el mismo trazo de tiza que todo lo demás: el
+círculo central asomando por arriba a la derecha, la esquina del área por el
+lado izquierdo y el cuarto de círculo del córner abajo. Fragmentos que se salen
+por los bordes, no un campo entero — un campo completo competiría con el
+contenido; tres trozos se leen como lo que quedó dibujado de otra vez.
+
+La opacidad no es una elección estética sino un número medido. Sobre esas
+líneas se lee texto, así que suben el brillo del fondo: a 0,035 la cifra verde
+de la comparación baja de 7,80:1 a 7,16:1, y el listón para texto pequeño es
+7:1. No hay margen. Para que se vean más se engorda el trazo, que cubre más
+superficie sin cambiar el contraste por píxel.
+
+En el móvil sólo sale uno: tres trozos en 375 px son dos de más.
+
+**Y un punto que no debía estar.** En el listado del perfil salía la viñeta de
+la lista. `SetCard` es un `<li>` y ahí colgaba de un `<div>`: un `li` huérfano
+conserva su `display: list-item` y pinta su punto. Revisado que no quede
+ninguno más.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

@@ -209,6 +209,18 @@ y a partir de ahí estás leyendo números sin saber de quién son. En el móvil
 donde la rejilla se apila y no hay cabecera posible, cada número lleva su
 etiqueta encima en micro.
 
+**El fondo lleva trozos de campo, y su opacidad es un número medido.** Son
+tres fragmentos de tiza (`ChalkBackdrop`) fijos detrás de todo. Sobre ellos se
+lee texto, así que suben el brillo del fondo y bajan el contraste: a 0,035 la
+cifra verde de la comparación pasa de 7,80:1 a 7,16:1, y el listón de AAA para
+texto pequeño es 7:1. **No hay margen para subirla sin volver a medir.** Para
+ganar presencia se engorda el trazo, que cubre más pero no cambia el contraste
+por píxel.
+
+**`SetCard` es un `<li>`**, así que va siempre dentro de un `<ul>`. Un `li`
+colgando de un `div` conserva su `display: list-item` y pinta su punto, y eso
+es lo que se veía en el listado del perfil.
+
 **El alto de la cabecera está en una variable, `--header-h`.** Lo necesitan
 las barras que se quedan pegadas debajo de ella y el `scroll-margin` de los
 anclas. Estaba puesto a ojo en dos sitios y en uno de ellos estaba mal por

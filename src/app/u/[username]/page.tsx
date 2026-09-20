@@ -124,11 +124,11 @@ export default async function ProfilePage({
               action={isMe ? { href: '/sets/nuevo', label: 'Crear mi primer set' } : undefined}
             />
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {published.map((set) => (
                 <SetCard key={set.id} set={set} />
               ))}
-            </div>
+            </ul>
           )}
         </div>
       </section>

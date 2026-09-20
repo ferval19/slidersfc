@@ -3,6 +3,7 @@ import { Analytics } from '@vercel/analytics/next';
 import { Big_Shoulders, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 
 import { AuthRelay } from '@/components/auth-relay';
+import { ChalkBackdrop } from '@/components/chalk-backdrop';
 import { ChalkFilters } from '@/components/chalk';
 import { SetupNotice } from '@/components/setup-notice';
 import { SiteFooter } from '@/components/site-footer';
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body className="flex min-h-full flex-col">
         <ChalkFilters />
+        <ChalkBackdrop />
         <AuthRelay />
         <SiteHeader />
         <SetupNotice />
