@@ -12,8 +12,12 @@ type Hero = {
   eyebrow: string;
   /**
    * El titular, en tres líneas; la última va con el rotulador. Conviene que
-   * ninguna pase de unos veinte caracteres: en ultracondensada y a 80 px, una
-   * línea más larga se parte sola y el hero se come la pantalla entera.
+   * ninguna pase de unos veinte caracteres: si se parte sola, el hero se come
+   * la pantalla entera y los sets quedan debajo del pliegue. El tope de
+   * tamaño (5rem) está puesto para que quepan tres líneas en la columna del
+   * hero a 1280 px; con 6rem se partían en cinco. Por lo mismo la columna del
+   * texto se lleva 1,35 de 2 en pantalla ancha: el dibujo es decoración y el
+   * titular es lo que no puede romperse.
    */
   title: [string, string, string];
   body: string;
@@ -45,7 +49,7 @@ export const HEROES: Hero[] = [
     title: ['Cincuenta números', 'no dicen nada.', 'Una forma sí'],
     body: 'Cada set se dibuja sobre el preajuste de fábrica, así que de un vistazo ves qué ha movido esa persona y cuánto. Es la pregunta de verdad, y no hay que comparar nada a mano.',
     drawing: ChalkSliderStack,
-    secondary: { href: '/guia', label: 'Qué lleva un set' },
+    secondary: { href: '#sets', label: 'Ver los sets' },
   },
   {
     eyebrow: 'Modo consola',
@@ -71,15 +75,27 @@ export function pickHero() {
   return HEROES[Math.floor(Math.random() * HEROES.length)];
 }
 
-export function Hero({ hero, newSetHref }: { hero: Hero; newSetHref: string }) {
+export function Hero({
+  hero,
+  newSetHref,
+  setCount,
+}: {
+  hero: Hero;
+  newSetHref: string;
+  /** Cuántos sets hay publicados. Sale en el botón: es la prueba de que esto
+   *  tiene contenido, y va en la primera pantalla sin costar sitio. */
+  setCount: number;
+}) {
   const Drawing = hero.drawing;
+  const verLos =
+    setCount > 0 && setCount < 30 ? `Ver los ${setCount} sets` : hero.secondary.label;
 
   return (
-    <section className="grid items-center gap-10 pt-12 pb-14 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:pt-16">
+    <section className="grid items-center gap-6 pt-8 pb-8 sm:gap-10 sm:pt-12 sm:pb-14 lg:grid-cols-[1.35fr_0.65fr] lg:gap-16 lg:pt-16">
       <div>
         <p className="eyebrow">{hero.eyebrow}</p>
 
-        <h1 className="display mt-5 text-[clamp(3rem,10vw,6rem)]">
+        <h1 className="display mt-5 text-[clamp(2.75rem,8vw,5rem)]">
           {hero.title[0]}
           <br />
           {hero.title[1]}
@@ -87,19 +103,21 @@ export function Hero({ hero, newSetHref }: { hero: Hero; newSetHref: string }) {
           <span className="text-ink-user">{hero.title[2]}</span>
         </h1>
 
-        <p className="mt-7 max-w-prose text-base text-chalk-dim sm:text-lg">{hero.body}</p>
+        <p className="mt-5 max-w-prose text-base text-chalk-dim sm:mt-7 sm:text-lg">{hero.body}</p>
 
-        <div className="mt-9 flex flex-wrap gap-3">
+        <div className="mt-6 flex flex-wrap gap-3 sm:mt-9">
           <Link href={newSetHref} className="btn btn-primary">
             Publicar mi set
           </Link>
           <Link href={hero.secondary.href} className="btn btn-ghost">
-            {hero.secondary.label}
+            {hero.secondary.href === '#sets' ? verLos : hero.secondary.label}
           </Link>
         </div>
       </div>
 
-      <Drawing className="mx-auto w-full max-w-[21rem] lg:max-w-none" />
+      {/* Más pequeño en el móvil: ahí va después de los botones, y a tamaño
+          completo se comía un tercio de pantalla justo antes del primer set. */}
+      <Drawing className="mx-auto w-full max-w-[13rem] sm:max-w-[21rem] lg:max-w-none" />
     </section>
   );
 }

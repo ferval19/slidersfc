@@ -36,10 +36,41 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto max-w-6xl px-5">
-      <Hero hero={hero} newSetHref={newSetHref} />
+      <Hero hero={hero} newSetHref={newSetHref} setCount={sets.length} />
 
-      {/* La tesis, en funcionamiento */}
-      <section className="panel px-5 py-6 sm:px-7">
+      {/* Los sets, lo primero después del hero. Antes venían detrás de los dos
+          bloques explicativos y había que bajar dos pantallas y media en el
+          móvil para ver uno: en una web que va de sets publicados, eso era
+          tener el contenido escondido detrás de la explicación. */}
+      <section id="sets" className="scroll-mt-[var(--header-h)] pt-4 sm:pt-8">
+        <div className="flex flex-col gap-5">
+          <h2 className="display text-4xl">Sets recientes</h2>
+          <FilterBar games={games} />
+        </div>
+
+        <div className="mt-8">
+          {sets.length === 0 ? (
+            <EmptyState
+              title="La pizarra está en blanco"
+              body="Todavía no hay ningún set publicado. Si tienes unos valores que te funcionan, súbelos: es exactamente para lo que existe esto."
+              action={{
+                href: newSetHref,
+                label: 'Publicar el primero',
+              }}
+            />
+          ) : (
+            <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {sets.map((set) => (
+                <SetCard key={set.id} set={set} />
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
+
+      {/* La tesis, en funcionamiento. Debajo del listado: quien ya ha visto
+          que hay sets es quien se pregunta cómo se leen. */}
+      <section className="panel mt-16 px-5 py-6 sm:px-7">
         <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3">
           <h2 className="display text-2xl">Así se lee un set</h2>
           <ScaleLegend scopes={['user', 'cpu']} labels={SCOPE_LABELS} />
@@ -75,9 +106,8 @@ export default async function HomePage() {
         </p>
       </section>
 
-      {/* La guía. Va aquí, entre la muestra y el listado: quien acaba de
-          entender cómo se lee un set es justo quien se pregunta qué hace falta
-          para publicar el suyo. */}
+      {/* La guía, al final: quien acaba de entender cómo se lee un set es
+          justo quien se pregunta qué hace falta para publicar el suyo. */}
       <section className="panel mt-6 flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:gap-8 sm:p-8">
         <ChalkClipboard className="mx-auto size-24 shrink-0 text-chalk-dim sm:mx-0 sm:size-28" />
 
@@ -103,33 +133,6 @@ export default async function HomePage() {
           <Link href="/guia" className="btn btn-ghost mt-6">
             Leer la guía
           </Link>
-        </div>
-      </section>
-
-      {/* Feed */}
-      <section id="sets" className="pt-16">
-        <div className="flex flex-col gap-5">
-          <h2 className="display text-4xl">Sets recientes</h2>
-          <FilterBar games={games} />
-        </div>
-
-        <div className="mt-8">
-          {sets.length === 0 ? (
-            <EmptyState
-              title="La pizarra está en blanco"
-              body="Todavía no hay ningún set publicado. Si tienes unos valores que te funcionan, súbelos: es exactamente para lo que existe esto."
-              action={{
-                href: newSetHref,
-                label: 'Publicar el primero',
-              }}
-            />
-          ) : (
-            <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {sets.map((set) => (
-                <SetCard key={set.id} set={set} />
-              ))}
-            </ul>
-          )}
         </div>
       </section>
     </div>

@@ -799,6 +799,30 @@ guardar, mucho.
 El historial entra en la copia de seguridad, con su viaje de ida y vuelta
 comprobado — esa parte la escribió Sonnet con el encargo cerrado.
 
+### 20/09 · Los sets, donde tienen que estar
+
+Medido antes de tocar nada: en el móvil había que bajar **2,9 pantallas** para
+ver el primer set. Estaban detrás del hero, de «Así se lee un set» y de la
+guía — en una web que va de sets publicados, el contenido escondido detrás de
+la explicación.
+
+Ahora el listado va **justo después del hero** y los dos bloques explicativos
+debajo: quien ya ha visto que hay sets es quien se pregunta cómo se leen. Y el
+hero adelgaza — menos aire y un dibujo más pequeño en el móvil, donde va
+después de los botones y se comía un tercio de pantalla.
+
+El resultado, medido: **de 2,9 a 1,1 pantallas** en el móvil, y en un portátil
+de 1280×800 el primer set entra **dentro de la primera pantalla** (0,97).
+
+De paso, dos arreglos de escritorio que salieron al medir. Los titulares del
+hero se partían en **cinco líneas** a 1280 px en vez de las tres previstas,
+porque el tope de tamaño era demasiado grande para su columna: bajado a 5rem y
+ensanchada la columna del texto, que el dibujo es decoración y el titular es lo
+que no puede romperse. Comprobado que los cuatro titulares aguantan en tres
+líneas. Y el segundo botón del hero dice ahora **«Ver los 3 sets»** con la
+cuenta real: es la prueba de que esto tiene contenido, en la primera pantalla y
+sin costar sitio.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

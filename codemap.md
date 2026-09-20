@@ -265,6 +265,14 @@ haya pegado arriba, y eso no es lo mismo en las dos: en escritorio la cabecera
 del sitio más la barra, en el móvil sólo la cabecera. Con el valor de
 escritorio, saltar a una categoría en el móvil dejaba asomando la anterior.
 
+**En la portada, los sets van antes que los bloques explicativos.** Estaban
+detrás de «Así se lee un set» y de la guía, y había que bajar 2,9 pantallas en
+el móvil para ver uno: en una web que va de sets publicados, eso es tener el
+contenido escondido detrás de la explicación. Ahora van justo después del
+hero (1,1 pantallas en el móvil, dentro de la primera en un portátil), y los
+explicativos debajo — quien ya ha visto que hay sets es quien se pregunta cómo
+se leen.
+
 **La portada elige un hero al azar en el servidor, y no es un carrusel.** No
 hay flechas ni temporizador: se elige uno por petición y ahí se queda hasta que
 se recargue. Un carrusel que se mueve solo obliga a leer a su ritmo; así cada
@@ -273,9 +281,12 @@ en el servidor evita el parpadeo y el salto de maquetación de decidirlo en el
 cliente; funciona porque la portada ya es dinámica (lee la sesión). Si algún
 día se volviera estática, el hero se quedaría congelado.
 
-**Los titulares del hero no pasan de unos veinte caracteres por línea.** En
-ultracondensada a 80 px, una línea más larga se parte sola y el hero se come la
-pantalla entera antes de que se lea una palabra del cuerpo.
+**Los titulares del hero no pasan de unos veinte caracteres por línea**, y el
+tope de tamaño (5rem) y el reparto de la retícula (1,35 de 2 para el texto)
+están puestos para que esas tres líneas quepan a 1280 px. Con 6rem y 1,15 se
+partían en cinco, el hero se comía los 800 px de una pantalla de portátil y el
+primer set quedaba debajo del pliegue. Si se toca alguna de las tres cosas, hay
+que volver a contar las líneas de los cuatro titulares.
 
 **La duración de los tiempos se guarda como texto.** Mucha gente juega «7 u 8
 minutos» y un entero les obligaría a mentir. El CHECK de la base lo mantiene
