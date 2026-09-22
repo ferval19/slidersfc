@@ -459,6 +459,22 @@ juego desdobla rival y compañero —quien pega un set de FC26 en FC27 escribe
 «CPU»—, y los números por encima de 100 se descartan, que si no un «8 minutos»
 o un «2026» entran como valor.
 
+**La botonera de la ficha tiene dos escalones, no ocho botones iguales.**
+Arriba, lo que hace cualquiera con el set: meterlo en la consola —que es a lo
+que se viene—, compartirlo, comparar y guardarlo. Debajo, y sólo si es tuyo,
+lo que se le hace al set, en `btn-sm` y con el rótulo «Sólo tú» delante. Antes
+eran ocho botones del mismo tamaño en dos filas que se leían como un muro, con
+**Borrar** a un dedo de **Editar**; ahora Borrar va además detrás de una línea
+vertical. `btn-sm` recorta sobre todo a los lados: de alto sólo baja de 42 a
+37 px, porque por debajo de eso el dedo ya falla.
+
+**Los iconos de botón son otra familia de tiza**, con sus reglas en
+[docs/direccion-visual.md](docs/direccion-visual.md): lienzo de 48, trazo de 4
+y tres o cuatro caminos. `ChalkGamepad` (el del hero) y `ChalkPad` (el del
+botón) son dos dibujos distintos del mismo objeto, y tiene que ser así: el
+primero a 16 px es una mancha. El de comparar es el propio regulador de la web
+en miniatura, para que se reconozca antes de leerse.
+
 **Los favoritos son públicos y no llevan contador.** Las dos mitades son la
 misma decisión. Públicos, porque un favorito aquí no es un marcador privado:
 es decir «éste me funciona», y esa señal es lo que le falta a un sitio con

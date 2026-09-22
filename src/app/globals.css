@@ -188,6 +188,19 @@ body::after {
     border-color: #f2efe470;
   }
 
+  /*
+   * Segundo escalón. Las acciones del dueño de un set son ocho botones en la
+   * misma cabecera que las de todo el mundo, y con el tamaño único se leían
+   * como un muro sin jerarquía. Recorta sobre todo a los lados: de alto sólo
+   * baja de 42 a 36 px, que por debajo de eso el dedo ya falla.
+   */
+  .btn-sm {
+    padding: 0.5625rem 0.8125rem;
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    gap: 0.375rem;
+  }
+
   .chip {
     display: inline-flex;
     align-items: center;

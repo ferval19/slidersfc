@@ -184,30 +184,6 @@ export function ChalkShield({ className = '' }: { className?: string }) {
   );
 }
 
-/**
- * Estrella. Guardar un set de otro. Rellena cuando ya está guardado.
- *
- * Dos cosas la separan del resto de dibujos: el trazo es más grueso porque
- * ésta se pinta dentro de un botón, a 16 px en vez de a 28, y con el de 2 se
- * quedaba en medio píxel; y el relleno va en `style` y no en `fill`, porque
- * `.chalk-stroke` declara `fill: none` y una regla de CSS le gana siempre a
- * un atributo de presentación.
- */
-export function ChalkStar({ className = '', filled = false }: { className?: string; filled?: boolean }) {
-  return (
-    <svg viewBox="0 0 48 48" className={className} aria-hidden>
-      <g
-        className="chalk-stroke"
-        stroke="currentColor"
-        strokeWidth="4"
-        style={filled ? { fill: 'currentColor', fillOpacity: 0.35 } : undefined}
-      >
-        <path d="M24 6 L29 19 Q36 19 42 20 Q35 25 31 29 Q34 36 36 42 Q29 38 24 35 Q19 39 12 42 Q14 35 17 29 Q11 25 6 20 Q13 19 19 19 Z" />
-      </g>
-    </svg>
-  );
-}
-
 /** Formación sobre el campo. Marca de sección para posicionamiento. */
 export function ChalkFormation({ className = '' }: { className?: string }) {
   return (
@@ -365,6 +341,146 @@ export function EmptyBoardDrawing({ className = '' }: { className?: string }) {
 }
 
 /** Iconos de categoría, por si la categoría no tiene uno propio. */
+// ---------------------------------------------------------------------------
+// Iconos de botón
+//
+// Otra familia, aunque compartan tiza. Los dibujos de arriba se ven a 28 px o
+// más y pueden permitirse detalle; éstos viven dentro de un botón, a 14-16 px,
+// y ahí el detalle se convierte en mugre. Las reglas, por si se añade uno:
+// lienzo de 48, **trazo de 4** (a 14 px da el mismo grosor aparente que un
+// dibujo de trazo 2 a 28) y tres o cuatro caminos como mucho.
+//
+// Lo que NO se dibuja en tiza: las marcas ajenas. El logotipo de X va tal cual
+// es, porque una marca no es decoración y redibujarla es falsificarla.
+// ---------------------------------------------------------------------------
+
+function Icono({ className, children }: { className: string; children: React.ReactNode }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} aria-hidden>
+      <g className="chalk-stroke" stroke="currentColor" strokeWidth="4">
+        {children}
+      </g>
+    </svg>
+  );
+}
+
+/**
+ * Estrella. Guardar un set de otro. Rellena cuando ya está guardado.
+ *
+ * El relleno va en `style` y no en `fill` porque `.chalk-stroke` declara
+ * `fill: none`, y una regla de CSS le gana siempre a un atributo.
+ */
+export function ChalkStar({ className = '', filled = false }: { className?: string; filled?: boolean }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} aria-hidden>
+      <g
+        className="chalk-stroke"
+        stroke="currentColor"
+        strokeWidth="4"
+        style={filled ? { fill: 'currentColor', fillOpacity: 0.35 } : undefined}
+      >
+        <path d="M24 6 L29 19 Q36 19 42 20 Q35 25 31 29 Q34 36 36 42 Q29 38 24 35 Q19 39 12 42 Q14 35 17 29 Q11 25 6 20 Q13 19 19 19 Z" />
+      </g>
+    </svg>
+  );
+}
+
+/** Mando. Meter el set en la consola. */
+export function ChalkPad({ className = '' }: { className?: string }) {
+  return (
+    <Icono className={className}>
+      <path d="M15 17 Q24 15 33 17 Q41 19 43 30 Q44 38 38 38 Q33 37 31 30 Q24 28 17 30 Q15 37 10 38 Q4 38 5 30 Q7 19 15 17 Z" />
+      <path d="M13 24 L21 24 M17 20 L17 28" strokeWidth="3.2" />
+      <path d="M33 22 L33.4 22 M37 27 L37.4 27" strokeWidth="6" />
+    </Icono>
+  );
+}
+
+/** Un enlace que sale. Compartir. */
+export function ChalkShare({ className = '' }: { className?: string }) {
+  return (
+    <Icono className={className}>
+      <path d="M22 11 L11 11 Q8 11 8 14 L8 37 Q8 40 11 40 L34 40 Q37 40 37 37 L37 26" />
+      <path d="M24 24 L41 7" />
+      <path d="M30 7 L42 6 L41 18" />
+    </Icono>
+  );
+}
+
+/**
+ * Dos carriles con la muesca en sitios distintos. Comparar.
+ *
+ * Es el regulador de la web en miniatura: quien ya ha visto una ficha
+ * reconoce el dibujo antes de leer la palabra.
+ */
+export function ChalkScales({ className = '' }: { className?: string }) {
+  return (
+    <Icono className={className}>
+      <path d="M6 17 L42 17" strokeWidth="3" />
+      <path d="M17 11 L17 23" />
+      <path d="M6 32 L42 32" strokeWidth="3" />
+      <path d="M32 26 L32 38" />
+    </Icono>
+  );
+}
+
+/** Tiza escribiendo. Editar. */
+export function ChalkPiece({ className = '' }: { className?: string }) {
+  return (
+    <Icono className={className}>
+      <path d="M17 33 L32 11 L40 17 L25 39 Z" />
+      <path d="M25 39 L14 41 L17 33" />
+    </Icono>
+  );
+}
+
+/** Ojo. Publicar o retirar: se ve o no se ve. */
+export function ChalkEye({ className = '', crossed = false }: { className?: string; crossed?: boolean }) {
+  return (
+    <Icono className={className}>
+      <path d="M5 24 Q24 9 43 24 Q24 39 5 24 Z" />
+      <path d="M24 21 L24.4 21" strokeWidth="9" />
+      {crossed ? <path d="M9 41 L39 7" /> : null}
+    </Icono>
+  );
+}
+
+/** Una hoja que se va a otro sitio. Llevar el set a otro juego. */
+export function ChalkCarry({ className = '' }: { className?: string }) {
+  return (
+    <Icono className={className}>
+      <path d="M7 9 L23 9 L23 39 L7 39 Z" />
+      <path d="M29 24 L43 24" />
+      <path d="M37 18 L43 24 L37 30" />
+    </Icono>
+  );
+}
+
+/**
+ * El borrador de la pizarra. Borrar.
+ *
+ * En una pizarra no se tira nada a una papelera: se pasa el borrador. Y la
+ * palabra doble —borrador de pizarra, borrador de set— la desambigua la
+ * etiqueta, que aquí siempre va al lado.
+ */
+export function ChalkEraser({ className = '' }: { className?: string }) {
+  return (
+    <Icono className={className}>
+      <path d="M9 28 L28 13 Q29 12 30 13 L40 22 Q41 23 40 24 L21 39 Q20 40 19 39 L9 30 Q8 29 9 28 Z" />
+      <path d="M15 33 L34 18" strokeWidth="3" />
+    </Icono>
+  );
+}
+
+/** Visto. El enlace ya está copiado. */
+export function ChalkCheck({ className = '' }: { className?: string }) {
+  return (
+    <Icono className={className}>
+      <path d="M8 26 L19 37 L41 11" />
+    </Icono>
+  );
+}
+
 export const CATEGORY_DRAWINGS = {
   speed: ChalkStopwatch,
   shooting: ChalkBoot,

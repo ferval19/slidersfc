@@ -75,3 +75,16 @@ Diagramas de pizarra en SVG en línea, trazo único de tiza con temblor y un
 filtro de rugosidad: medio campo con flechas, balón, bota, silbato, formación.
 Se usan como portada del hero, marcas de sección y estados vacíos. Nunca como
 relleno.
+
+**Dos familias, no una.** Los dibujos de arriba se ven a 28 px o más y pueden
+permitirse detalle. Los **iconos de botón** viven a 14-16 px, y ahí el detalle
+se convierte en mugre: lienzo de 48, trazo de 4 —a 14 px da el mismo grosor
+aparente que un dibujo de trazo 2 a 28— y tres o cuatro caminos como mucho. El
+mando del hero y el mando del botón son dos dibujos distintos a propósito.
+
+Los iconos de botón sólo van donde compiten varias acciones, que hoy es la
+botonera de la ficha de un set. Un botón solo en una página no lleva icono: no
+hay nada de lo que distinguirlo, y sería el relleno que esta página prohíbe.
+
+**Las marcas ajenas no se dibujan en tiza.** El logotipo de X va tal cual es.
+Una marca no es decoración, y redibujarla es falsificarla.

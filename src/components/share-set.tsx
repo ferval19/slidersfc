@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { ChalkCheck, ChalkShare } from '@/components/chalk';
+
 /**
  * Compartir un set. Usa el diálogo nativo del sistema cuando existe (móvil) y
  * en escritorio copia el enlace, que es lo que se acaba haciendo igualmente.
@@ -43,6 +45,7 @@ export function ShareSet({
   return (
     <div className="flex flex-wrap items-center gap-2">
       <button type="button" onClick={share} className="btn btn-quiet">
+        {copied ? <ChalkCheck className="size-4" /> : <ChalkShare className="size-4" />}
         {copied ? '¡Enlace copiado!' : 'Compartir'}
       </button>
 

@@ -853,6 +853,29 @@ Lo demás lo sujeta el SQL y no la interfaz: no puedes guardarte tu propio set,
 ni guardar un borrador ajeno probando ids. La ficha esconde el botón al autor
 por lo mismo, pero quien manda es la política.
 
+### 22/09 · La botonera de la ficha
+
+El dueño de un set veía ocho botones del mismo tamaño en dos filas que se leían
+como un bloque, sin nada que dijera que la primera es lo que hace cualquiera
+con el set y la segunda lo que sólo puede hacerle él. Y **Borrar** —que no se
+deshace— estaba a un dedo de **Editar**, mismo tamaño y misma fila.
+
+Ahora son dos escalones. Arriba, meter en la consola, compartir, comparar y
+guardar. Debajo, más pequeños y con el rótulo «Sólo tú» delante, editar,
+publicar o retirar, llevar a otro juego y, detrás de una línea vertical,
+borrar.
+
+Y llevan icono, con una regla nueva: **son otra familia de tiza**. Los dibujos
+del hero se ven a 28 px y pueden permitirse detalle; a 16 px ese mismo detalle
+es una mancha, así que los iconos de botón tienen su propio lienzo, su trazo
+más grueso y un tope de tres o cuatro líneas. El mando del hero y el mando del
+botón son dos dibujos distintos del mismo objeto, a propósito.
+
+Dos que merecen mención: el de comparar es **el regulador de la web en
+miniatura**, para que se reconozca antes de leerse; y el de borrar es **el
+borrador de la pizarra**, porque en una pizarra no se tira nada a una papelera.
+El logotipo de X se queda como es: una marca no es decoración.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

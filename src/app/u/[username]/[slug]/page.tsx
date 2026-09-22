@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 
 import { Avatar } from '@/components/avatar';
+import { ChalkPad, ChalkScales } from '@/components/chalk';
 import { CommentComposer, CommentList } from '@/components/comment-thread';
 import { FavoriteButton } from '@/components/favorite-button';
 import { SetConditions } from '@/components/set-conditions';
@@ -144,43 +145,48 @@ export default async function SetDetailPage({ params }: { params: Params }) {
 
         <SetConditions set={detail.set} />
 
-        {/* «Meter en la consola» es la acción principal: es para lo que se
-            abre un set. Compartir va para todo el mundo y no sólo para el
-            autor, porque un set se comparte más veces de las que se edita. */}
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2">
-          <Link
-            href={consolePath(detail.owner.username, detail.set.slug)}
-            className="btn btn-primary"
-          >
-            Meter en la consola
-          </Link>
+        {/* Dos escalones, no ocho botones iguales. Arriba, lo que hace
+            cualquiera con el set —meterlo en la consola es a lo que se viene,
+            y compartir se usa más veces que editar—. Debajo, y sólo si es
+            tuyo, lo que se le hace al set. */}
+        <div className="flex flex-col gap-3 pt-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href={consolePath(detail.owner.username, detail.set.slug)}
+              className="btn btn-primary"
+            >
+              <ChalkPad className="size-4" />
+              Meter en la consola
+            </Link>
 
-          {detail.set.is_published ? (
-            <ShareSet url={shareUrl} title={detail.set.title} gameName={detail.game.name} />
-          ) : null}
+            {detail.set.is_published ? (
+              <ShareSet url={shareUrl} title={detail.set.title} gameName={detail.game.name} />
+            ) : null}
 
-          {/* La pregunta que se hace quien llega aquí desde otro set no es qué
-              valores tiene éste, sino en qué se diferencia del suyo. */}
-          <Link
-            href={comparePickerPath({
-              username: detail.owner.username,
-              slug: detail.set.slug ?? '',
-            })}
-            className="btn btn-quiet"
-          >
-            Comparar
-          </Link>
+            {/* La pregunta que se hace quien llega aquí desde otro set no es
+                qué valores tiene éste, sino en qué se diferencia del suyo. */}
+            <Link
+              href={comparePickerPath({
+                username: detail.owner.username,
+                slug: detail.set.slug ?? '',
+              })}
+              className="btn btn-quiet"
+            >
+              <ChalkScales className="size-4" />
+              Comparar
+            </Link>
 
-          {/* El autor no se ve el botón: el SQL prohíbe guardarse el set
-              propio, y enseñárselo sólo invitaría a un error de RLS. */}
-          {!isOwner ? (
-            <FavoriteButton
-              setId={detail.set.id}
-              pathname={setPath(detail.owner.username, detail.set.slug)}
-              mine={favorited}
-              loginHref={user ? undefined : `/login?next=${setPath(detail.owner.username, detail.set.slug)}`}
-            />
-          ) : null}
+            {/* El autor no se ve el botón: el SQL prohíbe guardarse el set
+                propio, y enseñárselo sólo invitaría a un error de RLS. */}
+            {!isOwner ? (
+              <FavoriteButton
+                setId={detail.set.id}
+                pathname={setPath(detail.owner.username, detail.set.slug)}
+                mine={favorited}
+                loginHref={user ? undefined : `/login?next=${setPath(detail.owner.username, detail.set.slug)}`}
+              />
+            ) : null}
+          </div>
 
           {isOwner ? (
             <SetOwnerActions
