@@ -47,10 +47,10 @@ autor**, no por los likes.
 
 Esto es lo que hace que la campaña funcione, y caduca:
 
-1. **El catálogo real de FC27** — 61 sliders con sus nombres y su orden del
+1. **El catálogo real de FC27** — 65 sliders con sus nombres y su orden del
    menú, leídos del juego con el acceso anticipado. Del 19 al 25 de septiembre
    esto es información que se busca y no está publicada en español.
-2. **Los 121 valores de fábrica** del preajuste «Jugabilidad realista».
+2. **Los 129 valores de fábrica** del preajuste «Jugabilidad realista».
    Referencia que nadie más ha transcrito.
 3. **El desdoble CPU rival / CPU de tu equipo**, que es nuevo en FC27 y del que
    casi nadie se ha dado cuenta todavía.
@@ -241,7 +241,7 @@ viene de la persona con más autoridad posible para darte crédito.
 > Fallo al interceptar 90
 > Impacto del físico 99
 >
-> Los 121 valores, abajo.
+> Los 129 valores, abajo.
 
 **Respuesta 1 (inmediata):**
 
@@ -291,11 +291,11 @@ tiene y no sabe articular. Es el tipo de post que se cita.
 
 > El menú de sliders de FC27, entero:
 >
-> 61 sliders
-> 121 valores que meter a mano
+> 65 sliders
+> 129 valores que meter a mano
 > 9 categorías
 >
-> Son 23 más que en FC26. La mitad de la pestaña de tiro es nueva: vaselina,
+> Son 36 más que en FC26. La mitad de la pestaña de tiro es nueva: vaselina,
 > zapatazo y tiros rasos potentes tienen ahora su propio error y su propia
 > velocidad.
 
@@ -326,11 +326,104 @@ alguien que ya piensa en sliders y tiene un set. Esa es tu lista de la fase 3.
 
 ---
 
+### P4b · Martes 23/09, 21:30 · EL POST DE FEEDBACK · imagen `08-ven-a-romperla.png`
+
+**Va en el sitio de P5.** El modo consola ya sale en el tuit 5/8 del hilo del
+jueves, así que P5 es lo único prescindible de la semana — y este post no lo es.
+
+Se publica **antes del 25 a propósito**. Pedir que te rompan la web cuando ya ha
+entrado todo el mundo no sirve de nada: el sentido es tener dos días para
+arreglar lo que salga. Hoy hay **2 sets, 1 perfil y 0 comentarios**; ese cero es
+la hipótesis del producto sin probar, y este post es el intento de romperlo.
+
+El tono es **más cálido que el resto de la campaña**, y está bien que lo sea: es
+un post que pide un favor, y los favores no se piden en seco. Pero sigue sin
+llevar exclamaciones ni emojis — la gracia está en reconocer que el sitio está
+vacío, no en animarlo con signos.
+
+#### Variante A · «el sitio vacío» — la recomendada
+
+> Os cuento cómo va SlidersFC: 2 sets, 1 perfil y 0 comentarios. Está más vacío
+> que un campo de entrenamiento en agosto.
+>
+> Si tenéis cinco minutos, entrad y cacharread. Subid vuestro set, o decidme
+> simplemente qué no se entiende, que seguro que hay cosas.
+>
+> slidersfc.vercel.app
+
+**Respuesta 1 (inmediata):**
+
+> Lo que más me sirve: si te atascas en algo, dímelo aunque te parezca una
+> tontería. Suele ser justo lo que yo ya no veo de mirarlo tanto.
+>
+> Y si subes un set, te comento yo el primero.
+
+Esa última línea hace dos cosas a la vez: quita el miedo a publicar en un sitio
+vacío y **resuelve el cero de comentarios**, que es lo único que quieres esta
+semana.
+
+#### Variante B · «un favor» — si prefieres ir de frente
+
+> Va un favor de los que se piden con vergüenza.
+>
+> El jueves sale FC27 y me gustaría que SlidersFC no estuviera rota cuando
+> llegue la gente. ¿Alguien tiene diez minutos para entrar, registrarse y
+> decirme qué le chirría?
+>
+> Se entra rápido y no pido nada más: slidersfc.vercel.app
+
+Funciona mejor **sin imagen**. Un post que pide ayuda personal se lee más
+sincero en texto pelado; con tarjeta se parece a un anuncio.
+
+#### Variante C · corta, para reutilizar
+
+Guárdala para repetir la petición dentro de dos semanas sin sonar pesado.
+
+> Si entráis en SlidersFC y algo os parece raro, confuso o directamente mal,
+> decídmelo por aquí. Lo raro de hacer una web tú solo es que dejas de ver los
+> fallos a los tres días.
+>
+> slidersfc.vercel.app
+
+---
+
+#### Comprueba esto antes de publicarlo
+
+- **Que registrarse funcione de verdad.** Es el único post de la campaña que
+  pide explícitamente crear una cuenta; si falla, el daño es peor que no
+  publicarlo. Confirma que **«Confirm email» está desactivado** (punto 2 de la
+  hoja de ruta) y **entra con una cuenta nueva desde el móvil**, no desde tu
+  navegador de siempre.
+- **Si el acceso con X sigue sin activarse**, no lo menciones en el post.
+- **Que los números de la imagen sigan siendo ciertos.** El chiste se sostiene
+  sobre que son verdad. Si ya hay tres sets, cambia `ESTADO` en
+  `scripts/promo-images.mjs` y regenera.
+
+#### Qué hacer con lo que te contesten
+
+La hoja de ruta dice que el modo de fallo de un proyecto personal es **«se
+volvió una obligación y lo abandoné»**, y una petición de feedback es justo la
+forma más fácil de abrirse una cola sin querer. Así que:
+
+- **Arregla una cosa esa misma noche y dilo en la misma conversación.** Una sola.
+  «Ya está» dicho en dos horas convierte a quien te avisó en alguien que vuelve;
+  es el mejor rendimiento por minuto de toda la campaña.
+- **Lo demás, a la hoja de ruta**, y se responde con un «apuntado» sin fecha. No
+  prometas cuándo.
+- **Esto no abre un canal de soporte.** Es una petición puntual, no un «estoy
+  aquí para lo que necesitéis». Si alguien se instala en el hilo pidiendo cosas,
+  un «buena idea, lo apunto» y a otra cosa.
+
+---
+
 ### P5 · Martes 23/09, 21:30 · imagen `06-modo-consola.png`
+
+> **Desplazado por P4b.** Su contenido ya está en el tuit 5/8 del hilo del
+> jueves. Déjalo aquí por si quieres recuperarlo más adelante como post suelto.
 
 Primer post donde la web es el asunto.
 
-> Lo peor de un set no es decidir los valores. Es meter 121 números en el menú
+> Lo peor de un set no es decidir los valores. Es meter 129 números en el menú
 > sin perder la cuenta de por dónde ibas.
 >
 > Así que le he puesto un modo para eso: una columna, en el orden del menú,
@@ -389,7 +482,7 @@ hora respondiendo.
 
 **2/8** · imagen `05-comentarios.png`
 
-> El problema de siempre: alguien comparte una captura con 121 números y en
+> El problema de siempre: alguien comparte una captura con 129 números y en
 > respuestas se pregunta «¿por qué 35 y no 42?».
 >
 > Nadie contesta, porque no hay dónde.
@@ -398,7 +491,7 @@ hora respondiendo.
 
 **3/8** · imagen `04-catalogo.png`
 
-> El catálogo de FC27 está entero y es el de verdad: 61 sliders, 121 valores,
+> El catálogo de FC27 está entero y es el de verdad: 65 sliders, 129 valores,
 > con los nombres y el orden exactos del menú en español.
 >
 > Sacado del juego estos días, no traducido a ojo. «Tiros de calidad», no «tiro
@@ -406,7 +499,7 @@ hora respondiendo.
 
 **4/8** · imagen `02-preajuste-realista.png`
 
-> Y está cargado el preajuste de jugabilidad realista con sus 121 valores de
+> Y está cargado el preajuste de jugabilidad realista con sus 129 valores de
 > fábrica.
 >
 > No es un set bueno ni malo: es el punto de partida. Sirve para ver de un
@@ -555,7 +648,7 @@ Coge un slider, explica qué hace de verdad y qué está poniendo la gente.
 >
 > Súbelo a 60 y tendrás más espacio entre líneas — y más contras en contra.
 
-Da para 61 semanas. Y es lo que acabará indexando la web en Google, que es el
+Da para 65 semanas. Y es lo que acabará indexando la web en Google, que es el
 canal que no depende de X.
 
 ### Formato B · «Set de la semana» (jueves)
@@ -681,10 +774,11 @@ node scripts/promo-images.mjs
 | `01-marca.png` | La marca y para qué sirve | Hilo 1/8, P0 en hilo 4/4 |
 | `02-preajuste-realista.png` | Valores de fábrica de FC27 | P1, hilo 4/8 |
 | `03-cpu-asimetria.png` | CPU rival vs. CPU de tu equipo | P2, hilo 6/8 |
-| `04-catalogo.png` | 61 sliders, 121 valores, 9 categorías | P3, hilo 3/8 |
+| `04-catalogo.png` | 65 sliders, 129 valores, 9 categorías | P3, hilo 3/8 |
 | `05-comentarios.png` | El comentario anclado a un valor | P6, hilo 2/8 |
 | `06-modo-consola.png` | El modo consola | P5, hilo 5/8 |
 | `07-publica-tu-set.png` | La llamada a publicar | Hilo 7/8, fase 3 |
+| `08-ven-a-romperla.png` | El sitio vacío: 2 sets, 1 perfil, 0 comentarios | P4b |
 
 Los valores que aparecen **no están escritos a mano**: el script los lee de
 `supabase/seed/catalog.mjs` y de `supabase/seed/03_set_fc27_realista.sql`. Si

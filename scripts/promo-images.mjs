@@ -47,6 +47,15 @@ const INK = { user: USER, cpu_teammate: MATE, cpu_opponent: RIVAL, cpu: RIVAL };
 
 const URL = 'slidersfc.vercel.app';
 
+/**
+ * Sólo para `08-ven-a-romperla`. Es una foto del estado de la web, y el script
+ * no puede leer la base de datos, así que se pone a mano.
+ *
+ * COMPRUÉBALO ANTES DE PUBLICAR: el chiste de la imagen es que los números son
+ * verdad. Si dices 0 comentarios y ya hay tres, el post se cae solo.
+ */
+const ESTADO = { sets: 2, perfiles: 1, comentarios: 0 };
+
 // ---------------------------------------------------------------------------
 // Datos: catálogo y valores de fábrica, leídos de la fuente de verdad
 // ---------------------------------------------------------------------------
@@ -518,6 +527,38 @@ const cards = {
           ),
         ]),
         flex({ key: 'sp3', height: 24 }),
+      ],
+    }),
+
+  /**
+   * 8 · El post de feedback. Enseña el sitio vacío a propósito: a esta escala
+   * la honestidad es más simpática que cualquier alarde, y un cero pide que lo
+   * rompan mucho mejor que un «¡pruébala!».
+   */
+  '08-ven-a-romperla': () =>
+    board({
+      accent: MATE,
+      children: [
+        flex({ key: 'e' }, eyebrow('SlidersFC, a día de hoy', MATE)),
+        flex({ key: 'sp1', flexGrow: 1 }),
+        flex({ key: 'nums', alignItems: 'flex-end', width: W - 144 }, [
+          ...[
+            [ESTADO.sets, 'SETS PUBLICADOS', CHALK],
+            [ESTADO.perfiles, 'PERFILES', CHALK],
+            [ESTADO.comentarios, 'COMENTARIOS', USER],
+          ].map(([n, label, color], i) =>
+            flex({ key: label, flexDirection: 'column', width: i === 2 ? 460 : 380 }, [
+              flex({ key: 'a', fontFamily: 'Display', fontSize: 168, lineHeight: 0.88, color }, String(n)),
+              flex({ key: 'b', fontSize: 24, color: DIM, letterSpacing: 2 }, label),
+            ]),
+          ),
+        ]),
+        flex({ key: 'sp2', height: 46 }),
+        title('Ven a romperla', 116),
+        flex({ key: 'sp3', height: 26 }),
+        flex({ key: 's', fontSize: 30, color: DIM, maxWidth: 1200, lineHeight: 1.4 },
+          'Está recién hecha y se nota. Dime qué no se entiende.'),
+        flex({ key: 'sp4', flexGrow: 1 }),
       ],
     }),
 
