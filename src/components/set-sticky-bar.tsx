@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { categoryAnchor, useActiveCategory } from '@/components/active-category';
+import { ChalkPad } from '@/components/chalk';
 import { categoryShortLabel } from '@/lib/constants';
 
 type Props = {
@@ -96,7 +97,11 @@ export function SetStickyBar({ title, conditions, categories, consoleHref }: Pro
             ))}
           </nav>
 
+          {/* El mismo icono que «Meter en la consola» de arriba: aquí el
+              botón se queda en una palabra, y el dibujo es lo que lo ata a la
+              acción que ya ha visto quien ha bajado hasta aquí. */}
           <a href={consoleHref} className="btn btn-primary shrink-0 px-3 py-2">
+            <ChalkPad className="size-4" />
             Consola
           </a>
         </div>

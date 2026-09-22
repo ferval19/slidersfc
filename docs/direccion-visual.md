@@ -82,9 +82,17 @@ se convierte en mugre: lienzo de 48, trazo de 4 —a 14 px da el mismo grosor
 aparente que un dibujo de trazo 2 a 28— y tres o cuatro caminos como mucho. El
 mando del hero y el mando del botón son dos dibujos distintos a propósito.
 
-Los iconos de botón sólo van donde compiten varias acciones, que hoy es la
-botonera de la ficha de un set. Un botón solo en una página no lleva icono: no
-hay nada de lo que distinguirlo, y sería el relleno que esta página prohíbe.
+**Un icono sólo entra donde hay algo de lo que distinguirse.** Varias acciones
+compitiendo en la misma barra, o un botón tan estrecho que se queda en una
+palabra. Repasada la web entera, eso son cinco sitios: la botonera de la ficha,
+las dos acciones del perfil propio, la barra pegada del set, la cabecera del
+modo consola y las dos herramientas del formulario.
+
+Y lo que **no** lleva icono, que es casi todo: el botón solo de una página
+—«Leer la guía», «Volver al feed», el de un estado vacío—, los pares de
+formulario tipo Guardar / Cancelar, los cierres de un panel y el botón del
+encabezado. No hay nada de lo que distinguirlos, y un dibujo ahí es el relleno
+que esta página prohíbe.
 
 **Las marcas ajenas no se dibujan en tiza.** El logotipo de X va tal cual es.
 Una marca no es decoración, y redibujarla es falsificarla.

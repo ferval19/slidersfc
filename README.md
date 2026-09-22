@@ -876,6 +876,26 @@ miniatura**, para que se reconozca antes de leerse; y el de borrar es **el
 borrador de la pizarra**, porque en una pizarra no se tira nada a una papelera.
 El logotipo de X se queda como es: una marca no es decoración.
 
+### 22/09 · El repaso de los botones
+
+Repasados los treinta botones de la web contra la regla que se acababa de
+escribir. Pasan cinco sitios: las dos acciones del perfil propio, la barra
+pegada del set —donde «Consola» se queda en una palabra y recupera el dibujo
+del botón grande de arriba—, la cabecera del modo consola, y las dos
+herramientas del formulario, plegar y restablecer.
+
+El resto se queda como está, que es lo que más trabajo dio decidir: un botón
+solo en una página no tiene de qué distinguirse, y los pares Guardar / Cancelar
+tampoco. La regla completa, con la lista de lo que no lleva icono, está en la
+[dirección visual](docs/direccion-visual.md).
+
+Dos arreglos que salieron del repaso. La flecha de volver del modo consola era
+un **carácter tipográfico** —el único dibujo de la web que no era de tiza, y
+sin nombre para quien no ve la pantalla—; ahora es una flecha dibujada con su
+`aria-label`. Y el icono de plegar, dos galones convergiendo, se leía como una
+**equis**, que en cualquier interfaz significa cerrar: lleva una línea central
+que quita la ambigüedad.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

@@ -481,6 +481,55 @@ export function ChalkCheck({ className = '' }: { className?: string }) {
   );
 }
 
+/** Puerta con la flecha saliendo. Cerrar sesión. */
+export function ChalkExit({ className = '' }: { className?: string }) {
+  return (
+    <Icono className={className}>
+      <path d="M22 8 L8 8 L8 40 L22 40" />
+      <path d="M20 24 L41 24" />
+      <path d="M33 16 L41 24 L33 32" />
+    </Icono>
+  );
+}
+
+/** Flecha a la izquierda. Volver. */
+export function ChalkBack({ className = '' }: { className?: string }) {
+  return (
+    <Icono className={className}>
+      <path d="M40 24 L9 24" />
+      <path d="M19 14 L9 24 L19 34" />
+    </Icono>
+  );
+}
+
+/**
+ * Dos galones y una línea. Despliegan si se alejan de ella, pliegan si se
+ * acercan. La línea no es adorno: sin ella, dos galones que convergen se leen
+ * como una equis, que en cualquier interfaz significa «cerrar».
+ */
+export function ChalkChevrons({ className = '', expand = false }: { className?: string; expand?: boolean }) {
+  return (
+    <Icono className={className}>
+      <path d="M10 24 L38 24" strokeWidth="3" />
+      {expand ? (
+        <path d="M14 16 L24 6 L34 16 M14 32 L24 42 L34 32" />
+      ) : (
+        <path d="M14 6 L24 16 L34 6 M14 42 L24 32 L34 42" />
+      )}
+    </Icono>
+  );
+}
+
+/** Flecha que vuelve sobre sí misma. Restablecer. */
+export function ChalkUndo({ className = '' }: { className?: string }) {
+  return (
+    <Icono className={className}>
+      <path d="M11 20 Q20 8 31 12 Q42 16 40 28 Q38 40 25 40 Q16 40 12 34" />
+      <path d="M6 10 L11 21 L22 17" />
+    </Icono>
+  );
+}
+
 export const CATEGORY_DRAWINGS = {
   speed: ChalkStopwatch,
   shooting: ChalkBoot,

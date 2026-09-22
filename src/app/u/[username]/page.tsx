@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 
 import { Avatar } from '@/components/avatar';
+import { ChalkPiece } from '@/components/chalk';
 import { EmptyState } from '@/components/empty-state';
 import { SetCard } from '@/components/set-card';
 import { SignOutButton } from '@/components/sign-out-button';
@@ -109,6 +110,7 @@ export default async function ProfilePage({
         {isMe ? (
           <div className="flex flex-wrap items-center gap-2">
             <Link href={editProfilePath()} className="btn btn-quiet">
+              <ChalkPiece className="size-4" />
               Editar perfil
             </Link>
             <SignOutButton />

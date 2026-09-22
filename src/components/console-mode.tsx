@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { CATEGORY_DRAWINGS } from '@/components/chalk';
+import { CATEGORY_DRAWINGS, ChalkBack, ChalkUndo } from '@/components/chalk';
 import { categoryLabel, CPU_BEHAVIOURS, SCOPE_INK, SCOPE_LABELS } from '@/lib/constants';
 import type { CategoryBlockView } from '@/lib/set-view';
 import type { CpuBehaviour, SliderScope } from '@/lib/database.types';
@@ -127,8 +127,15 @@ export function ConsoleMode({
   return (
     <div className="mx-auto max-w-xl pb-28">
       <header className="flex items-center gap-3 px-5 py-3">
-        <Link href={setHref} className="btn btn-quiet shrink-0 px-3 py-2" title="Volver al set">
-          ←
+        {/* Era una flecha tipográfica: el único dibujo de la web que no
+            estaba hecho de tiza, y sin nombre para quien no ve la pantalla. */}
+        <Link
+          href={setHref}
+          className="btn btn-quiet shrink-0 px-3 py-2"
+          aria-label="Volver al set"
+          title="Volver al set"
+        >
+          <ChalkBack className="size-4" />
         </Link>
         <span className="flex min-w-0 flex-1 flex-col">
           <span className="truncate text-sm font-semibold">{title}</span>
@@ -285,6 +292,7 @@ export function ConsoleMode({
               onClick={() => setDone(new Set())}
               className="btn btn-ghost shrink-0 px-3 py-2 text-[0.625rem]"
             >
+              <ChalkUndo className="size-3.5" />
               Reiniciar
             </button>
           ) : null}

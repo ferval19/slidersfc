@@ -3,6 +3,7 @@
 import { useTransition } from 'react';
 
 import { signOut } from '@/app/actions/auth';
+import { ChalkExit } from '@/components/chalk';
 
 export function SignOutButton() {
   const [pending, startTransition] = useTransition();
@@ -14,6 +15,7 @@ export function SignOutButton() {
       disabled={pending}
       onClick={() => startTransition(async () => void (await signOut()))}
     >
+      <ChalkExit className="size-4" />
       {pending ? 'Saliendo…' : 'Cerrar sesión'}
     </button>
   );

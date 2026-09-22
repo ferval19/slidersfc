@@ -9,6 +9,7 @@ import {
   ChalkShield,
   ChalkStopwatch,
 } from "@/components/chalk";
+import { ChalkChevrons, ChalkUndo } from "@/components/chalk";
 import { ImportPanel } from "@/components/import-panel";
 import { SliderControl } from "@/components/slider-control";
 import { ScaleLegend } from "@/components/slider-scale";
@@ -305,6 +306,7 @@ export function SliderSetForm({
               }
               className="btn btn-quiet"
             >
+              <ChalkChevrons className="size-4" expand={folded.size === blocks.length} />
               {folded.size === blocks.length ? "Desplegar todo" : "Plegar todo"}
             </button>
             <button
@@ -312,6 +314,7 @@ export function SliderSetForm({
               onClick={() => setValues(defaultsFor(definitions))}
               className="btn btn-quiet"
             >
+              <ChalkUndo className="size-4" />
               Restablecer
             </button>
           </div>
