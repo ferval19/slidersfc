@@ -82,7 +82,10 @@ pregunta que se hace todo el que llega a un set ajeno teniendo ya el suyo.
 - **Votos o estrellas.** Canibalizan el diferencial: la gracia es que
   expliques por qué 35 y no 42.
 - **App móvil.** El modo consola ya cubre el caso real.
-- **Traducir al inglés.** Duplica el trabajo de contenido para siempre.
+- ~~**Traducir al inglés.**~~ **Revocado el 22/09**: se escribió con cero
+  visitas, y Fernando ha detectado interacción con público inglés. El coste que
+  decía sigue siendo cierto —duplica el trabajo para siempre—, así que el plan
+  se dedica sobre todo a acotarlo: [plan-ingles.md](plan-ingles.md).
 
 ## La regla que evita construir de más
 
