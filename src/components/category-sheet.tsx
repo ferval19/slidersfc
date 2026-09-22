@@ -11,6 +11,17 @@ type Props = {
   active: string | null;
   open: boolean;
   onClose: () => void;
+  /**
+   * Cuántos sliders llevas tocados en cada categoría. Sólo lo pasa el
+   * formulario; en la ficha no hay nada que tocar y se queda sin marcas.
+   */
+  marks?: Record<string, number>;
+  /**
+   * Qué hacer al elegir una categoría, si no vale con saltar a su ancla. El
+   * formulario la necesita para desplegarla antes: plegada, el ancla existe
+   * pero lleva a una cabecera cerrada y parece que el índice no ha hecho nada.
+   */
+  onSelect?: (category: string) => void;
 };
 
 /**
@@ -22,7 +33,14 @@ type Props = {
  * y en tamaño de dedo. Se abre tocando la cabecera de la categoría, que ya
  * está pegada arriba mientras la recorres.
  */
-export function CategorySheet({ categories, active, open, onClose }: Props) {
+export function CategorySheet({
+  categories,
+  active,
+  open,
+  onClose,
+  marks,
+  onSelect,
+}: Props) {
   // Con la hoja abierta, el fondo no se mueve.
   useEffect(() => {
     if (!open) return;
@@ -48,6 +66,10 @@ export function CategorySheet({ categories, active, open, onClose }: Props) {
     // Tras cerrar, para que el desplazamiento no compita con el bloqueo del
     // scroll del cuerpo.
     requestAnimationFrame(() => {
+      if (onSelect) {
+        onSelect(category);
+        return;
+      }
       document.getElementById(categoryAnchor(category))?.scrollIntoView({ block: 'start' });
     });
   };
@@ -95,6 +117,11 @@ export function CategorySheet({ categories, active, open, onClose }: Props) {
                     />
                   ) : null}
                   <span className="display flex-1 text-xl">{categoryLabel(category)}</span>
+                  {marks && marks[category] > 0 ? (
+                    <span className="value-pill text-xs text-ink-user">
+                      {marks[category]} tocado{marks[category] === 1 ? '' : 's'}
+                    </span>
+                  ) : null}
                   <span className="eyebrow">{count}</span>
                 </button>
               </li>

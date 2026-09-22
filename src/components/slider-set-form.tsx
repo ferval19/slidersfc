@@ -10,7 +10,9 @@ import {
   ChalkStopwatch,
 } from "@/components/chalk";
 import { ChalkChevrons, ChalkUndo } from "@/components/chalk";
+import { categoryAnchor } from "@/components/active-category";
 import { ImportPanel } from "@/components/import-panel";
+import { SetFormNav } from "@/components/set-form-nav";
 import { SliderControl } from "@/components/slider-control";
 import { ScaleLegend } from "@/components/slider-scale";
 import {
@@ -111,6 +113,70 @@ export function SliderSetForm({
   // que arrastrar un regulador no repinte los otros ciento veintiuno.
   const setValue = useCallback((definitionId: number, next: number) => {
     setValues((previous) => ({ ...previous, [String(definitionId)]: next }));
+  }, []);
+
+  /**
+   * Contra qué se compara para saber si has tocado un valor. Editando es lo
+   * guardado; creando, el valor de fábrica — que es la pregunta equivalente:
+   * «qué he cambiado del preajuste».
+   */
+  const baseline = useMemo(
+    () => initial?.values ?? defaultsFor(definitions),
+    [initial, definitions],
+  );
+
+  /**
+   * Cuántos sliders llevas cambiados en cada categoría. Es lo que pinta los
+   * puntos de la barra, y lo que convierte una navegación en un resumen de lo
+   * que llevas hecho.
+   */
+  const touched = useMemo(() => {
+    const counts: Record<string, number> = {};
+
+    for (const block of blocks) {
+      let changed = 0;
+
+      for (const row of block.rows) {
+        const moved = Object.values(row.byScope).some((definition) => {
+          const key = String(definition.id);
+          const fallback = definition.default_value;
+          return (values[key] ?? fallback) !== (baseline[key] ?? fallback);
+        });
+        if (moved) changed += 1;
+      }
+
+      counts[block.category] = changed;
+    }
+
+    return counts;
+  }, [blocks, values, baseline]);
+
+  /**
+   * Ir a una categoría desde la barra o desde la hoja.
+   *
+   * Despliega antes de saltar: plegada, el ancla existe pero lleva a una
+   * cabecera cerrada y parece que el índice no ha hecho nada.
+   *
+   * Los dos cuadros son necesarios. El primero espera a que React pinte el
+   * despliegue; sin él, si saltas a la última categoría con todo plegado la
+   * página aún no es lo bastante alta para subirla del todo y el salto se
+   * queda corto.
+   */
+  const goToCategory = useCallback((category: string) => {
+    setFolded((previous) => {
+      if (!previous.has(category)) return previous;
+      const next = new Set(previous);
+      next.delete(category);
+      return next;
+    });
+
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() =>
+        document
+          .getElementById(categoryAnchor(category))
+          ?.scrollIntoView({ block: "start" }),
+      ),
+    );
   }, []);
 
   return (
@@ -327,13 +393,29 @@ export function SliderSetForm({
           }
         />
 
+        <SetFormNav
+          categories={blocks.map((block) => ({
+            category: block.category,
+            count: block.rows.length,
+          }))}
+          touched={touched}
+          onGo={goToCategory}
+        />
+
         {blocks.map((block) => {
           const Drawing =
             CATEGORY_DRAWINGS[block.category as keyof typeof CATEGORY_DRAWINGS];
           const isFolded = folded.has(block.category);
 
           return (
-            <div key={block.category}>
+            // El margen de scroll descuenta lo que queda pegado arriba: la
+            // cabecera del sitio y la barra de categorías. Sin él, al saltar,
+            // el título de la categoría queda justo debajo de las dos.
+            <div
+              key={block.category}
+              id={categoryAnchor(block.category)}
+              className="scroll-mt-[calc(var(--header-h)+3.25rem)]"
+            >
               <button
                 type="button"
                 onClick={() =>
