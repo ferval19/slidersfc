@@ -30,7 +30,7 @@ src/app/
   guia/                          qué lleva un set, explicado campo por campo
   icon.tsx apple-icon.tsx        favicon SFC generado
   opengraph-image.tsx            tarjeta por defecto del resto de la web
-  actions/                       auth.ts · sets.ts · comments.ts
+  actions/                       auth.ts · sets.ts · comments.ts · favorites.ts
 
 src/components/                  UI. Los de cliente llevan 'use client'
 src/lib/                         lógica sin UI (ver abajo)
@@ -85,6 +85,7 @@ slider_definitions  catálogo por juego: category, applies_to, name, slug, rango
 slider_sets         owner_id, game_id, title, slug, description, version, is_published
 slider_set_values   (set, definition) → value
 slider_comments     slider_definition_id NULL = comentario general al set
+slider_set_favorites (usuario, set) → guardado. Nunca un set propio
 ```
 
 `applies_to` es `user` | `cpu` | `cpu_opponent` | `cpu_teammate`.
@@ -94,8 +95,10 @@ de comportamiento de la CPU.
 
 **El control de acceso vive en RLS**, no en Next. Lectura pública de sets
 publicados, escritura sólo del dueño, comentarios de cualquier usuario
-autenticado editables sólo por su autor. Las seis tablas tienen RLS activada y
-`npm run test:sql` lo comprueba.
+autenticado editables sólo por su autor. **Todas** las tablas tienen RLS
+activada y `npm run test:sql` lo comprueba contándolas: cuando se añade una
+tabla, esa prueba falla hasta que se sube el número a mano, que es justo lo que
+se quiere.
 
 ---
 
@@ -455,6 +458,29 @@ lo escribe casi todo el mundo), «CPU» a secas cae en `cpu_opponent` cuando el
 juego desdobla rival y compañero —quien pega un set de FC26 en FC27 escribe
 «CPU»—, y los números por encima de 100 se descartan, que si no un «8 minutos»
 o un «2026» entran como valor.
+
+**Los favoritos son públicos y no llevan contador.** Las dos mitades son la
+misma decisión. Públicos, porque un favorito aquí no es un marcador privado:
+es decir «éste me funciona», y esa señal es lo que le falta a un sitio con
+pocos sets — quien entra en un perfil ve qué respeta esa persona. Sin
+contador, porque un número de guardados al lado de un set es una nota, y las
+notas son lo que la hoja de ruta descarta desde el principio: canibalizan el
+diferencial, que es que expliques por qué 35 y no 42. La tabla guarda lo
+necesario para contar el día que se decida lo contrario; enseñarlo son dos
+líneas y volver atrás no lo son.
+
+**Nadie puede guardarse su propio set.** Lo impide la política de RLS
+(`not public.owns_set(...)`), no la interfaz: un perfil que se
+autorrecomienda no dice nada, y la sección existe para enseñar trabajo ajeno.
+La ficha esconde el botón al autor por lo mismo, pero quien manda es el SQL.
+La política exige además `can_read_set`, que no es paranoia: sin ella se
+podría marcar el borrador de cualquiera probando ids, y la fila resultante
+sería pública.
+
+**Los favoritos no entran en la copia de seguridad.** Decisión, no olvido:
+reconstruirlos pide resolver usuario y set por nombre, como ya hace con los
+comentarios, y no compensa por un dato que se vuelve a marcar en dos clics.
+Está apuntado en la hoja de ruta por si algún día hay volumen que perder.
 
 **`import-sliders.ts` no importa nada que no sea un tipo.** Así `node` puede
 cargarlo quitando los tipos y `scripts/test-import.mjs` lo prueba contra el

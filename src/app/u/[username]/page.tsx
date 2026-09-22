@@ -6,7 +6,12 @@ import { Avatar } from '@/components/avatar';
 import { EmptyState } from '@/components/empty-state';
 import { SetCard } from '@/components/set-card';
 import { SignOutButton } from '@/components/sign-out-button';
-import { getProfileByUsername, getSetsByOwner, getUsernameAfterRename } from '@/lib/queries';
+import {
+  getFavoriteSetsByUser,
+  getProfileByUsername,
+  getSetsByOwner,
+  getUsernameAfterRename,
+} from '@/lib/queries';
 import { editProfilePath, profilePath } from '@/lib/paths';
 import { getCurrentUser } from '@/lib/supabase/server';
 
@@ -50,7 +55,11 @@ export default async function ProfilePage({
     notFound();
   }
 
-  const [sets, user] = await Promise.all([getSetsByOwner(profile.id), getCurrentUser()]);
+  const [sets, favorites, user] = await Promise.all([
+    getSetsByOwner(profile.id),
+    getFavoriteSetsByUser(profile.id),
+    getCurrentUser(),
+  ]);
   const isMe = user?.id === profile.id;
 
   const published = sets.filter((set) => set.is_published);
@@ -145,6 +154,35 @@ export default async function ProfilePage({
                 <SetCard key={set.id} set={set} />
               ))}
             </ul>
+          </section>
+        </>
+      ) : null}
+
+      {/* En el perfil propio, vacío invita a guardar; en el de otro no se
+          pinta nada: no hace falta anunciar que alguien no ha guardado nada. */}
+      {favorites.length > 0 || isMe ? (
+        <>
+          <div className="chalk-rule" />
+          <section className="py-9">
+            <h2 className="display text-3xl">
+              Favoritos <span className="text-chalk-dim">· {favorites.length}</span>
+            </h2>
+
+            <div className="mt-5">
+              {favorites.length === 0 ? (
+                <EmptyState
+                  title="Aún no has guardado nada"
+                  body="Cuando veas un set que te sirva de verdad, guárdalo desde su ficha. Aquí es donde vuelves a encontrarlo."
+                  action={{ href: '/', label: 'Ver la portada' }}
+                />
+              ) : (
+                <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {favorites.map((set) => (
+                    <SetCard key={set.id} set={set} />
+                  ))}
+                </ul>
+              )}
+            </div>
           </section>
         </>
       ) : null}

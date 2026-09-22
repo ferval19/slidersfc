@@ -115,6 +115,13 @@ export type SliderComment = {
   created_at: string;
 };
 
+/** Que alguien se ha guardado el set de otro. La clave es el par. */
+export type SliderSetFavorite = {
+  user_id: string;
+  slider_set_id: string;
+  created_at: string;
+};
+
 type Insert<T, Optional extends keyof T> = Omit<T, Optional> & Partial<Pick<T, Optional>>;
 
 /**
@@ -280,6 +287,27 @@ export type Database = {
           {
             foreignKeyName: 'slider_comments_author_id_fkey';
             columns: ['author_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      slider_set_favorites: {
+        Row: SliderSetFavorite;
+        Insert: Insert<SliderSetFavorite, 'created_at'>;
+        Update: Partial<SliderSetFavorite>;
+        Relationships: [
+          {
+            foreignKeyName: 'slider_set_favorites_slider_set_id_fkey';
+            columns: ['slider_set_id'];
+            isOneToOne: false;
+            referencedRelation: 'slider_sets';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'slider_set_favorites_user_id_fkey';
+            columns: ['user_id'];
             isOneToOne: false;
             referencedRelation: 'profiles';
             referencedColumns: ['id'];

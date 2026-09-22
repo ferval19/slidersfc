@@ -184,6 +184,30 @@ export function ChalkShield({ className = '' }: { className?: string }) {
   );
 }
 
+/**
+ * Estrella. Guardar un set de otro. Rellena cuando ya está guardado.
+ *
+ * Dos cosas la separan del resto de dibujos: el trazo es más grueso porque
+ * ésta se pinta dentro de un botón, a 16 px en vez de a 28, y con el de 2 se
+ * quedaba en medio píxel; y el relleno va en `style` y no en `fill`, porque
+ * `.chalk-stroke` declara `fill: none` y una regla de CSS le gana siempre a
+ * un atributo de presentación.
+ */
+export function ChalkStar({ className = '', filled = false }: { className?: string; filled?: boolean }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} aria-hidden>
+      <g
+        className="chalk-stroke"
+        stroke="currentColor"
+        strokeWidth="4"
+        style={filled ? { fill: 'currentColor', fillOpacity: 0.35 } : undefined}
+      >
+        <path d="M24 6 L29 19 Q36 19 42 20 Q35 25 31 29 Q34 36 36 42 Q29 38 24 35 Q19 39 12 42 Q14 35 17 29 Q11 25 6 20 Q13 19 19 19 Z" />
+      </g>
+    </svg>
+  );
+}
+
 /** Formación sobre el campo. Marca de sección para posicionamiento. */
 export function ChalkFormation({ className = '' }: { className?: string }) {
   return (

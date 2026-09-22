@@ -28,6 +28,7 @@ export const MIGRATIONS_DESPUES = [
   'supabase/migrations/20260919180000_profile_youtube.sql',
   'supabase/migrations/20260920140000_set_conditions.sql',
   'supabase/migrations/20260920180000_set_versions.sql',
+  'supabase/migrations/20260922120000_set_favorites.sql',
 ];
 
 export const STARTER_SET = 'supabase/seed/02_set_full_manual_fg.sql';

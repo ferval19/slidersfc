@@ -567,6 +567,61 @@ await (await expectFailure(
   await db.close();
 }
 
+// --- Favoritos --------------------------------------------------------------
+{
+  const db = await freshDatabase();
+  const me = (await db.query(`select id from auth.users where email = '${EMAIL}'`)).rows[0].id;
+
+  // Un segundo usuario: guardarse el set propio lo prohíbe el SQL, así que
+  // hace falta alguien que guarde el set de otro.
+  await db.exec(`insert into auth.users (email) values ('otro@ejemplo.com')`);
+  const otro = (await db.query(`select id from auth.users where email = 'otro@ejemplo.com'`)).rows[0].id;
+
+  const game = (await db.query(`select id from public.games where slug = 'fc27'`)).rows[0].id;
+  const set = (
+    await db.query(`
+      insert into public.slider_sets (owner_id, game_id, title)
+      values ('${me}', ${game}, 'Set para guardar')
+      returning id
+    `)
+  ).rows[0].id;
+
+  await db.exec(
+    `insert into public.slider_set_favorites (user_id, slider_set_id) values ('${otro}', '${set}')`,
+  );
+  check(
+    'se puede guardar un set',
+    1 === (await count(db, `select count(*)::int as n from public.slider_set_favorites`)),
+  );
+
+  let duplicado = false;
+  try {
+    await db.exec(
+      `insert into public.slider_set_favorites (user_id, slider_set_id) values ('${otro}', '${set}')`,
+    );
+  } catch {
+    duplicado = true;
+  }
+  check('guardar dos veces el mismo par lo rechaza la clave primaria', duplicado);
+
+  await db.exec(`delete from public.slider_sets where id = '${set}'`);
+  check(
+    'al borrar el set desaparece el favorito',
+    0 === (await count(db, `select count(*)::int as n from public.slider_set_favorites`)),
+  );
+
+  const policies = await db.query(
+    `select cmd from pg_policies where tablename = 'slider_set_favorites'`,
+  );
+  check(
+    'la tabla tiene sus tres políticas, ni una de actualizar',
+    policies.rows.length === 3 && !policies.rows.some((row) => row.cmd === 'UPDATE'),
+    JSON.stringify(policies.rows.map((row) => row.cmd)),
+  );
+
+  await db.close();
+}
+
 // --- RLS ------------------------------------------------------------------
 {
   const db = await freshDatabase();
@@ -578,7 +633,7 @@ await (await expectFailure(
   const without = rows.filter((row) => !row.relrowsecurity).map((row) => row.relname);
   check(
     `RLS activada en las ${rows.length} tablas`,
-    rows.length === 9 && without.length === 0,
+    rows.length === 10 && without.length === 0,
     without.join(', '),
   );
   await db.close();

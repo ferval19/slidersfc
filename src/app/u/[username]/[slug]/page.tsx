@@ -4,13 +4,20 @@ import { notFound, permanentRedirect } from 'next/navigation';
 
 import { Avatar } from '@/components/avatar';
 import { CommentComposer, CommentList } from '@/components/comment-thread';
+import { FavoriteButton } from '@/components/favorite-button';
 import { SetConditions } from '@/components/set-conditions';
 import { SetHistory } from '@/components/set-history';
 import { SetStickyBar } from '@/components/set-sticky-bar';
 import { SetOwnerActions } from '@/components/set-owner-actions';
 import { ShareSet } from '@/components/share-set';
 import { SliderTable } from '@/components/slider-table';
-import { getGames, getSetDetail, getSetHistory, getUsernameAfterRename } from '@/lib/queries';
+import {
+  isFavorite,
+  getGames,
+  getSetDetail,
+  getSetHistory,
+  getUsernameAfterRename,
+} from '@/lib/queries';
 import { buildSetView } from '@/lib/set-view';
 import { conditionsSummary } from '@/lib/set-conditions';
 import { comparePickerPath, consolePath, profilePath, setPath } from '@/lib/paths';
@@ -71,8 +78,12 @@ export default async function SetDetailPage({ params }: { params: Params }) {
     notFound();
   }
 
-  // El historial se pide con el set ya resuelto: necesita su id.
-  const history = await getSetHistory(detail.set.id);
+  // El historial y el estado de favorito se piden con el set ya resuelto:
+  // los dos necesitan su id.
+  const [history, favorited] = await Promise.all([
+    getSetHistory(detail.set.id),
+    isFavorite(detail.set.id, user?.id ?? null),
+  ]);
 
   const view = buildSetView(detail, user?.id ?? null);
   const isOwner = user?.id === detail.owner.id;
@@ -159,6 +170,17 @@ export default async function SetDetailPage({ params }: { params: Params }) {
           >
             Comparar
           </Link>
+
+          {/* El autor no se ve el botón: el SQL prohíbe guardarse el set
+              propio, y enseñárselo sólo invitaría a un error de RLS. */}
+          {!isOwner ? (
+            <FavoriteButton
+              setId={detail.set.id}
+              pathname={setPath(detail.owner.username, detail.set.slug)}
+              mine={favorited}
+              loginHref={user ? undefined : `/login?next=${setPath(detail.owner.username, detail.set.slug)}`}
+            />
+          ) : null}
 
           {isOwner ? (
             <SetOwnerActions

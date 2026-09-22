@@ -73,6 +73,10 @@ pregunta que se hace todo el que llega a un set ajeno teniendo ya el suyo.
 - **Tarjeta de compartir con las diferencias**, no sólo con los valores.
 - **FC28**. El catálogo ya está preparado para un juego nuevo: es un rato de
   datos, no de código.
+- **Los favoritos, en la copia de seguridad.** Se quedaron fuera a propósito:
+  reponerlos pide resolver usuario y set por nombre, como ya hace con los
+  comentarios, y hoy no compensa por un dato que se vuelve a marcar en dos
+  clics. Cuando haya volumen que perder, `scripts/backup-sql.mjs`.
 
 ## Lo que NO haría
 
@@ -80,7 +84,9 @@ pregunta que se hace todo el que llega a un set ajeno teniendo ya el suyo.
   full-text.** Cada una es una obligación permanente. Con 0 comentarios,
   moderar es resolver un problema imaginario.
 - **Votos o estrellas.** Canibalizan el diferencial: la gracia es que
-  expliques por qué 35 y no 42.
+  expliques por qué 35 y no 42. **Sigue en pie el 22/09**, con los favoritos ya
+  hechos: guardar un set es un marcador, y por eso **no enseña cuánta gente lo
+  ha guardado**. Ese número sería la nota que esta línea descarta.
 - **App móvil.** El modo consola ya cubre el caso real.
 - ~~**Traducir al inglés.**~~ **Revocado el 22/09**: se escribió con cero
   visitas, y Fernando ha detectado interacción con público inglés. El coste que

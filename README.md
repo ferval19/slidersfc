@@ -61,7 +61,13 @@ Editor del dashboard, o con la CLI (`supabase db push`):
    nombre de usuario no rompa los enlaces ya compartidos
 10. `supabase/migrations/20260919180000_profile_youtube.sql` — el canal de
    YouTube en el perfil
-13. `supabase/storage/01_avatars.sql` — almacén de las fotos de perfil. Va
+11. `supabase/migrations/20260920140000_set_conditions.sql` — dificultad,
+    duración y cámara de un set
+12. `supabase/migrations/20260920180000_set_versions.sql` — historial de
+    versiones de un set
+13. `supabase/migrations/20260922120000_set_favorites.sql` — guardar en
+    favoritos el set de otro
+14. `supabase/storage/01_avatars.sql` — almacén de las fotos de perfil. Va
     aparte de las migraciones porque es configuración de Storage y
     `npm run test:sql` no puede probarla
 
@@ -822,6 +828,30 @@ que no puede romperse. Comprobado que los cuatro titulares aguantan en tres
 líneas. Y el segundo botón del hero dice ahora **«Ver los 3 sets»** con la
 cuenta real: es la prueba de que esto tiene contenido, en la primera pantalla y
 sin costar sitio.
+
+### 22/09 · Guardar el set de otro
+
+Hasta ahora, volver a un set que te había gustado era cosa del historial del
+navegador o de acordarte del nombre de quien lo publicó. Los favoritos lo
+arreglan por el lado del que **lee**, que es casi todo el mundo que entra: se
+guardan desde la ficha y salen en el perfil, lo último primero.
+
+Dos decisiones que no se ven:
+
+**Son públicos.** Un favorito aquí no es un marcador privado, es decir «éste me
+funciona». Esa señal es justo lo que le falta a un sitio con pocos sets: quien
+entra en un perfil ve qué juega esa persona y qué respeta.
+
+**No llevan contador.** Es lo contrario de lo que pide el cuerpo, y es
+deliberado: un número de guardados al lado de un set es una nota, y las notas
+están en la lista de lo que no se hace desde el primer día, porque canibalizan
+el diferencial —la gracia es que expliques por qué 35 y no 42, no que pongas
+cuatro estrellas—. La tabla guarda lo necesario para contar el día que se
+decida lo contrario; enseñarlo son dos líneas, y volver atrás no lo son.
+
+Lo demás lo sujeta el SQL y no la interfaz: no puedes guardarte tu propio set,
+ni guardar un borrador ajeno probando ids. La ficha esconde el botón al autor
+por lo mismo, pero quien manda es la política.
 
 ---
 

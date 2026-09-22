@@ -353,6 +353,60 @@ export type GroupedSlider = {
   scopes: SliderDefinition[];
 };
 
+/**
+ * ¿He guardado yo este set?
+ *
+ * No devuelve cuánta gente lo ha guardado, y no es un olvido: un número de
+ * guardados al lado de un set es una nota, y la hoja de ruta descarta las
+ * notas por escrito —canibalizan lo que hace distinta a esta web, que es que
+ * expliques por qué 35 y no 42—. La tabla guarda lo necesario para contar el
+ * día que se decida lo contrario.
+ */
+export async function isFavorite(setId: string, userId: string | null): Promise<boolean> {
+  if (!userId) return false;
+
+  return safeRead(
+    'isFavorite',
+    async (supabase) => {
+      const { data } = await supabase
+        .from('slider_set_favorites')
+        .select('user_id')
+        .eq('user_id', userId)
+        .eq('slider_set_id', setId)
+        .maybeSingle();
+      return data !== null;
+    },
+    false,
+  );
+}
+
+/** Los sets que ha guardado alguien, lo último primero. */
+export async function getFavoriteSetsByUser(userId: string): Promise<SetListItem[]> {
+  return safeRead(
+    'getFavoriteSetsByUser',
+    async (supabase) => {
+      const { data: favorites } = await supabase
+        .from('slider_set_favorites')
+        .select('slider_set_id')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(30);
+
+      const ids = (favorites ?? []).map((row) => row.slider_set_id);
+      if (ids.length === 0) return [];
+
+      const { data: sets } = await supabase.from('slider_sets').select(SET_LIST_SELECT).in('id', ids);
+
+      // .in() no respeta el orden de los ids, y aquí el orden ES el dato
+      // (lo último guardado, primero). RLS puede además esconder algún set
+      // que se despublicó entre medias: simplemente vendrá menos de lo pedido.
+      const byId = new Map(((sets ?? []) as unknown as SetListItem[]).map((set) => [set.id, set]));
+      return ids.map((id) => byId.get(id)).filter((set): set is SetListItem => set !== undefined);
+    },
+    [],
+  );
+}
+
 export function groupDefinitions(definitions: SliderDefinition[]) {
   const byCategory = new Map<string, Map<string, GroupedSlider>>();
 
