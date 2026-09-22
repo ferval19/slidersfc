@@ -548,6 +548,36 @@ Cómo se reparte en la práctica:
 | Revisar lo que vuelve y pasar las comprobaciones | |
 | Actualizar el mapa del código y el historial | |
 
+### Tres árboles, tres ramas, una sesión en cada uno
+
+Desde el 22/09 hay más de una sesión trabajando a la vez, y durante veinte
+minutos compartieron un solo árbol. Se pisaron dos veces: una rama cambiada
+debajo de quien estaba escribiendo, y un `git add -A` que estuvo a punto de
+meter el trabajo de otra sesión dentro de un commit que decía otra cosa.
+
+```
+sliderXI            main                producto
+sliderXI-marketing  marketing           docs/comunicacion-x.md, promo-images.mjs, promo/x/
+sliderXI-clips      clips-de-gameplay   nadie hasta el 25 (lo dice su propio ADR)
+```
+
+Son `git worktree` del mismo repositorio: una copia de los ficheros por rama,
+un solo `.git`. Se crean con `git worktree add ../<carpeta> <rama>` y se listan
+con `git worktree list`.
+
+Las tres reglas que salieron de aquellos dos sustos, y que siguen valiendo
+aunque ahora haya un árbol por sesión:
+
+1. **Nunca `git add -A`.** Se commitea por ruta explícita. Con tres árboles, un
+   `add -A` en el sitio equivocado es peor, no mejor.
+2. **Cambiar de rama se avisa antes**, no después.
+3. **Cada árbol se queda en su rama.** Una rama sólo puede estar sacada en un
+   árbol a la vez: si se deja el principal fuera de `main`, el `worktree add`
+   del siguiente falla con «already used by worktree».
+
+Y una que no es de git: **el trabajo sin commitear de otra sesión no se toca.**
+Ni se commitea, ni se copia, ni se revierte. Puede estar a medias de escribirse.
+
 **Al delegar, el encargo va cerrado**: ficheros a tocar, firma de lo que se
 escribe, y qué comprobación tiene que pasar. Un subagente arranca en frío, sin
 nada de esta conversación; lo que no vaya en el encargo, se lo inventa.
