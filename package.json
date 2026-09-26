@@ -18,7 +18,9 @@
     "test:compare": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-compare.mjs",
     "test:backup": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-backup.mjs",
     "test:conditions": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-conditions.mjs",
-    "test": "npm run test:sql && npm run test:import && npm run test:profile && npm run test:compare && npm run test:conditions && npm run test:backup"
+    "test": "npm run test:sql && npm run test:import && npm run test:profile && npm run test:compare && npm run test:conditions && npm run test:backup",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -30,6 +32,7 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

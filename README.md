@@ -9,6 +9,7 @@ Stack: Next.js 16 (App Router, TypeScript, Tailwind v4) + Supabase (Postgres, Au
 - [Dirección visual](docs/direccion-visual.md) — la pizarra del entrenador
 - [Hoja de ruta](docs/hoja-de-ruta.md) — qué viene y en qué orden
 - [Comunicación en X](docs/comunicacion-x.md) — el plan de lanzamiento, con los posts escritos
+- [Tests end-to-end](docs/testing-e2e.md) — Playwright: auditoría, plan y cómo correrlos
 - [Historial](#historial) — qué se ha hecho y por qué
 
 ---
@@ -190,6 +191,8 @@ npm run dev
 | `npm run test:backup` | Vuelca, repone en una base vacía y comprueba que ha vuelto todo |
 | `npm test` | Los seis anteriores, en orden |
 | `npm run backup` | Copia de seguridad a `copias/`: JSON + SQL de reposición |
+| `npm run test:e2e` | Tests de Playwright (navegador real). Necesita `.env.test.local` — ver [docs/testing-e2e.md](docs/testing-e2e.md) |
+| `npm run test:e2e:ui` | Lo mismo, en modo interactivo |
 
 ## Estructura
 

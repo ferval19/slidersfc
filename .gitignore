@@ -46,6 +46,12 @@ next-env.d.ts
 
 # Plantilla de entorno (sí se versiona)
 !.env.example
+!.env.test.example
 
 # copias de seguridad de la base (contienen datos, no van al repositorio)
 /copias
+
+# Playwright
+/playwright-report/
+/test-results/
+/blob-report/

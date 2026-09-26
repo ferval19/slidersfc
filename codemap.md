@@ -49,7 +49,9 @@ scripts/backup.mjs               volcado de la base a JSON + SQL de reposición
 scripts/backup-sql.mjs           el generador del SQL de reposición (puro)
 scripts/test-backup.mjs          vuelca, repone en una base vacía y comprueba
 scripts/schema-files.mjs         qué ficheros de SQL hay y EN QUÉ ORDEN van
-docs/                            dirección visual · hoja de ruta
+docs/                            dirección visual · hoja de ruta · tests E2E
+e2e/                             tests de Playwright (navegador real)
+playwright.config.ts             levanta next dev en el 3100 con NODE_ENV=test
 ```
 
 ### `src/lib`
@@ -498,6 +500,14 @@ reconstruirlos pide resolver usuario y set por nombre, como ya hace con los
 comentarios, y no compensa por un dato que se vuelve a marcar en dos clics.
 Está apuntado en la hoja de ruta por si algún día hay volumen que perder.
 
+**Los tests de Playwright fuerzan `NODE_ENV=test` al levantar `next dev`.**
+No por gusto: `.env.local` de este árbol apunta al Supabase de producción, y
+con `NODE_ENV=test` Next carga `.env.test.local` y **no carga** `.env.local`
+(mecanismo nativo de Next, no algo de este proyecto). Así ningún test puede
+escribir en producción por accidente, ni falta ninguna comprobación propia
+para evitarlo. El coste es que hace falta un segundo proyecto de Supabase
+sólo para tests — ver [docs/testing-e2e.md](docs/testing-e2e.md).
+
 **`import-sliders.ts` no importa nada que no sea un tipo.** Así `node` puede
 cargarlo quitando los tipos y `scripts/test-import.mjs` lo prueba contra el
 catálogo real sin levantar Next. El formato de entrada no lo controlamos —cada
@@ -522,6 +532,7 @@ npm run test:conditions # dificultad, duración y cámara
 npm run test:backup  # vuelca, repone en una base vacía y comprueba
 npm run backup       # copia de seguridad a copias/ (JSON + SQL)
 npm test             # los seis de arriba
+npm run test:e2e     # Playwright, navegador real — necesita .env.test.local (docs/testing-e2e.md)
 ```
 
 Antes de dar algo por bueno: `typecheck`, `lint`, **`build`** y, si has tocado
