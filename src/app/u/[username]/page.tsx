@@ -13,7 +13,9 @@ import {
   getSetsByOwner,
   getUsernameAfterRename,
 } from '@/lib/queries';
+import { jsonLd } from '@/lib/json-ld';
 import { editProfilePath, profilePath } from '@/lib/paths';
+import { publicSiteUrl } from '@/lib/site-url';
 import { getCurrentUser } from '@/lib/supabase/server';
 
 export async function generateMetadata({
@@ -31,6 +33,7 @@ export async function generateMetadata({
   return {
     title: `${name} (@${profile.username})`,
     description: profile.bio ?? `Sets de sliders publicados por ${name} en SlidersFC.`,
+    alternates: { canonical: profilePath(profile.username) },
     openGraph: {
       title: `${name} en SlidersFC`,
       description: profile.bio ?? `Sets de sliders publicados por ${name}.`,
@@ -66,8 +69,25 @@ export default async function ProfilePage({
   const published = sets.filter((set) => set.is_published);
   const drafts = sets.filter((set) => !set.is_published);
 
+  const siteUrl = publicSiteUrl();
+  const name = profile.display_name ?? profile.username;
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: `${siteUrl}/` },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name,
+        item: `${siteUrl}${profilePath(profile.username)}`,
+      },
+    ],
+  };
+
   return (
     <div className="mx-auto max-w-6xl px-5 py-12">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} />
       <header className="flex flex-wrap items-start gap-5 pb-8">
         <Avatar url={profile.avatar_url} name={profile.display_name ?? profile.username} size={64} />
 

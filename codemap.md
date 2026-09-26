@@ -74,6 +74,7 @@ playwright.config.ts             levanta next dev en el 3100 con NODE_ENV=test
 | `auth-callback.ts` | Handler compartido por `/auth/callback` y `/auth/confirm` |
 | `site-url.ts` | Origen público. Cascada: variable explícita → Vercel → localhost |
 | `og-fonts.ts` | Fuentes de las imágenes generadas, leídas de `public/fonts/` |
+| `json-ld.ts` | `JSON.stringify` que escapa `<`, para meter JSON-LD en un `<script>` sin que un título o una bio ajenos lo puedan cerrar a medio camino |
 | `supabase/` | `server` (con cookies) · `client` (navegador) · `anon` (sin cookies) · `session` (proxy) · `env` · `providers` |
 
 ---
@@ -451,6 +452,18 @@ guardado. Quien entra con X trae la foto de `pbs.twimg.com`, y guardar el
 perfil sin tocarla no puede fallar por eso; pero una URL nueva y ajena sí se
 rechaza, porque un avatar remoto le enseña la IP de cada visitante a un
 servidor de otro.
+
+**El `canonical` va por página, nunca en el layout raíz.** Ponerlo una vez en
+`layout.tsx` lo heredarían todas las rutas que no lo pisen, y eso canonicaliza
+`/guia` hacia `/` — justo lo contrario de lo que hace un canonical. Por eso
+cada página con contenido propio (portada, juego, perfil, ficha de set, guía,
+comparar) lo declara en su propio `metadata` o `generateMetadata`.
+
+**El `WebSite` del JSON-LD no lleva `SearchAction`.** La hoja de ruta descarta
+la búsqueda a propósito («nada que genere cola» no es el motivo aquí, pero la
+decisión de no construirla sigue en pie); anunciar una acción de búsqueda que
+no existe en el marcado sería mentirle al buscador, y Google penaliza el
+marcado que no coincide con lo que hay en la página.
 
 **El importador de texto busca el nombre más largo primero.** «Velocidad» es
 prefijo de «Velocidad de tiros de calidad»; si se busca por orden de catálogo,

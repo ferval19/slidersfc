@@ -21,6 +21,7 @@ import {
 } from '@/lib/queries';
 import { buildSetView } from '@/lib/set-view';
 import { conditionsSummary } from '@/lib/set-conditions';
+import { jsonLd } from '@/lib/json-ld';
 import { comparePickerPath, consolePath, profilePath, setPath } from '@/lib/paths';
 import { publicSiteUrl } from '@/lib/site-url';
 import { getCurrentUser } from '@/lib/supabase/server';
@@ -88,10 +89,38 @@ export default async function SetDetailPage({ params }: { params: Params }) {
 
   const view = buildSetView(detail, user?.id ?? null);
   const isOwner = user?.id === detail.owner.id;
-  const shareUrl = `${publicSiteUrl()}${setPath(detail.owner.username, detail.set.slug)}`;
+  const siteUrl = publicSiteUrl();
+  const shareUrl = `${siteUrl}${setPath(detail.owner.username, detail.set.slug)}`;
+  const authorName = detail.owner.display_name ?? detail.owner.username;
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: `${siteUrl}/` },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: `Sliders de ${detail.game.name}`,
+        item: `${siteUrl}/juegos/${detail.game.slug}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: authorName,
+        item: `${siteUrl}${profilePath(detail.owner.username)}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: detail.set.title,
+        item: shareUrl,
+      },
+    ],
+  };
 
   return (
     <article className="mx-auto max-w-5xl px-5 py-10">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} />
       <header className="flex flex-col gap-4 pb-8">
         <div className="flex flex-wrap items-center gap-2">
           <Link href={`/juegos/${detail.game.slug}`} className="chip chip-active">

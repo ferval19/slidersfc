@@ -899,6 +899,42 @@ sin nombre para quien no ve la pantalla—; ahora es una flecha dibujada con su
 **equis**, que en cualquier interfaz significa cerrar: lleva una línea central
 que quita la ambigüedad.
 
+### 26/09 · Estudio SEO para «sliders FC»
+
+Punto de partida: `site:slidersfc.vercel.app` no devuelve nada — Google
+todavía no ha indexado ni una sola página. La búsqueda «sliders FC» la copan
+guías de sliders de EA FC26 en inglés (Operation Sports, Dexerto,
+GameTyrant); nadie compite todavía por la marca «SlidersFC», así que la
+oportunidad real a corto plazo es el término de marca, no el genérico.
+
+Lo que ya estaba bien: `robots.ts` y `sitemap.ts` cubren juegos, sets y
+perfiles; `editar` y `consola` ya llevan `noindex` porque compiten con la
+ficha; el logotipo es texto real («Sliders» + «FC»), no una imagen.
+
+Lo que faltaba y se ha añadido:
+
+- **`canonical`** en portada, `/juegos/[slug]`, `/u/[username]`, `/guia` y
+  `/comparar` (aquí sin el `?a=`, que no es contenido). La ficha de un set ya
+  lo tenía.
+- **JSON-LD**: `WebSite` en el layout raíz (sin `SearchAction`: no hay
+  buscador, y anunciar uno que no existe es mentirle a Google) y
+  `BreadcrumbList` en juego, perfil y ficha de set.
+- **`viewport`** como export aparte (Next 16 no lo admite dentro de
+  `metadata`) con el verde de la pizarra como `themeColor`.
+
+Nuevo: [`src/lib/json-ld.ts`](src/lib/json-ld.ts), un `JSON.stringify` que
+escapa `<` — un título o una bio de un desconocido no debe poder cerrar la
+etiqueta `script` a medio JSON.
+
+**Lo que no es código y decide más que el código.** El sitio vive en
+`slidersfc.vercel.app`, no en un dominio propio: para una marca literal como
+«SlidersFC», un dominio propio (`slidersfc.com` o `.app`) es la palanca más
+grande que queda, y comprarlo y apuntar `NEXT_PUBLIC_SITE_URL` no es una
+decisión que tome una sesión de Claude. Lo mismo con enviar el sitemap a
+Google Search Console y con los enlaces desde fuera (X, foros de FC) — sin
+alguna señal externa, cero páginas indexadas se queda en cero por mucho
+marcado que lleven.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

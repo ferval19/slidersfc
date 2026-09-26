@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { ChalkClipboard } from '@/components/chalk';
@@ -9,6 +10,10 @@ import { ScaleLegend, ScaleTrack } from '@/components/slider-scale';
 import { SCOPE_LABELS } from '@/lib/constants';
 import { getGames, getPublishedSets } from '@/lib/queries';
 import { getCurrentUser } from '@/lib/supabase/server';
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+};
 
 /**
  * Muestra de cómo se lee un set. No son valores de relleno: son cuatro filas

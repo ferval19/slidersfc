@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: 'Comparar dos sets',
   description:
     'Pon dos sets de sliders uno al lado del otro y mira en qué se diferencian, valor a valor.',
+  // Canónica sin el `?a=`: es un selector, no contenido — todas las
+  // combinaciones de selección deben consolidar en la misma URL.
+  alternates: { canonical: '/comparar' },
 };
 
 export default async function ComparePickerPage({

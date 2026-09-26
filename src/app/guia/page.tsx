@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   title: 'Qué lleva un set',
   description:
     'Todo lo que se puede contar de un set de sliders en SlidersFC, campo por campo, y por qué cada cosa importa.',
+  alternates: { canonical: '/guia' },
   openGraph: {
     title: 'Qué lleva un set — SlidersFC',
     description: 'Campo por campo, qué se puede contar de un set de sliders y por qué importa.',
