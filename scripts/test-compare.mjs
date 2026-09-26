@@ -13,7 +13,7 @@
  * es puro (sólo importa tipos) para que eso baste.
  */
 
-import { buildCompareView } from '../src/lib/compare.ts';
+import { buildCompareView, topDifferences } from '../src/lib/compare.ts';
 
 let failures = 0;
 
@@ -222,6 +222,64 @@ const find = (definitions, slug, scope) =>
       view.total === 0 &&
       view.scopes.length === 0 &&
       view.hasReference === false,
+  );
+}
+
+// --- topDifferences: ordena por diferencia absoluta, respeta el límite,
+// deja fuera las filas sin diferencia y elige la celda que manda -----------
+{
+  const definitions = definitionsFrom([
+    { slug: 'aceleracion', name: 'Aceleración', category: 'Prueba', scopes: ['user', 'cpu'] },
+    { slug: 'marcaje', name: 'Marcaje', category: 'Prueba', scopes: ['user'] },
+    { slug: 'pases', name: 'Pases', category: 'Prueba', scopes: ['user', 'cpu'] },
+    { slug: 'presion', name: 'Presión', category: 'Prueba', scopes: ['user'] },
+  ]);
+  const idUserAcel = find(definitions, 'aceleracion', 'user').id;
+  const idCpuAcel = find(definitions, 'aceleracion', 'cpu').id;
+  const idMarcaje = find(definitions, 'marcaje', 'user').id;
+  const idUserPases = find(definitions, 'pases', 'user').id;
+  const idCpuPases = find(definitions, 'pases', 'cpu').id;
+  const idPresion = find(definitions, 'presion', 'user').id;
+
+  // Aceleración: la CPU manda (|-20| > |10|). Pases: sin diferencia, fuera.
+  const a = {
+    [idUserAcel]: 40,
+    [idCpuAcel]: 60,
+    [idMarcaje]: 30,
+    [idUserPases]: 50,
+    [idCpuPases]: 50,
+    [idPresion]: 60,
+  };
+  const b = {
+    [idUserAcel]: 50,
+    [idCpuAcel]: 40,
+    [idMarcaje]: 35,
+    [idUserPases]: 50,
+    [idCpuPases]: 50,
+    [idPresion]: 45,
+  };
+  const view = buildCompareView({ definitions, a, b });
+  const top = topDifferences(view, 10);
+
+  check(
+    'topDifferences: deja fuera las filas con spread 0',
+    !top.some((row) => row.name === 'Pases'),
+  );
+  check(
+    'topDifferences: ordena por diferencia absoluta descendente',
+    top.map((row) => row.name).join(',') === 'Aceleración,Presión,Marcaje',
+    top.map((row) => `${row.name}:${row.delta}`).join(' '),
+  );
+  check(
+    'topDifferences: de una fila con varias celdas elige la que manda en el spread',
+    top[0].a === 60 && top[0].b === 40 && top[0].delta === -20,
+    `${top[0].a} / ${top[0].b} / ${top[0].delta}`,
+  );
+
+  const limited = topDifferences(view, 2);
+  check(
+    'topDifferences: respeta el limit',
+    limited.length === 2 && limited.map((row) => row.name).join(',') === 'Aceleración,Presión',
   );
 }
 

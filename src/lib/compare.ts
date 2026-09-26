@@ -218,3 +218,20 @@ export function buildCompareView(input: {
     total: rows.length,
   };
 }
+
+/** Las filas donde más se separan los dos sets, de mayor a menor. */
+export function topDifferences(
+  view: CompareView,
+  limit: number,
+): { name: string; a: number | null; b: number | null; delta: number }[] {
+  return view.rows
+    .filter((row) => row.spread > 0)
+    .map((row) => {
+      // La celda que manda en el spread de la fila: si hay empate, la
+      // primera en el orden en que vienen las celdas.
+      const cell = row.cells.find((candidate) => Math.abs(candidate.delta ?? 0) === row.spread)!;
+      return { name: row.name, a: cell.a, b: cell.b, delta: cell.delta ?? 0 };
+    })
+    .sort((rowA, rowB) => Math.abs(rowB.delta) - Math.abs(rowA.delta))
+    .slice(0, limit);
+}

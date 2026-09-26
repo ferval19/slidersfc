@@ -61,7 +61,7 @@ playwright.config.ts             levanta next dev en el 3100 con NODE_ENV=test
 | `queries.ts` | Todas las lecturas. Cada una envuelta en `safeRead`: si Supabase no responde, la página se queda vacía en vez de caerse |
 | `set-view.ts` | Convierte el detalle de un set en algo plano y serializable para los Client Components |
 | `set-conditions.ts` | Dificultad, duración y cámara: validación y etiquetas. Puro |
-| `compare.ts` | El modelo de comparar dos sets: deltas, spread y orden. Puro, para poder probarlo |
+| `compare.ts` | El modelo de comparar dos sets: deltas, spread y orden, más `topDifferences` para la tarjeta de compartir. Puro, para poder probarlo |
 | `profile.ts` | Validación del perfil. Puro: lo comparten el formulario y la acción de servidor, con las mismas reglas |
 | `avatar-storage.ts` | Dónde vive cada avatar. El formato de la carpeta lo exige la política de Storage |
 | `image.ts` | Recorta y reduce la foto a 512 px en el navegador antes de subirla |
@@ -489,6 +489,24 @@ y tres o cuatro caminos. `ChalkGamepad` (el del hero) y `ChalkPad` (el del
 botón) son dos dibujos distintos del mismo objeto, y tiene que ser así: el
 primero a 16 px es una mancha. El de comparar es el propio regulador de la web
 en miniatura, para que se reconozca antes de leerse.
+
+**La tarjeta de una comparación enseña las diferencias, no los valores.** La
+del set enseña cinco sliders fijos, porque de un set interesa cómo es. De una
+comparación interesa **en qué se separan**, así que las cinco filas salen
+ordenadas por diferencia y el titular es el dato que la resume: «Se separan en
+48 de 65». Cuando no se separan en ninguno dice «Son el mismo set», que
+compartido vale más todavía.
+
+La tarjeta **repite el filtro de `cpu_controls` de la página**. Si uno de los
+dos sets lleva la CPU en automático, esos valores no los usa el juego y la
+página los deja fuera; si la tarjeta no hiciera lo mismo diría «48 de 65»
+donde la página dice otra cosa, y una tarjeta que no cuadra con la página a la
+que lleva es peor que no tener tarjeta.
+
+**Las metaetiquetas de `twitter` van explícitas en cada página, no se heredan
+de `openGraph`.** Next no las deriva: sin ellas, X coge el título y la
+descripción del layout raíz y la tarjeta anuncia la web entera en lugar de lo
+que estás compartiendo. La imagen sí se enlaza sola desde `opengraph-image.tsx`.
 
 **Los favoritos son públicos y no llevan contador.** Las dos mitades son la
 misma decisión. Públicos, porque un favorito aquí no es un marcador privado:

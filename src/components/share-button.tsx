@@ -5,22 +5,21 @@ import { useState } from 'react';
 import { ChalkCheck, ChalkShare } from '@/components/chalk';
 
 /**
- * Compartir un set. Usa el diálogo nativo del sistema cuando existe (móvil) y
- * en escritorio copia el enlace, que es lo que se acaba haciendo igualmente.
- * El enlace directo a X va aparte porque es donde está esta comunidad.
+ * Compartir un enlace. Usa el diálogo nativo del sistema cuando existe
+ * (móvil) y en escritorio copia el enlace, que es lo que se acaba haciendo
+ * igualmente. El enlace directo a X va aparte porque es donde está esta
+ * comunidad.
  */
-export function ShareSet({
+export function ShareButton({
   url,
   title,
-  gameName,
+  text,
 }: {
   url: string;
   title: string;
-  gameName: string;
+  text: string;
 }) {
   const [copied, setCopied] = useState(false);
-
-  const text = `${title} — sliders de ${gameName}`;
 
   const share = async () => {
     if (navigator.share) {

@@ -4,11 +4,13 @@ import { notFound } from 'next/navigation';
 
 import { Avatar } from '@/components/avatar';
 import { CompareTable } from '@/components/compare-table';
+import { ShareButton } from '@/components/share-button';
 import { COMPARE_INK } from '@/components/slider-scale';
 import { buildCompareView } from '@/lib/compare';
 import { cpuBehaviourLabel } from '@/lib/constants';
-import { comparePickerPath, setPath } from '@/lib/paths';
+import { comparePath, comparePickerPath, setPath } from '@/lib/paths';
 import { getSetDetail, type SetDetail } from '@/lib/queries';
+import { publicSiteUrl } from '@/lib/site-url';
 
 type Params = Promise<{ ua: string; sa: string; ub: string; sb: string }>;
 
@@ -28,11 +30,17 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   if (!a || !b) return { title: 'Comparación no encontrada' };
 
   const title = `${a.set.title} contra ${b.set.title}`;
+  const description = `En qué se diferencian estos dos sets de ${a.game.name}, valor a valor.`;
 
+  // `twitter` va explícito y no se hereda de `openGraph`: sin él, X coge el
+  // título y la descripción por defecto del layout y la tarjeta anuncia la
+  // web entera en vez de esta comparación. La imagen la pone sola
+  // `opengraph-image.tsx`, que vive en esta misma carpeta.
   return {
     title,
-    description: `En qué se diferencian estos dos sets de ${a.game.name}, valor a valor.`,
-    openGraph: { title: `${title} — SlidersFC`, type: 'article' },
+    description,
+    openGraph: { title: `${title} — SlidersFC`, description, type: 'article' },
+    twitter: { card: 'summary_large_image', title: `${title} — SlidersFC`, description },
   };
 }
 
@@ -92,6 +100,21 @@ export default async function ComparePage({ params }: { params: Params }) {
               ? 'Ni un solo valor distinto entre los dos.'
               : `En los otros ${view.total - view.differing} coinciden. La barra entre las dos muescas es la distancia, y la cifra de la derecha dice cuánto sube o baja el segundo: en verde si sube, en rojo si baja.`}
           </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <ShareButton
+            url={`${publicSiteUrl()}${comparePath(
+              { username: a.owner.username, slug: a.set.slug },
+              { username: b.owner.username, slug: b.set.slug },
+            )}`}
+            title={`${a.set.title} contra ${b.set.title}`}
+            text={
+              view.differing === 0
+                ? `${a.set.title} y ${b.set.title} son el mismo set, valor a valor`
+                : `${a.set.title} contra ${b.set.title}: se separan en ${view.differing} de ${view.total} sliders de ${a.game.name}`
+            }
+          />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">

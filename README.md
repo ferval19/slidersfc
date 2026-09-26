@@ -935,6 +935,28 @@ Google Search Console y con los enlaces desde fuera (X, foros de FC) — sin
 alguna señal externa, cero páginas indexadas se queda en cero por mucho
 marcado que lleven.
 
+### 26/09 · Compartir una comparación
+
+Estaba en «más adelante» de la hoja de ruta como «tarjeta de compartir con las
+diferencias, no sólo con los valores». Ya está.
+
+Botón de compartir en la comparación, y una imagen propia para las redes. La
+del set enseña cinco sliders fijos porque de un set interesa cómo es; de una
+comparación interesa **en qué se separan**, así que las cinco filas van
+ordenadas por diferencia, con la cifra en verde o rojo, y el titular es el
+resumen: «Se separan en 48 de 65». Si no se separan en ninguno, «Son el mismo
+set» — que compartido vale más todavía.
+
+Dos detalles que no se ven y sostienen lo demás. La tarjeta **repite el filtro
+de los controles de la CPU** que hace la página: si no, diría un número donde
+la página dice otro, y una tarjeta que no cuadra con su página es peor que no
+tenerla. Y las metaetiquetas de `twitter` van explícitas, porque no se heredan
+de las de OpenGraph: sin ellas, X anunciaba la web entera en vez de la
+comparación.
+
+De paso, `ShareSet` pasa a llamarse `ShareButton` y recibe el texto en lugar de
+componerlo: ya no comparte sólo sets.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

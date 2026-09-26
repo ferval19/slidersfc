@@ -10,7 +10,7 @@ import { SetConditions } from '@/components/set-conditions';
 import { SetHistory } from '@/components/set-history';
 import { SetStickyBar } from '@/components/set-sticky-bar';
 import { SetOwnerActions } from '@/components/set-owner-actions';
-import { ShareSet } from '@/components/share-set';
+import { ShareButton } from '@/components/share-button';
 import { SliderTable } from '@/components/slider-table';
 import {
   isFavorite,
@@ -189,7 +189,11 @@ export default async function SetDetailPage({ params }: { params: Params }) {
             </Link>
 
             {detail.set.is_published ? (
-              <ShareSet url={shareUrl} title={detail.set.title} gameName={detail.game.name} />
+              <ShareButton
+                url={shareUrl}
+                title={detail.set.title}
+                text={`${detail.set.title} — sliders de ${detail.game.name}`}
+              />
             ) : null}
 
             {/* La pregunta que se hace quien llega aquí desde otro set no es
