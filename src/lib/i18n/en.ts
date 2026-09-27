@@ -543,7 +543,8 @@ const en: Dictionary = {
     losValoresTitulo: 'The values',
     elGruesoDelSet: 'The bulk of the set',
     losValoresIntro:
-      "FC 27 has 65 sliders and FC 26 has 29. They come out in the exact order of the game's menu, so you can enter them while checking it.",
+      (fc27: number, fc26: number) =>
+        `FC 27 has ${fc27} sliders and FC 26 has ${fc26}. They come out in the exact order of the game's menu, so you can enter them while checking it.`,
     asiSeLee: 'How to read it',
     notaMarcaGris:
       "The gray mark is the game's factory preset. When your notch covers it, that slider is untouched; when it moves away, that's where you've made a change. In the first row, all three line up.",

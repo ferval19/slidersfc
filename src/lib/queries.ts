@@ -409,6 +409,39 @@ export async function getFavoriteSetsByUser(userId: string): Promise<SetListItem
   );
 }
 
+
+/**
+ * Cuántos sliders distintos tiene cada juego, por slug del juego.
+ *
+ * Lo pide la guía, que hasta hoy los llevaba escritos a mano en la frase —y
+ * desde que hay dos idiomas, escritos a mano **dos veces**. Un slider nuevo en
+ * el catálogo dejaba la guía mintiendo en castellano y en inglés a la vez, sin
+ * que fallara ninguna prueba.
+ *
+ * Cuenta slugs distintos y no filas: cada slider aparece una vez por ámbito.
+ */
+export async function getSliderCounts(): Promise<Record<string, number>> {
+  return safeRead(
+    'getSliderCounts',
+    async (supabase) => {
+      const { data } = await supabase
+        .from('slider_definitions')
+        .select('slug, games!inner ( slug )');
+
+      const porJuego = new Map<string, Set<string>>();
+      for (const fila of (data ?? []) as unknown as { slug: string; games: { slug: string } }[]) {
+        const juego = fila.games?.slug;
+        if (!juego) continue;
+        if (!porJuego.has(juego)) porJuego.set(juego, new Set());
+        porJuego.get(juego)!.add(fila.slug);
+      }
+
+      return Object.fromEntries([...porJuego].map(([juego, slugs]) => [juego, slugs.size]));
+    },
+    {},
+  );
+}
+
 export function groupDefinitions(definitions: SliderDefinition[], locale: Locale) {
   const byCategory = new Map<string, Map<string, GroupedSlider>>();
 

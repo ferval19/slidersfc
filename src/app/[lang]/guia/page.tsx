@@ -18,6 +18,7 @@ import { alternates } from '@/lib/i18n/alternates';
 import { getDictionary } from '@/lib/i18n/dictionary';
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import { localized } from '@/lib/paths';
+import { getSliderCounts } from '@/lib/queries';
 import { CAMERAS, difficulties } from '@/lib/set-conditions';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -37,6 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function GuidePage() {
   const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
+  const sliderCounts = await getSliderCounts();
   const t = getDictionary(locale).guia;
   const tComun = getDictionary(locale).comun;
 
@@ -88,7 +90,7 @@ export default async function GuidePage() {
       </Block>
 
       <Block icon={ChalkBall} title={t.losValoresTitulo} eyebrow={t.elGruesoDelSet}>
-        <p className="text-sm text-chalk-dim">{t.losValoresIntro}</p>
+        <p className="text-sm text-chalk-dim">{t.losValoresIntro(sliderCounts.fc27 ?? 0, sliderCounts.fc26 ?? 0)}</p>
 
         <div className="panel mt-5 p-5">
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3">

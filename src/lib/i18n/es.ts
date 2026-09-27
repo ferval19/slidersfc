@@ -551,7 +551,8 @@ export const es = {
     losValoresTitulo: 'Los valores',
     elGruesoDelSet: 'El grueso del set',
     losValoresIntro:
-      'FC 27 trae 65 sliders y FC 26, 29. Salen en el orden exacto del menú del juego, para que puedas ir metiéndolos mientras los consultas.',
+      (fc27: number, fc26: number) =>
+        `FC 27 trae ${fc27} sliders y FC 26, ${fc26}. Salen en el orden exacto del menú del juego, para que puedas ir metiéndolos mientras los consultas.`,
     asiSeLee: 'Así se lee',
     notaMarcaGris:
       'La marca gris es lo que trae el juego de fábrica. Cuando tu muesca la tapa, ese slider está sin tocar; cuando se separa, ahí has metido mano. En la primera fila coinciden los tres.',
