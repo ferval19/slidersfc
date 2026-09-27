@@ -1,10 +1,10 @@
 import { ImageResponse } from 'next/og';
-import { lang } from 'next/root-params';
 
 import { CompareCard, type CompareCardData } from '@/components/compare-card';
 import { SHARE_CARD_SIZE } from '@/components/share-card';
 import { buildCompareView, topDifferences } from '@/lib/compare';
-import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
+import { getDictionary } from '@/lib/i18n/dictionary';
+import { DEFAULT_LOCALE, isLocale, type Locale } from '@/lib/i18n/locale';
 import { displayFont, monoFont } from '@/lib/og-fonts';
 import { createSupabaseAnonClient } from '@/lib/supabase/anon';
 
@@ -15,13 +15,19 @@ export const alt = 'Comparación de dos sets en SlidersFC';
 /** Una hora: los valores de un set cambian poco y esto lo piden los bots. */
 export const revalidate = 3600;
 
+/**
+ * El idioma sale de `params`, no de `next/root-params`. Una imagen de
+ * OpenGraph es un Route Handler, y ahí root-params todavía no funciona: Next
+ * lanza en ejecución, con el `build` en verde. Como `[lang]` es un segmento de
+ * la ruta, el idioma ya viene en los parámetros y no hace falta nada más.
+ */
 export default async function Image({
   params,
 }: {
-  params: Promise<{ ua: string; sa: string; ub: string; sb: string }>;
+  params: Promise<{ lang: string; ua: string; sa: string; ub: string; sb: string }>;
 }) {
-  const { ua, sa, ub, sb } = await params;
-  const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
+  const { lang: langParam, ua, sa, ub, sb } = await params;
+  const locale: Locale = isLocale(langParam) ? langParam : DEFAULT_LOCALE;
 
   const [display, mono, data] = await Promise.all([
     displayFont(),
@@ -78,10 +84,11 @@ async function loadCardData(
   sb: string,
   locale: Locale,
 ): Promise<CompareCardData> {
+  const t = getDictionary(locale).comparar;
   const fallback: CompareCardData = {
     gameName: 'SlidersFC',
-    differing: 0,
-    total: 0,
+    title: t.sonElMismoSet,
+    matchMessage: t.losDosSetsIdenticos(0),
     a: { title: 'Dos sets', author: '' },
     b: { title: '—', author: '' },
     rows: [],
@@ -131,8 +138,8 @@ async function loadCardData(
 
     return {
       gameName: a.games.name,
-      differing: view.differing,
-      total: view.total,
+      title: view.differing === 0 ? t.sonElMismoSet : t.seSeparanEn(view.differing, view.total),
+      matchMessage: t.losDosSetsIdenticos(view.total),
       a: { title: a.title, author: a.profiles.display_name ?? a.profiles.username },
       b: { title: b.title, author: b.profiles.display_name ?? b.profiles.username },
       rows: topDifferences(view, 5),

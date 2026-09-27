@@ -42,7 +42,7 @@ export function CategorySheet({
   marks,
   onSelect,
 }: Props) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   // Con la hoja abierta, el fondo no se mueve.
   useEffect(() => {
@@ -119,7 +119,7 @@ export function CategorySheet({
                       className={`size-6 shrink-0 ${isActive ? 'text-ink-user' : 'text-chalk-dim'}`}
                     />
                   ) : null}
-                  <span className="display flex-1 text-xl">{categoryLabel(category)}</span>
+                  <span className="display flex-1 text-xl">{categoryLabel(category, locale)}</span>
                   {marks && marks[category] > 0 ? (
                     <span className="value-pill text-xs text-ink-user">
                       {t.set.marcasTocadas(marks[category])}

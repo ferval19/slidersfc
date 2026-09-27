@@ -23,6 +23,7 @@ import {
 import { buildSetView } from '@/lib/set-view';
 import { conditionsSummary } from '@/lib/set-conditions';
 import { getDictionary } from '@/lib/i18n/dictionary';
+import { alternates } from '@/lib/i18n/alternates';
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import { jsonLd } from '@/lib/json-ld';
 import { comparePickerPath, consolePath, localized, profilePath, setPath } from '@/lib/paths';
@@ -45,13 +46,14 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const description =
     detail.set.description?.replace(/\s+/g, ' ').slice(0, 180) ??
     `Set de sliders de ${detail.game.name}, por ${author}.`;
-  const path = localized(locale ?? DEFAULT_LOCALE, setPath(detail.owner.username, detail.set.slug));
+  const resolvedLocale = (locale ?? DEFAULT_LOCALE) as Locale;
+  const path = localized(resolvedLocale, setPath(detail.owner.username, detail.set.slug));
 
   // La imagen la genera opengraph-image.tsx; Next la enlaza sola.
   return {
     title,
     description,
-    alternates: { canonical: path },
+    alternates: alternates(resolvedLocale, setPath(detail.owner.username, detail.set.slug)),
     openGraph: {
       title,
       description,

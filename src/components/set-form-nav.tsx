@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { useActiveCategory } from '@/components/active-category';
 import { CategorySheet } from '@/components/category-sheet';
+import { useI18n } from '@/components/i18n-provider';
 import { categoryLabel, categoryShortLabel } from '@/lib/constants';
 
 type Props = {
@@ -41,6 +42,7 @@ type Props = {
  * no porque nadie la esté escondiendo.
  */
 export function SetFormNav({ categories, touched, onGo }: Props) {
+  const { locale } = useI18n();
   const [sheetOpen, setSheetOpen] = useState(false);
   const observed = useActiveCategory(categories.map((entry) => entry.category));
 
@@ -77,7 +79,7 @@ export function SetFormNav({ categories, touched, onGo }: Props) {
   };
 
   const active = picked ?? observed;
-  const activeLabel = active ? categoryLabel(active) : 'Valores';
+  const activeLabel = active ? categoryLabel(active, locale) : 'Valores';
   const totalTouched = Object.values(touched).reduce((sum, n) => sum + n, 0);
 
   return (
@@ -125,7 +127,7 @@ export function SetFormNav({ categories, touched, onGo }: Props) {
                 aria-current={active === category ? 'true' : undefined}
                 className={`chip chip-tight shrink-0 ${active === category ? 'chip-active' : ''}`}
               >
-                {categoryShortLabel(category)}
+                {categoryShortLabel(category, locale)}
                 {/* El punto dice que ahí has cambiado algo. Es lo único que
                     esta barra tiene y la de la ficha no puede tener. */}
                 {marks > 0 ? (

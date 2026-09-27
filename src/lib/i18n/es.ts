@@ -29,6 +29,7 @@ export const es = {
     haceDias: (n: number) => `hace ${n} ${n === 1 ? 'día' : 'días'}`,
     entra: 'Entra',
     enviando: 'Enviando…',
+    publicarUnSet: 'Publicar un set',
   },
   set: {
     noEncontrado: 'Set no encontrado',
@@ -84,5 +85,92 @@ export const es = {
     consola: 'Consola',
     irA: 'Ir a',
     marcasTocadas: (n: number) => `${n} tocado${n === 1 ? '' : 's'}`,
+  },
+  portada: {
+    setsRecientes: 'Sets recientes',
+    pizarraTitulo: 'La pizarra está en blanco',
+    pizarraBody:
+      'Todavía no hay ningún set publicado. Si tienes unos valores que te funcionan, súbelos: es exactamente para lo que existe esto.',
+    publicarElPrimero: 'Publicar el primero',
+    asiSeLeeUnSet: 'Así se lee un set',
+    muescasComparten:
+      'Las muescas comparten carril para leer la forma del set de un vistazo, sin comparar cincuenta números a mano. En un set publicado, cada número abre su propio hilo de comentarios.',
+    laGuiaEyebrow: 'La guía',
+    todoLoQueSePuedeContar:
+      'Todo lo que se puede contar de un set aquí, campo por campo, y por qué cada cosa importa. Casi nada es obligatorio, pero cuanto más pongas, más le sirve a quien se lo lleve.',
+    temas: [
+      'Dificultad, tiempos y cámara',
+      'Los valores y sus lados',
+      'Comportamiento de la CPU',
+      'Comentarios valor a valor',
+    ],
+    leerLaGuia: 'Leer la guía',
+    publicarMiSet: 'Publicar mi set',
+    verLosSets: (n: number) => `Ver los ${n} sets`,
+  },
+  setCard: {
+    borrador: 'Borrador',
+    anonimo: 'Anónimo',
+  },
+  filtro: {
+    juego: 'Juego',
+    todos: 'Todos',
+  },
+  juegos: {
+    tituloLinea1: 'Sliders de',
+    juegoNoEncontrado: 'Juego no encontrado',
+    descripcion: (gameName: string) => `Sets de sliders de ${gameName} publicados por la comunidad de SlidersFC.`,
+    setPublicado: (n: number): string => (n === 1 ? 'set publicado' : 'sets publicados'),
+    aunNoHaySets: (gameName: string) => `Aún no hay sets de ${gameName}`,
+    enCuantoAlguienPublique:
+      'En cuanto alguien publique el primero aparecerá aquí, con sus valores por categoría y los comentarios de la comunidad.',
+  },
+  comparar: {
+    eyebrow: 'Dos sets, uno al lado del otro',
+    intro:
+      'La pregunta que siempre se acaba haciendo no es qué valores tiene un set, sino en qué se diferencia del que ya usas. Aquí sale eso: dónde coinciden, dónde no y cuánto.',
+    sinConQueComparar: 'Todavía no hay con qué comparar',
+    hacenFaltaDos: 'Hacen falta al menos dos sets. Publica el tuyo y vuelve.',
+    elPrimero: 'El primero',
+    elSegundo: 'El segundo',
+    eligeUnSet: 'Elige un set…',
+    borradorTag: '(borrador)',
+    ningunOtroSetDe: (gameName: string) => `Todavía no hay otro set de ${gameName} con el que compararlo.`,
+    soloSetsDe: (gameName: string) => `Sólo sets de ${gameName}: los sliders de un juego no son los de otro.`,
+    noSePuedenComparar: 'No se pueden comparar',
+    dosJuegosDistintos: (titleA: string, gameA: string, titleB: string, gameB: string) =>
+      `«${titleA}» es de ${gameA} y «${titleB}» de ${gameB}. Cada juego trae su propia lista de sliders, así que enfrentarlos valor a valor no diría nada. Si lo que quieres es llevarte un set al juego nuevo, en su ficha tienes el botón para copiarlo.`,
+    elegirOtrosDos: 'Elegir otros dos',
+    controlesCpuFuera: (title: string, behaviourLower: string) =>
+      `Los controles de la CPU se quedan fuera de la comparación: «${title}» la lleva en ${behaviourLower}, y ahí esos valores no los usa el juego.`,
+    sonElMismoSet: 'Son el mismo set',
+    seSeparanEn: (differing: number, total: number) => `Se separan en ${differing} de ${total}`,
+    niUnSoloValorDistinto: 'Ni un solo valor distinto entre los dos.',
+    enLosOtrosCoinciden: (rest: number) =>
+      `En los otros ${rest} coinciden. La barra entre las dos muescas es la distancia, y la cifra de la derecha dice cuánto sube o baja el segundo: en verde si sube, en rojo si baja.`,
+    compararOtrosDos: 'Comparar otros dos',
+    ordenDelJuego: 'Orden del juego',
+    porDiferencia: 'Por diferencia',
+    soloLoQueCambia: 'Sólo lo que cambia',
+    deFabrica: 'De fábrica',
+    losDosSetsIdenticos: (total: number) => `Los dos sets son idénticos en los ${total} sliders.`,
+    compartirTitulo: (titleA: string, titleB: string) => `${titleA} contra ${titleB}`,
+    compartirMismoSet: (titleA: string, titleB: string) =>
+      `${titleA} y ${titleB} son el mismo set, valor a valor`,
+    compartirDiferencia: (titleA: string, titleB: string, differing: number, total: number, gameName: string) =>
+      `${titleA} contra ${titleB}: se separan en ${differing} de ${total} sliders de ${gameName}`,
+    comparacionNoEncontrada: 'Comparación no encontrada',
+    tituloVs: (titleA: string, titleB: string) => `${titleA} contra ${titleB}`,
+    descripcionDiferencias: (gameName: string) => `En qué se diferencian estos dos sets de ${gameName}, valor a valor.`,
+  },
+  consola: {
+    modoConsola: 'Modo consola',
+    volverAlSet: 'Volver al set',
+    reiniciar: 'Reiniciar',
+    ponloEn: 'Ponlo en',
+    comportamientoDeLaCpu: 'Comportamiento de la CPU',
+    susSlidersNoHacenFalta: 'Sus sliders no hacen falta: el juego los ajusta solo.',
+    metidos: (completed: number, total: number) => `${completed} de ${total} metidos`,
+    slidersYaMetidos: 'Sliders ya metidos',
   },
 };

@@ -3,19 +3,25 @@ import { notFound } from 'next/navigation';
 import { lang } from 'next/root-params';
 
 import { ConsoleMode } from '@/components/console-mode';
+import { getDictionary } from '@/lib/i18n/dictionary';
 import { getSetDetail } from '@/lib/queries';
 import { buildSetView } from '@/lib/set-view';
 import { conditionsSummary } from '@/lib/set-conditions';
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
-import { setPath } from '@/lib/paths';
+import { localized, setPath } from '@/lib/paths';
 
 type Params = Promise<{ username: string; slug: string }>;
 
-export const metadata: Metadata = {
-  title: 'Modo consola',
-  // Es una vista de uso, no de lectura: indexarla competiría con la del set.
-  robots: { index: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
+
+  return {
+    title: getDictionary(locale).consola.modoConsola,
+    // Es una vista de uso, no de lectura: indexarla competiría con la del set.
+    // Sin `alternates`: no se indexa, así que no necesita `hreflang`.
+    robots: { index: false },
+  };
+}
 
 export default async function ConsolePage({ params }: { params: Params }) {
   const { username, slug } = await params;
@@ -30,7 +36,7 @@ export default async function ConsolePage({ params }: { params: Params }) {
     <ConsoleMode
       setId={detail.set.id}
       title={detail.set.title}
-      setHref={setPath(detail.owner.username, detail.set.slug)}
+      setHref={localized(locale, setPath(detail.owner.username, detail.set.slug))}
       scopes={view.scopes}
       blocks={view.blocks}
       cpuBehaviour={view.cpuBehaviour}

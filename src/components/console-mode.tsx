@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { CATEGORY_DRAWINGS, ChalkBack, ChalkUndo } from '@/components/chalk';
-import { categoryLabel, CPU_BEHAVIOURS, SCOPE_INK, SCOPE_LABELS } from '@/lib/constants';
+import { useI18n } from '@/components/i18n-provider';
+import { categoryLabel, cpuBehaviours, SCOPE_INK, scopeLabel } from '@/lib/constants';
 import type { CategoryBlockView } from '@/lib/set-view';
 import type { CpuBehaviour, SliderScope } from '@/lib/database.types';
 
@@ -40,6 +41,7 @@ export function ConsoleMode({
   cpuBehaviour?: CpuBehaviour;
   hasCpuBehaviour?: boolean;
 }) {
+  const { t, locale } = useI18n();
   const storageKey = `slidersfc:consola:${setId}`;
 
   const [done, setDone] = useState<Set<string>>(new Set());
@@ -51,7 +53,7 @@ export function ConsoleMode({
    * el juego no va a usar. En su lugar queda un paso, el de poner el selector.
    */
   const automatic = hasCpuBehaviour && cpuBehaviour !== 'custom';
-  const behaviour = CPU_BEHAVIOURS.find((candidate) => candidate.value === cpuBehaviour);
+  const behaviour = cpuBehaviours(locale).find((candidate) => candidate.value === cpuBehaviour);
 
   const steps = useMemo(
     () => (automatic ? blocks.filter((block) => block.category !== 'cpu_controls') : blocks),
@@ -132,8 +134,8 @@ export function ConsoleMode({
         <Link
           href={setHref}
           className="btn btn-quiet shrink-0 px-3 py-2"
-          aria-label="Volver al set"
-          title="Volver al set"
+          aria-label={t.consola.volverAlSet}
+          title={t.consola.volverAlSet}
         >
           <ChalkBack className="size-4" />
         </Link>
@@ -154,7 +156,7 @@ export function ConsoleMode({
           <section key={block.category} className="mt-8">
             <header className="flex items-center gap-2.5 px-5 pb-2">
               {Drawing ? <Drawing className="size-6 text-chalk-dim" /> : null}
-              <h2 className="display text-2xl">{categoryLabel(block.category)}</h2>
+              <h2 className="display text-2xl">{categoryLabel(block.category, locale)}</h2>
             </header>
 
             <ul>
@@ -181,7 +183,7 @@ export function ConsoleMode({
                           {row.cells.map((cell) => (
                             <span key={cell.scope} className="flex flex-col">
                               <span className="eyebrow text-[0.625rem]">
-                                {SCOPE_LABELS[cell.scope]}
+                                {scopeLabel(cell.scope, locale)}
                               </span>
                               <span
                                 className={`value-pill ${rowValueSize} leading-none`}
@@ -228,7 +230,7 @@ export function ConsoleMode({
       {automatic && behaviour ? (
         <section className="mt-8">
           <header className="flex items-center gap-2.5 px-5 pb-2">
-            <h2 className="display text-2xl">{categoryLabel('cpu_controls')}</h2>
+            <h2 className="display text-2xl">{categoryLabel('cpu_controls', locale)}</h2>
           </header>
           <ul>
             <li>
@@ -242,16 +244,16 @@ export function ConsoleMode({
               >
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm leading-snug font-semibold">
-                    Comportamiento de la CPU
+                    {t.consola.comportamientoDeLaCpu}
                   </span>
                   <span className="mt-2 flex flex-col">
-                    <span className="eyebrow text-[0.625rem]">Ponlo en</span>
+                    <span className="eyebrow text-[0.625rem]">{t.consola.ponloEn}</span>
                     <span className={`value-pill ${valueSize} leading-none text-ink-user`}>
                       {behaviour.label}
                     </span>
                   </span>
                   <span className="mt-2 block text-xs text-chalk-dim">
-                    Sus sliders no hacen falta: el juego los ajusta solo.
+                    {t.consola.susSlidersNoHacenFalta}
                   </span>
                 </span>
               </button>
@@ -274,16 +276,14 @@ export function ConsoleMode({
               aria-valuenow={percent}
               aria-valuemin={0}
               aria-valuemax={100}
-              aria-label="Sliders ya metidos"
+              aria-label={t.consola.slidersYaMetidos}
             >
               <div
                 className="h-full rounded-full bg-ink-user transition-[width] duration-200"
                 style={{ width: `${percent}%` }}
               />
             </div>
-            <p className="eyebrow mt-1.5">
-              {completed} de {total} metidos
-            </p>
+            <p className="eyebrow mt-1.5">{t.consola.metidos(completed, total)}</p>
           </div>
 
           {completed > 0 ? (
@@ -293,7 +293,7 @@ export function ConsoleMode({
               className="btn btn-ghost shrink-0 px-3 py-2 text-[0.625rem]"
             >
               <ChalkUndo className="size-3.5" />
-              Reiniciar
+              {t.consola.reiniciar}
             </button>
           ) : null}
         </div>

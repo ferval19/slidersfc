@@ -1,14 +1,22 @@
 import type { Metadata } from 'next';
+import { lang } from 'next/root-params';
 
 import { LoginForm } from '@/components/login-form';
+import { alternates } from '@/lib/i18n/alternates';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import { safeNextPath } from '@/lib/site-url';
 import { getCurrentUser } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 
-export const metadata: Metadata = {
-  title: 'Entrar',
-  description: 'Entra en SlidersFC con tu cuenta de X o con tu email.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
+
+  return {
+    title: 'Entrar',
+    description: 'Entra en SlidersFC con tu cuenta de X o con tu email.',
+    alternates: alternates(locale, '/login'),
+  };
+}
 
 export default async function LoginPage({
   searchParams,

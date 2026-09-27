@@ -3,8 +3,9 @@
 import { useMemo, useState } from 'react';
 
 import { CATEGORY_DRAWINGS } from '@/components/chalk';
+import { useI18n } from '@/components/i18n-provider';
 import { COMPARE_INK, DuoTrack } from '@/components/slider-scale';
-import { categoryLabel, SCOPE_LABELS } from '@/lib/constants';
+import { categoryLabel, scopeLabel } from '@/lib/constants';
 import type { CompareRow, CompareView } from '@/lib/compare';
 
 type Props = {
@@ -25,6 +26,7 @@ type Order = 'menu' | 'diff';
  * con unos sliders es sentarse a metérselos.
  */
 export function CompareTable({ view, aTitle, bTitle }: Props) {
+  const { t, locale } = useI18n();
   const [order, setOrder] = useState<Order>('menu');
   const [onlyDiff, setOnlyDiff] = useState(false);
 
@@ -47,7 +49,7 @@ export function CompareTable({ view, aTitle, bTitle }: Props) {
           {view.hasReference ? (
             <li className="flex items-center gap-2">
               <span className="h-4 w-[2px] rounded-full bg-chalk opacity-45" />
-              <span className="eyebrow">De fábrica</span>
+              <span className="eyebrow">{t.comparar.deFabrica}</span>
             </li>
           ) : null}
         </ul>
@@ -58,14 +60,14 @@ export function CompareTable({ view, aTitle, bTitle }: Props) {
             onClick={() => setOrder('menu')}
             className={`chip ${order === 'menu' ? 'chip-active' : ''}`}
           >
-            Orden del juego
+            {t.comparar.ordenDelJuego}
           </button>
           <button
             type="button"
             onClick={() => setOrder('diff')}
             className={`chip ${order === 'diff' ? 'chip-active' : ''}`}
           >
-            Por diferencia
+            {t.comparar.porDiferencia}
           </button>
           <button
             type="button"
@@ -73,15 +75,13 @@ export function CompareTable({ view, aTitle, bTitle }: Props) {
             className={`chip ${onlyDiff ? 'chip-active' : ''}`}
             aria-pressed={onlyDiff}
           >
-            Sólo lo que cambia
+            {t.comparar.soloLoQueCambia}
           </button>
         </div>
       </div>
 
       {view.differing === 0 ? (
-        <p className="panel p-5 text-sm text-chalk-dim">
-          Los dos sets son idénticos en los {view.total} sliders.
-        </p>
+        <p className="panel p-5 text-sm text-chalk-dim">{t.comparar.losDosSetsIdenticos(view.total)}</p>
       ) : null}
 
       {order === 'diff' ? (
@@ -101,7 +101,7 @@ export function CompareTable({ view, aTitle, bTitle }: Props) {
             <div key={block.category}>
               <header className="flex items-center gap-3 border-b border-chalk-line pb-3">
                 {Drawing ? <Drawing className="size-7 text-chalk-dim" /> : null}
-                <h3 className="display text-2xl">{categoryLabel(block.category)}</h3>
+                <h3 className="display text-2xl">{categoryLabel(block.category, locale)}</h3>
               </header>
               <ul>
                 {rows.map((row) => (
@@ -136,6 +136,7 @@ function Row({
   view: CompareView;
   withCategory?: boolean;
 }) {
+  const { locale } = useI18n();
   const cells = row.cells.filter((cell) => cell.a !== null || cell.b !== null);
 
   return (
@@ -143,7 +144,7 @@ function Row({
       <div className="min-w-0">
         <span className="text-sm leading-tight font-semibold">{row.name}</span>
         {withCategory ? (
-          <span className="eyebrow mt-0.5 block">{categoryLabel(row.category)}</span>
+          <span className="eyebrow mt-0.5 block">{categoryLabel(row.category, locale)}</span>
         ) : null}
       </div>
 
@@ -153,7 +154,7 @@ function Row({
             key={cell.scope}
             className="grid items-center gap-x-3 sm:grid-cols-[5.5rem_1fr_auto]"
           >
-            <span className="eyebrow">{SCOPE_LABELS[cell.scope]}</span>
+            <span className="eyebrow">{scopeLabel(cell.scope, locale)}</span>
 
             <DuoTrack
               min={view.min}

@@ -1,7 +1,7 @@
 import { lang } from 'next/root-params';
 
 import { ChalkClipboard } from '@/components/chalk';
-import { SCOPE_LABELS } from '@/lib/constants';
+import { scopeLabel } from '@/lib/constants';
 import { getDictionary } from '@/lib/i18n/dictionary';
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import type { VersionEntry } from '@/lib/queries';
@@ -62,7 +62,7 @@ export async function SetHistory({ entries }: { entries: VersionEntry[] }) {
                     >
                       <span className="col-span-2 leading-tight sm:col-span-1">
                         {change.name}
-                        <span className="eyebrow ml-2">{SCOPE_LABELS[change.scope]}</span>
+                        <span className="eyebrow ml-2">{scopeLabel(change.scope, locale)}</span>
                       </span>
 
                       <span className="value-pill text-chalk-dim">

@@ -2,6 +2,8 @@ import { ImageResponse } from 'next/og';
 
 import { ShareCard, SHARE_CARD_SIZE, type ShareCardData } from '@/components/share-card';
 import { SCOPE_ORDER } from '@/lib/constants';
+import { getDictionary } from '@/lib/i18n/dictionary';
+import { DEFAULT_LOCALE, isLocale, type Locale } from '@/lib/i18n/locale';
 import { displayFont, monoFont } from '@/lib/og-fonts';
 import { createSupabaseAnonClient } from '@/lib/supabase/anon';
 import type { SliderScope } from '@/lib/database.types';
@@ -16,17 +18,24 @@ export const revalidate = 3600;
 /** Sliders que mejor resumen un set de un vistazo. */
 const HIGHLIGHTS = ['sprint_speed', 'acceleration', 'shot_error', 'pass_error', 'line_width'];
 
+/**
+ * El idioma sale de `params`, no de `next/root-params`. Una imagen de
+ * OpenGraph es un Route Handler, y ahí root-params todavía no funciona: Next
+ * lanza en ejecución, con el `build` en verde. Como `[lang]` es un segmento de
+ * la ruta, el idioma ya viene en los parámetros y no hace falta nada más.
+ */
 export default async function Image({
   params,
 }: {
-  params: Promise<{ username: string; slug: string }>;
+  params: Promise<{ lang: string; username: string; slug: string }>;
 }) {
-  const { username, slug } = await params;
+  const { lang: localeParam, username, slug } = await params;
+  const locale: Locale = isLocale(localeParam) ? localeParam : DEFAULT_LOCALE;
 
   const [display, mono, data] = await Promise.all([
     displayFont(),
     monoFont(),
-    loadCardData(username, slug),
+    loadCardData(username, slug, locale),
   ]);
 
   return new ImageResponse(<ShareCard data={data} />, {
@@ -42,14 +51,15 @@ export default async function Image({
  * Sin cookies a propósito: la tarjeta la piden los bots de las redes, no una
  * sesión, y así la imagen se puede cachear.
  */
-async function loadCardData(username: string, slug: string): Promise<ShareCardData> {
+async function loadCardData(username: string, slug: string, locale: Locale): Promise<ShareCardData> {
+  const t = getDictionary(locale);
   const fallback: ShareCardData = {
     title: 'Sliders de EA Sports FC',
     gameName: 'SlidersFC',
     authorName: 'La comunidad',
     authorHandle: '',
-    sliderCount: 0,
-    commentCount: 0,
+    slidersLabel: '0 sliders',
+    commentsLabel: null,
     rows: [],
   };
 
@@ -114,13 +124,16 @@ async function loadCardData(username: string, slug: string): Promise<ShareCardDa
       };
     }).filter((item): item is NonNullable<typeof item> => item !== null);
 
+    const sliderCount = new Set(all.map((item) => item.slider_definitions.slug)).size;
+    const commentCount = comments.count ?? 0;
+
     return {
       title: row.title,
       gameName: row.games.name,
       authorName: row.profiles.display_name ?? row.profiles.username,
       authorHandle: row.profiles.twitter_handle ?? '',
-      sliderCount: new Set(all.map((item) => item.slider_definitions.slug)).size,
-      commentCount: comments.count ?? 0,
+      slidersLabel: `${sliderCount} sliders`,
+      commentsLabel: commentCount > 0 ? `${commentCount} ${t.set.comentarios(commentCount)}` : null,
       rows,
     };
   } catch (error) {

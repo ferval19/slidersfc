@@ -12,7 +12,6 @@ import { SiteHeader } from '@/components/site-header';
 import { SITE_NAME, SITE_TAGLINE } from '@/lib/constants';
 import { lang } from 'next/root-params';
 
-import { getDictionary } from '@/lib/i18n/dictionary';
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import { jsonLd } from '@/lib/json-ld';
 import { publicSiteUrl } from '@/lib/site-url';
@@ -104,7 +103,6 @@ function websiteJsonLd(locale: Locale) {
  */
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
-  const dictionary = getDictionary(locale);
 
   return (
     <html

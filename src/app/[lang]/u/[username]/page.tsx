@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
+import { lang } from 'next/root-params';
 
 import { Avatar } from '@/components/avatar';
 import { ChalkPiece } from '@/components/chalk';
@@ -13,8 +14,11 @@ import {
   getSetsByOwner,
   getUsernameAfterRename,
 } from '@/lib/queries';
+import { getDictionary } from '@/lib/i18n/dictionary';
+import { alternates } from '@/lib/i18n/alternates';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import { jsonLd } from '@/lib/json-ld';
-import { editProfilePath, profilePath } from '@/lib/paths';
+import { editProfilePath, localized, profilePath } from '@/lib/paths';
 import { publicSiteUrl } from '@/lib/site-url';
 import { getCurrentUser } from '@/lib/supabase/server';
 
@@ -23,7 +27,8 @@ export async function generateMetadata({
 }: {
   params: Promise<{ username: string }>;
 }): Promise<Metadata> {
-  const { username } = await params;
+  const [{ username }, localeParam] = await Promise.all([params, lang()]);
+  const locale = (localeParam ?? DEFAULT_LOCALE) as Locale;
   const profile = await getProfileByUsername(username);
 
   if (!profile) return { title: 'Perfil no encontrado' };
@@ -33,7 +38,7 @@ export async function generateMetadata({
   return {
     title: `${name} (@${profile.username})`,
     description: profile.bio ?? `Sets de sliders publicados por ${name} en SlidersFC.`,
-    alternates: { canonical: profilePath(profile.username) },
+    alternates: alternates(locale, profilePath(profile.username)),
     openGraph: {
       title: `${name} en SlidersFC`,
       description: profile.bio ?? `Sets de sliders publicados por ${name}.`,
@@ -47,7 +52,9 @@ export default async function ProfilePage({
 }: {
   params: Promise<{ username: string }>;
 }) {
-  const { username } = await params;
+  const [{ username }, localeParam] = await Promise.all([params, lang()]);
+  const locale = (localeParam ?? DEFAULT_LOCALE) as Locale;
+  const t = getDictionary(locale);
 
   const profile = await getProfileByUsername(username);
 
@@ -55,7 +62,7 @@ export default async function ProfilePage({
     // Puede ser el nombre de antes de alguien: los enlaces que ya circulan no
     // tienen por qué morir porque se haya cambiado el nombre.
     const current = await getUsernameAfterRename(username);
-    if (current) permanentRedirect(profilePath(current));
+    if (current) permanentRedirect(localized(locale, profilePath(current)));
     notFound();
   }
 
@@ -75,12 +82,12 @@ export default async function ProfilePage({
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Inicio', item: `${siteUrl}/` },
+      { '@type': 'ListItem', position: 1, name: t.comun.inicio, item: `${siteUrl}${localized(locale, '/')}` },
       {
         '@type': 'ListItem',
         position: 2,
         name,
-        item: `${siteUrl}${profilePath(profile.username)}`,
+        item: `${siteUrl}${localized(locale, profilePath(profile.username))}`,
       },
     ],
   };
@@ -129,7 +136,7 @@ export default async function ProfilePage({
 
         {isMe ? (
           <div className="flex flex-wrap items-center gap-2">
-            <Link href={editProfilePath()} className="btn btn-quiet">
+            <Link href={localized(locale, editProfilePath())} className="btn btn-quiet">
               <ChalkPiece className="size-4" />
               Editar perfil
             </Link>
@@ -152,12 +159,12 @@ export default async function ProfilePage({
                   ? 'Crea tu primer set con los valores que usas de verdad. Es lo que hace que alguien vuelva a tu perfil.'
                   : 'Cuando publique un set aparecerá aquí.'
               }
-              action={isMe ? { href: '/sets/nuevo', label: 'Crear mi primer set' } : undefined}
+              action={isMe ? { href: localized(locale, '/sets/nuevo'), label: 'Crear mi primer set' } : undefined}
             />
           ) : (
             <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {published.map((set) => (
-                <SetCard key={set.id} set={set} />
+                <SetCard key={set.id} set={set} locale={locale} />
               ))}
             </ul>
           )}
@@ -173,7 +180,7 @@ export default async function ProfilePage({
             </h2>
             <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {drafts.map((set) => (
-                <SetCard key={set.id} set={set} />
+                <SetCard key={set.id} set={set} locale={locale} />
               ))}
             </ul>
           </section>
@@ -195,12 +202,12 @@ export default async function ProfilePage({
                 <EmptyState
                   title="Aún no has guardado nada"
                   body="Cuando veas un set que te sirva de verdad, guárdalo desde su ficha. Aquí es donde vuelves a encontrarlo."
-                  action={{ href: '/', label: 'Ver la portada' }}
+                  action={{ href: localized(locale, '/'), label: 'Ver la portada' }}
                 />
               ) : (
                 <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                   {favorites.map((set) => (
-                    <SetCard key={set.id} set={set} />
+                    <SetCard key={set.id} set={set} locale={locale} />
                   ))}
                 </ul>
               )}

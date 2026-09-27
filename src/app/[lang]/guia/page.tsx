@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { lang } from 'next/root-params';
 import type { ComponentType, ReactNode } from 'react';
 
 import {
@@ -12,19 +13,26 @@ import {
   ChalkStopwatch,
 } from '@/components/chalk';
 import { ScaleLegend, ScaleTrack } from '@/components/slider-scale';
-import { CPU_BEHAVIOURS, SCOPE_LABELS } from '@/lib/constants';
+import { cpuBehaviours, scopeLabels } from '@/lib/constants';
+import { alternates } from '@/lib/i18n/alternates';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
+import { localized } from '@/lib/paths';
 import { CAMERAS, DIFFICULTIES } from '@/lib/set-conditions';
 
-export const metadata: Metadata = {
-  title: 'Qué lleva un set',
-  description:
-    'Todo lo que se puede contar de un set de sliders en SlidersFC, campo por campo, y por qué cada cosa importa.',
-  alternates: { canonical: '/guia' },
-  openGraph: {
-    title: 'Qué lleva un set — SlidersFC',
-    description: 'Campo por campo, qué se puede contar de un set de sliders y por qué importa.',
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
+
+  return {
+    title: 'Qué lleva un set',
+    description:
+      'Todo lo que se puede contar de un set de sliders en SlidersFC, campo por campo, y por qué cada cosa importa.',
+    alternates: alternates(locale, '/guia'),
+    openGraph: {
+      title: 'Qué lleva un set — SlidersFC',
+      description: 'Campo por campo, qué se puede contar de un set de sliders y por qué importa.',
+    },
+  };
+}
 
 /** Una fila de la muestra de la escala. Valores reales, no de relleno. */
 const SAMPLE = [
@@ -33,7 +41,9 @@ const SAMPLE = [
   { name: 'Altura de la línea', user: 58, cpu: 58, reference: 65 },
 ];
 
-export default function GuidePage() {
+export default async function GuidePage() {
+  const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
+
   return (
     <div className="mx-auto max-w-3xl px-5 py-12">
       <header className="pb-10">
@@ -102,7 +112,7 @@ export default function GuidePage() {
         <div className="panel mt-5 p-5">
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3">
             <span className="eyebrow">Así se lee</span>
-            <ScaleLegend scopes={['user', 'cpu']} labels={SCOPE_LABELS} withReference />
+            <ScaleLegend scopes={['user', 'cpu']} labels={scopeLabels(locale)} withReference />
           </div>
           <ul className="mt-4">
             {SAMPLE.map((row) => (
@@ -162,7 +172,7 @@ export default function GuidePage() {
           algo los sliders de esa pestaña.
         </p>
         <ul className="mt-4 flex flex-col gap-3">
-          {CPU_BEHAVIOURS.map((behaviour) => (
+          {cpuBehaviours(locale).map((behaviour) => (
             <li key={behaviour.value} className="flex flex-col gap-0.5">
               <span className="text-sm font-semibold">{behaviour.label}</span>
               <span className="text-sm text-chalk-dim">{behaviour.hint}</span>
@@ -211,10 +221,10 @@ export default function GuidePage() {
       <div className="chalk-rule mt-4" />
 
       <div className="flex flex-wrap items-center gap-3 pt-8">
-        <Link href="/sets/nuevo" className="btn btn-primary">
+        <Link href={localized(locale, '/sets/nuevo')} className="btn btn-primary">
           Publicar un set
         </Link>
-        <Link href="/" className="btn btn-ghost">
+        <Link href={localized(locale, '/')} className="btn btn-ghost">
           Ver los que hay
         </Link>
       </div>

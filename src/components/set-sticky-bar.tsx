@@ -29,7 +29,7 @@ export function SetStickyBar({ title, conditions, categories, consoleHref }: Pro
   const sentinel = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const active = useActiveCategory(categories);
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   /**
    * Aparecer o no, según si el testigo del final de la cabecera ha subido.
@@ -94,7 +94,7 @@ export function SetStickyBar({ title, conditions, categories, consoleHref }: Pro
                 href={`#${categoryAnchor(category)}`}
                 className={`chip chip-tight shrink-0 ${active === category ? 'chip-active' : ''}`}
               >
-                {categoryShortLabel(category)}
+                {categoryShortLabel(category, locale)}
               </a>
             ))}
           </nav>
