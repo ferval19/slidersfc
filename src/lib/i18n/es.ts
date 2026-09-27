@@ -504,6 +504,7 @@ export const es = {
     iniciarSesion: 'Tienes que iniciar sesión para guardar sets.',
   },
   guia: {
+    eyebrow: 'La guía',
     metaTitle: 'Qué lleva un set',
     metaDescription:
       'Todo lo que se puede contar de un set de sliders en SlidersFC, campo por campo, y por qué cada cosa importa.',
@@ -563,6 +564,7 @@ export const es = {
     pegarNombre: 'Pegar un set escrito',
     pegarBody:
       'En vez de teclear 129 valores, se puede pegar el texto tal como lo tengas: una tabla de Notion, un mensaje, una lista con viñetas. Antes de aplicar nada se ve qué ha entendido y qué líneas no ha reconocido.',
+    comportamientoCpuTitulo: 'Comportamiento de la CPU',
     soloFc27: 'Sólo FC 27',
     comportamientoCpuIntro:
       'FC 27 deja elegir cómo se comporta la CPU, y sólo en uno de los tres modos sirven de algo los sliders de esa pestaña.',
@@ -587,6 +589,9 @@ export const es = {
     imagenNombre: 'La imagen para compartir',
     imagenBody:
       'Al pegar el enlace en WhatsApp o en X sale una tarjeta con los valores dibujados, no un recuadro vacío. Se genera sola con el contenido del set.',
+    modoConsolaNombre: 'El modo consola',
+    modoConsolaBody:
+      'Una vista aparte, en letra grande y en el orden del menú, para tener el móvil en la mano mientras metes los valores. Marca lo que ya has hecho y no deja que se apague la pantalla.',
     verLosQueHay: 'Ver los que hay',
     sampleVelocidad: 'Velocidad',
     sampleErrorTiros: 'Error en tiros de calidad',

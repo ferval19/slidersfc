@@ -199,7 +199,7 @@ de X no aterriza en la portada, aterriza en el set que le han pasado.
 El catálogo no se puede dejar para después: una ficha con la interfaz en inglés
 y los sliders en castellano no sirve de nada.
 
-### Fase 2 — Lo que se escribe · pendiente
+### Fase 2 — Lo que se escribe · **HECHA el 27/09**
 
 Del camino de escribir ya está hecho **el acceso entero** —entrar, registrarse,
 recuperar la contraseña y sus ~41 errores— porque es el que va de leer a

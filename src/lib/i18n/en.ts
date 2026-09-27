@@ -497,6 +497,7 @@ const en: Dictionary = {
     iniciarSesion: 'You need to sign in to save sets.',
   },
   guia: {
+    eyebrow: 'The guide',
     metaTitle: 'What goes into a set',
     metaDescription:
       'Everything you can say about a slider set on SlidersFC, field by field, and why each one matters.',
@@ -555,6 +556,7 @@ const en: Dictionary = {
     pegarNombre: 'Paste a written set',
     pegarBody:
       "Instead of typing 129 values by hand, you can paste the text as you have it: a Notion table, a message, a bulleted list. Before anything is applied, you see what it understood and which lines it didn't recognize.",
+    comportamientoCpuTitulo: 'CPU behaviour',
     soloFc27: 'FC 27 only',
     comportamientoCpuIntro:
       "FC 27 lets you choose how the CPU behaves, and only in one of the three modes do the sliders on that tab do anything.",
@@ -579,6 +581,9 @@ const en: Dictionary = {
     imagenNombre: 'The share image',
     imagenBody:
       "Paste the link into WhatsApp or X and a card with the values drawn out shows up, not an empty box. It's generated on its own from the set's content.",
+    modoConsolaNombre: 'Console mode',
+    modoConsolaBody:
+      "A separate view, big type, values in the same order as the game's menu — built to hold in one hand while you enter them. It marks off what you've already done and keeps the screen from sleeping.",
     verLosQueHay: "See what's there",
     sampleVelocidad: 'Speed',
     sampleErrorTiros: 'Finesse Shot Error',

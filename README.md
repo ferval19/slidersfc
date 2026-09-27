@@ -1020,6 +1020,31 @@ sé el primero en decir por qué».
 Ninguno de los tres es una función nueva. Los tres son hacer visible la que ya
 había, que es la razón de ser de esta web.
 
+### 27/09 · La traducción, entera
+
+Fernando vio que `/en/sets/nuevo` seguía en castellano. Se cerró lo que
+quedaba: el formulario de sets, el perfil, los mensajes de error de todas las
+acciones de servidor y la guía, que eran 1.500 palabras de texto con voz y no
+cadenas sueltas.
+
+Lo que de verdad estaba roto no eran los textos. Las **redirecciones no
+llevaban el idioma**: alguien navegando en inglés creaba un set y aterrizaba en
+la versión en castellano. Y al formulario de comentarios le faltaba el campo
+oculto, así que el idioma nunca llegaba a la acción y los errores salían
+siempre en castellano, contestara quien contestara.
+
+**Dos módulos puros dejaron de serlo y hubo que devolverlos.** `profile.ts` y
+`set-conditions.ts` habían empezado a importar el diccionario como valor, y eso
+los rompe: no pueden importar nada que no sea un tipo, porque es justo lo que
+deja que `node` les quite los tipos y las pruebas los ejecuten sin levantar
+Next. Se arreglaron distinto a propósito: `profile.ts` recibe los mensajes por
+parámetro, porque son interfaz; `set-conditions.ts` se los queda, porque las
+dificultades y las cámaras son datos del juego, como los nombres de los
+sliders, y ya vivían ahí.
+
+Queda en castellano exactamente lo que tiene que quedar: los títulos, las
+descripciones y los comentarios que escribe la gente.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

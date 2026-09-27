@@ -15,103 +15,84 @@ import {
 import { ScaleLegend, ScaleTrack } from '@/components/slider-scale';
 import { cpuBehaviours, scopeLabels } from '@/lib/constants';
 import { alternates } from '@/lib/i18n/alternates';
+import { getDictionary } from '@/lib/i18n/dictionary';
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import { localized } from '@/lib/paths';
 import { CAMERAS, difficulties } from '@/lib/set-conditions';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
+  const t = getDictionary(locale).guia;
 
   return {
-    title: 'Qué lleva un set',
-    description:
-      'Todo lo que se puede contar de un set de sliders en SlidersFC, campo por campo, y por qué cada cosa importa.',
+    title: t.metaTitle,
+    description: t.metaDescription,
     alternates: alternates(locale, '/guia'),
     openGraph: {
-      title: 'Qué lleva un set — SlidersFC',
-      description: 'Campo por campo, qué se puede contar de un set de sliders y por qué importa.',
+      title: t.ogTitle,
+      description: t.ogDescription,
     },
   };
 }
 
-/** Una fila de la muestra de la escala. Valores reales, no de relleno. */
-const SAMPLE = [
-  { name: 'Velocidad', user: 35, cpu: 35, reference: 35 },
-  { name: 'Error en tiros de calidad', user: 62, cpu: 65, reference: 55 },
-  { name: 'Altura de la línea', user: 58, cpu: 58, reference: 65 },
-];
-
 export default async function GuidePage() {
   const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
+  const t = getDictionary(locale).guia;
+  const tComun = getDictionary(locale).comun;
+
+  /** Una fila de la muestra de la escala. Valores reales, no de relleno. */
+  const SAMPLE = [
+    { name: t.sampleVelocidad, user: 35, cpu: 35, reference: 35 },
+    { name: t.sampleErrorTiros, user: 62, cpu: 65, reference: 55 },
+    { name: t.sampleAlturaLinea, user: 58, cpu: 58, reference: 65 },
+  ];
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-12">
       <header className="pb-10">
-        <p className="eyebrow">La guía</p>
-        <h1 className="display mt-3 text-[clamp(2.75rem,8vw,4.5rem)]">Qué lleva un set</h1>
-        <p className="mt-5 max-w-prose text-base text-chalk-dim">
-          Un set de sliders son unos números, y unos números solos no le sirven a nadie. Esto es
-          todo lo que se puede contar de un set aquí, campo por campo, y por qué cada cosa
-          importa. Casi nada es obligatorio: cuanto más pongas, más útil le resulta a quien se
-          lo lleve.
-        </p>
+        <p className="eyebrow">{t.eyebrow}</p>
+        <h1 className="display mt-3 text-[clamp(2.75rem,8vw,4.5rem)]">{t.titulo}</h1>
+        <p className="mt-5 max-w-prose text-base text-chalk-dim">{t.intro}</p>
       </header>
 
       <div className="chalk-rule" />
 
-      <Block icon={ChalkClipboard} title="Lo básico" eyebrow="Obligatorio">
-        <Field name="Título">
-          Lo que se ve en la lista y lo que se comparte. Es lo único que se pide de verdad, junto
-          con el juego. Un buen título ya dice a quién va dirigido:{' '}
-          <em>«Full manual · Leyenda · 8 min»</em> se entiende sin abrirlo.
+      <Block icon={ChalkClipboard} title={t.loBasicoTitulo} eyebrow={t.obligatorio}>
+        <Field name={t.tituloNombre}>
+          {t.tituloBodyInicio}
+          <em>{t.tituloEjemplo}</em>
+          {t.tituloBodyFin}
         </Field>
-        <Field name="Juego">
-          FC 27 o FC 26. No se puede cambiar después de crear el set, porque los valores cuelgan
-          de la lista de sliders de ese juego y no son la misma lista. Si quieres llevarte un set
-          al juego nuevo, en su ficha hay un botón que lo copia y empareja lo que encaja.
+        <Field name={t.juegoNombre}>{t.juegoBody}</Field>
+        <Field name={t.descripcionNombre}>{t.descripcionBody}</Field>
+        <Field name={t.borradorPublicadoNombre}>{t.borradorPublicadoBody}</Field>
+      </Block>
+
+      <Block icon={ChalkShield} title={t.comoLoJuegasTitulo} eyebrow={t.opcionalPeroFalta}>
+        <p className="text-sm text-chalk-dim">{t.comoLoJuegasIntro}</p>
+
+        <Field name={t.dificultadNombre} icon={ChalkShield}>
+          {t.dificultadBodyInicio}
+          {difficulties(locale).map((d) => d.label).join(', ')}
+          {t.dificultadBodyFin}
         </Field>
-        <Field name="Descripción">
-          Para qué sirve el set y cómo se comporta el partido con él. También los controles que
-          usas: manual o asistido cambia el resultado tanto como cualquier slider.
+        <Field name={t.duracionNombre} icon={ChalkStopwatch}>
+          {t.duracionBodyInicio}
+          <code>{t.duracionCodigo}</code>
+          {t.duracionBodyFin}
         </Field>
-        <Field name="Borrador o publicado">
-          Un borrador sólo lo ves tú. Sirve para ir afinando sin que nadie lo vea a medias, y
-          para compararlo con otro mientras lo trabajas.
+        <Field name={t.camaraNombre} icon={ChalkCamera}>
+          {t.camaraBodyInicio}
+          {CAMERAS.slice(0, 4).join(', ')}…{t.camaraBodyFin}
         </Field>
       </Block>
 
-      <Block icon={ChalkShield} title="Cómo lo juegas" eyebrow="Opcional, pero es lo que más falta hace">
-        <p className="text-sm text-chalk-dim">
-          Los mismos valores en otra dificultad no dan el mismo partido. Sin esto, quien copie tu
-          set no sabe si le va a funcionar.
-        </p>
-
-        <Field name="Dificultad" icon={ChalkShield}>
-          Las seis del juego: {difficulties(locale).map((d) => d.label).join(', ')}. Es lo que más cambia
-          el comportamiento de la CPU, muy por encima de cualquier slider suelto.
-        </Field>
-        <Field name="Duración de cada tiempo" icon={ChalkStopwatch}>
-          En minutos. Se puede poner un rango si juegas con uno —<code>7-8</code>— porque mucha
-          gente no usa siempre el mismo. La duración manda en el ritmo: unos valores afinados a
-          6 minutos se desmontan a 15.
-        </Field>
-        <Field name="Cámara" icon={ChalkCamera}>
-          El nombre y, si los ajustas, su altura y su zoom —las dos van de 0 a 20—. El campo
-          sugiere las del juego ({CAMERAS.slice(0, 4).join(', ')}…) pero admite cualquier cosa,
-          porque cada menú las llama a su manera. Lo único que se pide es que si pones altura o
-          zoom digas de qué cámara, porque unos números sueltos no dicen nada.
-        </Field>
-      </Block>
-
-      <Block icon={ChalkBall} title="Los valores" eyebrow="El grueso del set">
-        <p className="text-sm text-chalk-dim">
-          FC 27 trae 65 sliders y FC 26, 29. Salen en el orden exacto del menú del juego, para
-          que puedas ir metiéndolos mientras los consultas.
-        </p>
+      <Block icon={ChalkBall} title={t.losValoresTitulo} eyebrow={t.elGruesoDelSet}>
+        <p className="text-sm text-chalk-dim">{t.losValoresIntro}</p>
 
         <div className="panel mt-5 p-5">
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3">
-            <span className="eyebrow">Así se lee</span>
+            <span className="eyebrow">{t.asiSeLee}</span>
             <ScaleLegend scopes={['user', 'cpu']} labels={scopeLabels(locale)} withReference />
           </div>
           <ul className="mt-4">
@@ -141,36 +122,16 @@ export default async function GuidePage() {
               </li>
             ))}
           </ul>
-          <p className="mt-4 text-xs text-chalk-dim">
-            La marca gris es lo que trae el juego de fábrica. Cuando tu muesca la tapa, ese slider
-            está sin tocar; cuando se separa, ahí has metido mano. En la primera fila coinciden
-            los tres.
-          </p>
+          <p className="mt-4 text-xs text-chalk-dim">{t.notaMarcaGris}</p>
         </div>
 
-        <Field name="Lados">
-          Casi todos los sliders van por duplicado: lo que se aplica a tu equipo y lo que se
-          aplica a la CPU. Alguno es sólo tuyo, como la barra de potencia, y sale con un guion en
-          el lado de la CPU.
-        </Field>
-        <Field name="Los cuatro maestros">
-          En FC 27, encima de los tiros y de los pases hay cuatro reguladores que escalan el grupo
-          entero. El juego pide dejarlos en 50 y tocar sólo los de cada tipo — si los mueves, tus
-          valores no significan lo mismo en otra consola, así que van guardados como cualquier
-          otro.
-        </Field>
-        <Field name="Pegar un set escrito">
-          En vez de teclear 129 valores, se puede pegar el texto tal como lo tengas: una tabla de
-          Notion, un mensaje, una lista con viñetas. Antes de aplicar nada se ve qué ha entendido
-          y qué líneas no ha reconocido.
-        </Field>
+        <Field name={t.ladosNombre}>{t.ladosBody}</Field>
+        <Field name={t.maestrosNombre}>{t.maestrosBody}</Field>
+        <Field name={t.pegarNombre}>{t.pegarBody}</Field>
       </Block>
 
-      <Block icon={ChalkFormation} title="Comportamiento de la CPU" eyebrow="Sólo FC 27">
-        <p className="text-sm text-chalk-dim">
-          FC 27 deja elegir cómo se comporta la CPU, y sólo en uno de los tres modos sirven de
-          algo los sliders de esa pestaña.
-        </p>
+      <Block icon={ChalkFormation} title={t.comportamientoCpuTitulo} eyebrow={t.soloFc27}>
+        <p className="text-sm text-chalk-dim">{t.comportamientoCpuIntro}</p>
         <ul className="mt-4 flex flex-col gap-3">
           {cpuBehaviours(locale).map((behaviour) => (
             <li key={behaviour.value} className="flex flex-col gap-0.5">
@@ -179,53 +140,32 @@ export default async function GuidePage() {
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-sm text-chalk-dim">
-          Si eliges táctico o dinámico, esos dieciséis sliders desaparecen de la ficha: enseñarlos
-          sería decir que tu set toca cosas que no toca. Tus valores no se borran — vuelven al
-          poner personalizado.
-        </p>
+        <p className="mt-4 text-sm text-chalk-dim">{t.comportamientoCpuOutro}</p>
       </Block>
 
-      <Block icon={ChalkCommentedValue} title="Lo que aporta la gente" eyebrow="Después de publicar">
-        <Field name="Comentarios valor a valor">
-          Cada número abre su propio hilo. Es la razón de ser de esto: no «me gusta tu set», sino
-          «ese 35 de velocidad a mí se me queda corto con equipos de segunda». El comentario vive
-          pegado a la muesca de la que habla.
-        </Field>
-        <Field name="Comentarios generales">
-          Para lo que no va de un valor concreto, debajo del todo.
-        </Field>
-        <Field name="Versiones">
-          Si cambias valores de un set ya publicado, los comentarios anteriores se marcan como de
-          la versión antigua. Nadie queda respondiendo a unos números que ya no están.
-        </Field>
+      <Block icon={ChalkCommentedValue} title={t.loQueAportaTitulo} eyebrow={t.despuesDePublicar}>
+        <Field name={t.comentariosValorNombre}>{t.comentariosValorBody}</Field>
+        <Field name={t.comentariosGeneralesNombre}>{t.comentariosGeneralesBody}</Field>
+        <Field name={t.versionesNombre}>{t.versionesBody}</Field>
       </Block>
 
-      <Block icon={ChalkStopwatch} title="Lo que sale solo" eyebrow="No hay que rellenarlo">
-        <Field name="La dirección">
-          <code>/u/tu-nombre/el-titulo-del-set</code>, generada del título. No cambia aunque
-          cambies el título después, para que un enlace compartido no se rompa. Y si cambias tu
-          nombre de usuario, el antiguo sigue llevando al sitio.
+      <Block icon={ChalkStopwatch} title={t.loQueSaleSoloTitulo} eyebrow={t.noHayQueRellenarlo}>
+        <Field name={t.direccionNombre}>
+          <code>{t.direccionCodigo}</code>
+          {t.direccionBodyFin}
         </Field>
-        <Field name="La imagen para compartir">
-          Al pegar el enlace en WhatsApp o en X sale una tarjeta con los valores dibujados, no un
-          recuadro vacío. Se genera sola con el contenido del set.
-        </Field>
-        <Field name="El modo consola">
-          Una vista aparte, en letra grande y en el orden del menú, para tener el móvil en la mano
-          mientras metes los valores. Marca lo que ya has hecho y no deja que se apague la
-          pantalla.
-        </Field>
+        <Field name={t.imagenNombre}>{t.imagenBody}</Field>
+        <Field name={t.modoConsolaNombre}>{t.modoConsolaBody}</Field>
       </Block>
 
       <div className="chalk-rule mt-4" />
 
       <div className="flex flex-wrap items-center gap-3 pt-8">
         <Link href={localized(locale, '/sets/nuevo')} className="btn btn-primary">
-          Publicar un set
+          {tComun.publicarUnSet}
         </Link>
         <Link href={localized(locale, '/')} className="btn btn-ghost">
-          Ver los que hay
+          {t.verLosQueHay}
         </Link>
       </div>
     </div>
