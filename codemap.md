@@ -509,6 +509,20 @@ se escribe igual en los dos (`SlidersFC`, `EA SPORTS FC`, `X`, `Error 404`).
 tiene que ser recíproco, y si una de las dos versiones se despista, Google
 trata las dos como duplicado y elige él cuál enseña.
 
+**El nombre de un slider se resuelve en un solo sitio: `sliderName()`.** Hay
+tres agrupados distintos —la ficha, el formulario y el importador— porque cada
+uno necesita otra forma, y eso está bien. Lo que no puede repetirse es de dónde
+sale el nombre: el formulario lo tenía a mano (`definition.name`) y al traducir
+la web se quedó en castellano mientras la ficha ya estaba en inglés. Si añades
+una vista nueva, agrupa como te convenga pero el nombre pídeselo a
+`sliderName`.
+
+**El importador reconoce los tres nombres**: el castellano del menú, el inglés
+y el slug. El slug ya cubría casi todo el inglés de casualidad —los slugs SON
+los nombres ingleses en minúsculas—, pero no los que se separan, como «Shot
+Error (Master)». Importa porque quien pega un set de un foro inglés lo pega
+con los nombres que ve allí.
+
 **Lo que no se traduce nunca**: títulos, descripciones y comentarios de los
 sets, las notas de versión y los nombres de usuario. Son de quien los escribe.
 La web es bilingüe en el envoltorio y multilingüe en el contenido.

@@ -46,6 +46,7 @@ function definitionsFor(gameSlug) {
         category: slider.category,
         applies_to: scope,
         name: slider.name,
+        name_en: slider.nameEn ?? null,
         slug: slider.slug,
         min_value: game.range.min,
         max_value: game.range.max,
@@ -206,6 +207,24 @@ const valueOf = (report, definitions, slug, scope) =>
     report.rows.length === report.total && report.unmatched.length === 0,
     `${report.rows.length} de ${report.total}`,
   );
+}
+
+// --- Pegado en inglés ----------------------------------------------------
+// Alguien copia un set de un foro inglés. Los nombres que verá ahí son los del
+// menú en inglés, no los del catálogo en castellano.
+{
+  const report = parseSliderText(
+    ['Sprint Speed 40 45', 'Shot Error (Master) 55 60', 'Finesse Shot Error 30 35'].join('\n'),
+    fc27,
+  );
+  const porSlug = Object.fromEntries(report.rows.map((row) => [row.slug, row]));
+  check('reconoce un nombre inglés que coincide con el slug', Boolean(porSlug.sprint_speed));
+  check(
+    'y uno que NO coincide con el slug, como «Shot Error (Master)»',
+    Boolean(porSlug.master_shot_error),
+  );
+  check('y los tres a la vez, sin dejar líneas sueltas', report.unmatched.length === 0,
+    report.unmatched.join(' · '));
 }
 
 // --- Texto vacío ---------------------------------------------------------

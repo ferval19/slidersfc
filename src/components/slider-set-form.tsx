@@ -12,6 +12,7 @@ import {
 import { ChalkChevrons, ChalkUndo } from "@/components/chalk";
 import { categoryAnchor } from "@/components/active-category";
 import { useI18n } from "@/components/i18n-provider";
+import { sliderName, type Locale } from "@/lib/i18n/locale";
 import { ImportPanel } from "@/components/import-panel";
 import { SetFormNav } from "@/components/set-form-nav";
 import { SliderControl } from "@/components/slider-control";
@@ -88,8 +89,8 @@ export function SliderSetForm({
   );
 
   const { scopes, blocks } = useMemo(
-    () => buildBlocks(definitions),
-    [definitions],
+    () => buildBlocks(definitions, locale),
+    [definitions, locale],
   );
 
   /**
@@ -632,7 +633,14 @@ type FormRow = {
   byScope: Partial<Record<SliderScope, SliderDefinition>>;
 };
 
-function buildBlocks(definitions: SliderDefinition[]) {
+/**
+ * Ojo: esto agrupa por su cuenta en vez de usar `groupDefinitions`, porque la
+ * forma que necesita el formulario no es la misma. Lo que NO puede tener
+ * propio es el nombre: ése sale de `sliderName`, que es el único sitio donde
+ * se decide si toca el castellano o el inglés. Tenerlo aquí a mano fue
+ * justamente el fallo: la ficha se tradujo y el formulario se quedó atrás.
+ */
+function buildBlocks(definitions: SliderDefinition[], locale: Locale) {
   const scopes = sortScopes([...new Set(definitions.map((d) => d.applies_to))]);
   const byCategory = new Map<string, Map<string, FormRow>>();
 
@@ -644,7 +652,7 @@ function buildBlocks(definitions: SliderDefinition[]) {
     if (!rows.has(definition.slug)) {
       rows.set(definition.slug, {
         slug: definition.slug,
-        name: definition.name,
+        name: sliderName(definition, locale),
         byScope: {},
       });
     }

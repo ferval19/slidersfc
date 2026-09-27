@@ -70,6 +70,7 @@ export function normalize(text: string) {
 type Row = {
   slug: string;
   name: string;
+  nameEn: string | null;
   byScope: Partial<Record<SliderScope, SliderDefinition>>;
   scopes: SliderScope[];
 };
@@ -80,7 +81,13 @@ function buildRows(definitions: SliderDefinition[]) {
   for (const definition of definitions) {
     let row = rows.get(definition.slug);
     if (!row) {
-      row = { slug: definition.slug, name: definition.name, byScope: {}, scopes: [] };
+      row = {
+        slug: definition.slug,
+        name: definition.name,
+        nameEn: definition.name_en,
+        byScope: {},
+        scopes: [],
+      };
       rows.set(definition.slug, row);
     }
     row.byScope[definition.applies_to] = definition;
@@ -102,9 +109,18 @@ function buildNeedles(rows: Map<string, Row>) {
   const needles: { text: string; slug: string }[] = [];
 
   for (const row of rows.values()) {
-    needles.push({ text: normalize(row.name), slug: row.slug });
-    const fromSlug = normalize(row.slug);
-    if (fromSlug !== normalize(row.name)) needles.push({ text: fromSlug, slug: row.slug });
+    // Los tres nombres con los que alguien puede pegar un slider: el
+    // castellano del menú, el inglés del menú y el slug. El slug ya cubría
+    // casi todo el inglés de casualidad —los slugs SON los nombres ingleses en
+    // minúsculas—, pero no los que se separan, como «Shot Error (Master)».
+    const vistos = new Set<string>();
+    for (const texto of [row.name, row.nameEn, row.slug]) {
+      if (!texto) continue;
+      const limpio = normalize(texto);
+      if (!limpio || vistos.has(limpio)) continue;
+      vistos.add(limpio);
+      needles.push({ text: limpio, slug: row.slug });
+    }
   }
 
   return needles.sort((a, b) => b.text.length - a.text.length);
