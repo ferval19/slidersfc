@@ -993,6 +993,33 @@ es parte de dar un cambio por bueno.
 Queda para otra tanda el formulario de sets, el perfil y la guía: son para
 quien ya ha decidido quedarse.
 
+### 27/09 · Por qué no comentaba nadie
+
+Seis perfiles, seis sets, un desconocido publicando — y **cero comentarios**.
+Antes de añadir nada se miró la ficha como la ve alguien que llega de fuera, y
+aparecieron tres cosas, ninguna de ellas una función que faltara.
+
+**El número que avisa de que un valor tiene hilo sólo se pinta si ya hay
+comentarios.** Un arranque en frío de manual: la señal de que se puede comentar
+aparece cuando alguien ya ha comentado, y el primero tenía que adivinarlo.
+
+**Y el botón sólo se marcaba al pasar el ratón por encima.** En un móvil no hay
+hover. Justo en el sitio donde se usa esta web —el teléfono en la mano con la
+consola delante— los sesenta y cinco números no tenían absolutamente nada que
+dijera que se pueden tocar: eran una tabla. Ahora llevan un borde permanente
+al 25%, que son **2,12:1 contra la pizarra**, medido y no elegido a ojo: el
+primer intento, rebajando `chalk-line`, daba 1,15:1 — presente en el CSS e
+invisible en la pantalla.
+
+**Y la ficha anunciaba «0 comentarios»** en el tercer renglón, debajo del
+título. Prueba social al revés: antes de invitar a nadie a hablar, la página
+decía que aquí no habla nadie. La cuenta sale ahora sólo cuando hay alguna, y
+en su lugar, cuando no hay ninguna, va una invitación: «Toca cualquier número y
+sé el primero en decir por qué».
+
+Ninguno de los tres es una función nueva. Los tres son hacer visible la que ya
+había, que es la razón de ser de esta web.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

@@ -37,6 +37,8 @@ export const es = {
     borrador: 'Borrador · sólo tú lo ves',
     meterEnConsola: 'Meter en la consola',
     comparar: 'Comparar',
+    seElPrimero:
+      'Nadie ha comentado este set todavía. Toca cualquier número y sé el primero en decir por qué.',
     valores: 'Valores',
     ayudaValoresConReferencia:
       'La marca gris es lo que trae el juego de fábrica: lo que se separe de ella es lo que ha tocado el autor. Toca un número para comentarlo.',

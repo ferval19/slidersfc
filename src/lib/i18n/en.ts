@@ -37,6 +37,8 @@ const en: Dictionary = {
     borrador: 'Draft · only you can see it',
     meterEnConsola: 'Open in console',
     comparar: 'Compare',
+    seElPrimero:
+      'No one has commented on this set yet. Tap any number and be the first to say why.',
     valores: 'Values',
     ayudaValoresConReferencia:
       'The gray mark is the game\'s factory preset — anything that strays from it is what the author changed. Tap a number to comment on it.',

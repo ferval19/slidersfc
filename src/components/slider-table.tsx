@@ -195,7 +195,19 @@ export function SliderTable({
                               className={`relative ${VALUE_COL} rounded-[2px] border py-1.5 transition-colors ${ink.text} ${
                                 isOpen
                                   ? `${ink.border} bg-board-deep`
-                                  : 'border-transparent hover:border-chalk-line'
+                                  // Borde tenue SIEMPRE, no sólo al pasar por
+                                  // encima. En un móvil no hay hover, y ahí
+                                  // estos números no tenían nada que dijera que
+                                  // se pueden tocar: parecían una tabla. Y el
+                                  // móvil es donde se usa esto, con la consola
+                                  // delante.
+                                  //
+                                  // El 25% está medido, no elegido a ojo:
+                                  // 2,12:1 contra la pizarra. `chalk-line` ya
+                                  // es blanco al 16%, así que rebajarlo encima
+                                  // dejaba el borde en 1,15:1 — presente en el
+                                  // CSS y invisible en la pantalla.
+                                  : 'border-chalk/25 hover:border-chalk-line'
                               }`}
                             >
                               <span className="eyebrow block text-[0.5625rem] sm:hidden">

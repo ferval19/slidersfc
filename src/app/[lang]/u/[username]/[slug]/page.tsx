@@ -4,7 +4,7 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { lang } from 'next/root-params';
 
 import { Avatar } from '@/components/avatar';
-import { ChalkPad, ChalkScales } from '@/components/chalk';
+import { ChalkCommentedValue, ChalkPad, ChalkScales } from '@/components/chalk';
 import { CommentComposer, CommentList } from '@/components/comment-thread';
 import { FavoriteButton } from '@/components/favorite-button';
 import { SetConditions } from '@/components/set-conditions';
@@ -172,10 +172,17 @@ export default async function SetDetailPage({ params }: { params: Params }) {
           ) : null}
           <span>·</span>
           <span>{formatDate(detail.set.created_at, locale)}</span>
-          <span>·</span>
-          <span>
-            {view.totalComments} {t.set.comentarios(view.totalComments)}
-          </span>
+          {/* Sólo si hay alguno. Un «0 comentarios» en el tercer renglón de la
+              ficha es la prueba social al revés: antes de invitar a nadie a
+              hablar, la página anunciaba que aquí no habla nadie. */}
+          {view.totalComments > 0 ? (
+            <>
+              <span>·</span>
+              <span>
+                {view.totalComments} {t.set.comentarios(view.totalComments)}
+              </span>
+            </>
+          ) : null}
         </div>
 
         {detail.set.description ? (
@@ -265,6 +272,17 @@ export default async function SetDetailPage({ params }: { params: Params }) {
             {view.hasReference ? t.set.ayudaValoresConReferencia : t.set.ayudaValoresSinReferencia}
           </p>
         </div>
+
+        {/* Un set sin comentarios no enseña por ningún lado que se pueda
+            comentar: la señal —el numerito sobre el valor— sólo aparece
+            cuando ya hay alguno. Arranque en frío de manual, y el primero
+            tenía que adivinarlo. */}
+        {view.totalComments === 0 ? (
+          <p className="panel mt-5 flex items-center gap-3 px-4 py-3 text-sm text-chalk/90">
+            <ChalkCommentedValue className="size-9 shrink-0 text-chalk-dim" />
+            {t.set.seElPrimero}
+          </p>
+        ) : null}
 
         <SetStickyBar
           title={detail.set.title}
