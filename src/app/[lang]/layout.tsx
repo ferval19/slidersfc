@@ -9,9 +9,12 @@ import { SetupNotice } from '@/components/setup-notice';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { SITE_NAME, SITE_TAGLINE } from '@/lib/constants';
+import { lang } from 'next/root-params';
+
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import { jsonLd } from '@/lib/json-ld';
 import { publicSiteUrl } from '@/lib/site-url';
-import './globals.css';
+import '../globals.css';
 
 const display = Big_Shoulders({ variable: '--font-big-shoulders', subsets: ['latin'] });
 
@@ -78,10 +81,17 @@ const websiteJsonLd = {
   inLanguage: 'es',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+/**
+ * El idioma sale de `next/root-params` y no de las props. `[lang]` es un
+ * parámetro de raíz, y eso deja leerlo desde cualquier Server Component sin
+ * ir pasándolo de padre a hijo por sesenta ficheros.
+ */
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
+
   return (
     <html
-      lang="es"
+      lang={locale}
       className={`${display.variable} ${sans.variable} ${mono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
