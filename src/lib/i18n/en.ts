@@ -451,6 +451,8 @@ const en: Dictionary = {
       "Whoever opens one of your sets wants to know who's behind it and how they play. It's what separates loose values from values worth trusting.",
   },
   perfilErrores: {
+    nombreCogido: (n: string) => `“${n}” is taken. Try another one.`,
+    noSeHaPodidoGuardar: "Couldn't save your profile. Try again.",
     usernameCorto: 'The username needs at least 3 characters.',
     usernameInvalido: (max: number) =>
       `The username only allows unaccented letters, numbers and underscore, and ${max} characters at most.`,

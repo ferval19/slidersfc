@@ -66,10 +66,10 @@ export async function updateProfile(
     // 23505 = unique_violation. Es el único error que la persona puede
     // arreglar por su cuenta, así que se explica; el resto se registra.
     if (error.code === '23505') {
-      return { error: `«${fields.username}» ya está cogido. Prueba con otro.` };
+      return { error: getDictionary(locale).perfilErrores.nombreCogido(fields.username) };
     }
     console.error('[slidersfc] updateProfile falló:', error);
-    return { error: 'No se ha podido guardar el perfil. Vuelve a intentarlo.' };
+    return { error: getDictionary(locale).perfilErrores.noSeHaPodidoGuardar };
   }
 
   await removeOldAvatars(supabase, user.id, fields.avatar_url);

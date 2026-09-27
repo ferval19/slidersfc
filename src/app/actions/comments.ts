@@ -2,10 +2,18 @@
 
 import { revalidatePath } from 'next/cache';
 
+import { getDictionary } from '@/lib/i18n/dictionary';
+import { DEFAULT_LOCALE, isLocale, type Locale } from '@/lib/i18n/locale';
 import { setPath } from '@/lib/paths';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export type CommentFormState = { error?: string; ok?: boolean };
+
+/** Ver el comentario de `localeFromFormData` en `app/actions/auth.ts`. */
+function localeFromFormData(formData: FormData): Locale {
+  const value = String(formData.get('locale') ?? '');
+  return isLocale(value) ? value : DEFAULT_LOCALE;
+}
 
 /**
  * Publica un comentario. `slider_definition_id` vacío = comentario general
@@ -15,17 +23,18 @@ export async function postComment(
   _prevState: CommentFormState,
   formData: FormData,
 ): Promise<CommentFormState> {
+  const t = getDictionary(localeFromFormData(formData)).comentarioErrores;
   const setId = String(formData.get('slider_set_id') ?? '');
   const body = String(formData.get('body') ?? '').trim();
   const rawDefinition = String(formData.get('slider_definition_id') ?? '');
 
-  if (!setId) return { error: 'Falta el set al que comentar.' };
-  if (body.length === 0) return { error: 'Escribe algo antes de enviar.' };
-  if (body.length > 2000) return { error: 'El comentario no puede pasar de 2000 caracteres.' };
+  if (!setId) return { error: t.faltaSet };
+  if (body.length === 0) return { error: t.escribeAlgo };
+  if (body.length > 2000) return { error: t.longitudMaxima };
 
   const definitionId = rawDefinition === '' ? null : Number(rawDefinition);
   if (definitionId !== null && !Number.isInteger(definitionId)) {
-    return { error: 'Slider no válido.' };
+    return { error: t.sliderNoValido };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -33,7 +42,7 @@ export async function postComment(
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return { error: 'Tienes que iniciar sesión para comentar.' };
+  if (!user) return { error: t.iniciarSesion };
 
   // Guardamos la versión del set vigente, para poder marcar después los
   // comentarios que hablaban de valores ya cambiados.
@@ -43,7 +52,7 @@ export async function postComment(
     .eq('id', setId)
     .maybeSingle();
 
-  if (!set) return { error: 'Este set ya no existe.' };
+  if (!set) return { error: t.setNoExiste };
 
   const target = set as unknown as { version: number; slug: string; profiles: { username: string } };
 

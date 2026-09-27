@@ -457,6 +457,8 @@ export const es = {
       'Quien abre un set tuyo quiere saber quién lo firma y cómo juega. Es lo que separa unos valores sueltos de unos valores en los que fiarse.',
   },
   perfilErrores: {
+    nombreCogido: (n: string) => `«${n}» ya está cogido. Prueba con otro.`,
+    noSeHaPodidoGuardar: 'No se ha podido guardar el perfil. Vuelve a intentarlo.',
     usernameCorto: 'El nombre de usuario necesita al menos 3 caracteres.',
     usernameInvalido: (max: number) =>
       `El nombre de usuario sólo admite letras sin acentos, números y guión bajo, y como mucho ${max} caracteres.`,

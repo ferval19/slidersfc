@@ -10,6 +10,7 @@ import type { Dictionary } from '@/lib/i18n/dictionary';
 import { useI18n } from '@/components/i18n-provider';
 import { AVATAR_BUCKET, avatarObjectPath } from '@/lib/avatar-storage';
 import { ACCEPTED_IMAGE_TYPES, prepareAvatar } from '@/lib/image';
+import { localized } from '@/lib/paths';
 import {
   BIO_MAX,
   DISPLAY_NAME_MAX,
@@ -114,7 +115,7 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
                 onClick={() => fileInput.current?.click()}
                 disabled={uploading}
                 className="group relative size-28 shrink-0 overflow-hidden rounded-full border border-chalk-line bg-board-deep transition-colors hover:border-chalk disabled:cursor-wait"
-                aria-label="Cambiar la foto"
+                aria-label={t.cambiarLaFoto}
               >
                 {avatarUrl ? (
                   <img src={avatarUrl} alt="" className="size-full object-cover" />
@@ -128,7 +129,7 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
                 )}
 
                 <span className="eyebrow absolute inset-x-0 bottom-0 bg-board-deep/85 py-1.5 text-center text-chalk opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-                  {uploading ? '···' : 'Cambiar'}
+                  {uploading ? '···' : t.cambiar}
                 </span>
               </button>
 
@@ -138,7 +139,7 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
                   onClick={() => setAvatarUrl('')}
                   className="eyebrow hover:text-chalk"
                 >
-                  Quitar
+                  {t.quitar}
                 </button>
               ) : null}
 
@@ -164,9 +165,7 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
               {bio.trim() ? (
                 <p className="mt-3 max-w-prose text-sm whitespace-pre-line text-chalk/90">{bio}</p>
               ) : (
-                <p className="mt-3 text-sm text-chalk-dim/70 italic">
-                  Sin biografía. Lo que escribas abajo sale aquí.
-                </p>
+                <p className="mt-3 text-sm text-chalk-dim/70 italic">{t.sinBiografia}</p>
               )}
             </div>
           </div>
@@ -178,33 +177,28 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
             {uploadError}
           </p>
         ) : (
-          <p className="mt-2.5 text-xs text-chalk-dim">
-            Pincha en la foto para cambiarla. Se recorta en cuadrado y se guarda a 512 px: JPG,
-            PNG o WEBP.
-          </p>
+          <p className="mt-2.5 text-xs text-chalk-dim">{t.ayudaFoto}</p>
         )}
       </section>
 
       {/* Campos ---------------------------------------------------------- */}
       <section className="panel flex flex-col gap-6 p-5 sm:p-6">
         <label className="flex flex-col gap-1.5">
-          <span className="eyebrow">Nombre</span>
+          <span className="eyebrow">{t.nombre}</span>
           <input
             name="display_name"
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
             maxLength={DISPLAY_NAME_MAX}
-            placeholder="Full Manual FG"
+            placeholder={t.nombrePlaceholder}
             className="field"
           />
-          <span className="text-xs text-chalk-dim">
-            Como quieres que te llamen. Si lo dejas vacío, sale tu nombre de usuario.
-          </span>
+          <span className="text-xs text-chalk-dim">{t.nombreAyuda}</span>
         </label>
 
         <div className="flex flex-col gap-1.5">
           <label className="eyebrow" htmlFor="username">
-            Nombre de usuario
+            {t.nombreDeUsuario}
           </label>
           <div className="field flex items-center gap-0 p-0 focus-within:border-chalk/45">
             {/* En el móvil sólo cabe /u/: con el dominio delante, el nombre
@@ -219,32 +213,27 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
               onChange={(event) => setUsername(normalizeUsername(event.target.value))}
               required
               minLength={3}
-              placeholder="fullmanualfg"
+              placeholder={t.usernamePlaceholder}
               className="min-w-0 flex-1 border-0 bg-transparent py-2.5 pr-3 font-mono text-sm text-chalk outline-none"
             />
           </div>
 
           {renamed ? (
-            <span className="text-xs text-ink-user">
-              Cambia la dirección de tu perfil y la de todos tus sets. Los enlaces que ya hayas
-              compartido seguirán funcionando: llevarán a la nueva.
-            </span>
+            <span className="text-xs text-ink-user">{t.renombradoAyuda}</span>
           ) : (
-            <span className="text-xs text-chalk-dim">
-              Minúsculas, números y guión bajo. Es lo que aparece en la dirección de tus sets.
-            </span>
+            <span className="text-xs text-chalk-dim">{t.usernameAyuda}</span>
           )}
         </div>
 
         <label className="flex flex-col gap-1.5">
-          <span className="eyebrow">Biografía</span>
+          <span className="eyebrow">{t.biografia}</span>
           <textarea
             name="bio"
             value={bio}
             onChange={(event) => setBio(event.target.value)}
             rows={4}
             maxLength={BIO_MAX}
-            placeholder="Cómo juegas: dificultad, duración de los tiempos, cámara, mando o teclado. Es lo que da sentido a tus valores."
+            placeholder={t.biografiaPlaceholder}
             className="field resize-y"
           />
           <span
@@ -257,7 +246,7 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
         </label>
 
         <label className="flex flex-col gap-1.5">
-          <span className="eyebrow">Cuenta de X</span>
+          <span className="eyebrow">{t.cuentaDeX}</span>
           <div className="field flex items-center gap-0 p-0 focus-within:border-chalk/45">
             <span className="shrink-0 py-2.5 pl-3 font-mono text-sm text-chalk-dim">@</span>
             <input
@@ -265,30 +254,26 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
               value={twitter}
               onChange={(event) => setTwitter(event.target.value)}
               maxLength={TWITTER_MAX + 20}
-              placeholder="FullManualFG"
+              placeholder={t.twitterPlaceholder}
               className="min-w-0 flex-1 border-0 bg-transparent py-2.5 pr-3 font-mono text-sm text-chalk outline-none"
             />
           </div>
-          <span className="text-xs text-chalk-dim">
-            Puedes pegar el enlace entero; se queda con el nombre.
-          </span>
+          <span className="text-xs text-chalk-dim">{t.twitterAyuda}</span>
         </label>
 
         <label className="flex flex-col gap-1.5">
-          <span className="eyebrow">Canal de YouTube</span>
+          <span className="eyebrow">{t.canalDeYoutube}</span>
           <input
             name="youtube_url"
             value={youtube}
             onChange={(event) => setYoutube(event.target.value)}
-            placeholder="@FullManualFG"
+            placeholder={t.youtubePlaceholder}
             className="field font-mono text-sm"
           />
           <span
             className={`text-xs ${youtube.trim() && youtubeUrl === undefined ? 'text-ink-rival' : 'text-chalk-dim'}`}
           >
-            {youtube.trim() && youtubeUrl === undefined
-              ? 'Eso no parece un canal. Pega el enlace de tu canal, o tu @nombre.'
-              : 'Tu @nombre o el enlace del canal. El de un vídeo no vale: tiene que ser el canal.'}
+            {youtube.trim() && youtubeUrl === undefined ? t.youtubeAyudaMalo : t.youtubeAyudaNormal}
           </span>
         </label>
       </section>
@@ -304,10 +289,10 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
 
       <div className="sticky bottom-0 -mx-5 flex flex-wrap items-center gap-3 bg-board/95 px-5 py-4 backdrop-blur">
         <button type="submit" className="btn btn-primary" disabled={pending || uploading}>
-          {pending ? 'Guardando…' : 'Guardar perfil'}
+          {pending ? t.guardando : t.guardarPerfil}
         </button>
-        <a href={`/u/${profile.username}`} className="btn btn-ghost">
-          Cancelar
+        <a href={localized(locale, `/u/${profile.username}`)} className="btn btn-ghost">
+          {t.cancelar}
         </a>
       </div>
     </form>

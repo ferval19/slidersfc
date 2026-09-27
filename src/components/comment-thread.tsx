@@ -82,7 +82,7 @@ export function CommentComposer({
   const [state, formAction, pending] = useActionState(postComment, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   const pathname = usePathname();
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
 
   useEffect(() => {
     if (state.ok) formRef.current?.reset();
@@ -104,6 +104,7 @@ export function CommentComposer({
 
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-2">
+      <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="slider_set_id" value={setId} />
       <input
         type="hidden"

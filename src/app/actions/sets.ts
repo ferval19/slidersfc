@@ -5,13 +5,21 @@ import { redirect } from 'next/navigation';
 
 import { planCopy } from '@/lib/game-migration';
 import { validateConditions, type SetConditions } from '@/lib/set-conditions';
-import { editSetPath, setPath } from '@/lib/paths';
+import { editSetPath, localized, setPath } from '@/lib/paths';
+import { getDictionary, type Dictionary } from '@/lib/i18n/dictionary';
+import { DEFAULT_LOCALE, isLocale, type Locale } from '@/lib/i18n/locale';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { CpuBehaviour, SliderDefinition } from '@/lib/database.types';
 
 export type SetFormState = { error?: string };
 
 const VALUE_PREFIX = 'v_';
+
+/** Ver el comentario de `localeFromFormData` en `app/actions/auth.ts`. */
+function localeFromFormData(formData: FormData): Locale {
+  const value = String(formData.get('locale') ?? '');
+  return isLocale(value) ? value : DEFAULT_LOCALE;
+}
 
 type ParsedForm = {
   title: string;
@@ -25,20 +33,23 @@ type ParsedForm = {
   values: Map<number, number>;
 };
 
-function parseForm(formData: FormData): ParsedForm | { error: string } {
+function parseForm(
+  formData: FormData,
+  t: Dictionary['setAccionesErrores'],
+): ParsedForm | { error: string } {
   const title = String(formData.get('title') ?? '').trim();
   if (title.length < 3 || title.length > 120) {
-    return { error: 'El título debe tener entre 3 y 120 caracteres.' };
+    return { error: t.tituloLongitud };
   }
 
   const rawDescription = String(formData.get('description') ?? '').trim();
   if (rawDescription.length > 2000) {
-    return { error: 'La descripción no puede pasar de 2000 caracteres.' };
+    return { error: t.descripcionLongitud };
   }
 
   const gameId = Number(formData.get('game_id'));
   if (!Number.isInteger(gameId) || gameId <= 0) {
-    return { error: 'Elige un juego válido.' };
+    return { error: t.elegirJuegoValido };
   }
 
   // Lo que llegue que no sea uno de los tres se trata como personalizado, que
@@ -59,7 +70,7 @@ function parseForm(formData: FormData): ParsedForm | { error: string } {
 
   const rawNote = String(formData.get('version_note') ?? '').trim();
   if (rawNote.length > 500) {
-    return { error: 'La nota del cambio no puede pasar de 500 caracteres.' };
+    return { error: t.notaLongitud };
   }
 
   const values = new Map<number, number>();
@@ -74,7 +85,7 @@ function parseForm(formData: FormData): ParsedForm | { error: string } {
   }
 
   if (values.size === 0) {
-    return { error: 'No se han recibido valores de sliders.' };
+    return { error: t.sinValores };
   }
 
   return {
@@ -97,16 +108,17 @@ function parseForm(formData: FormData): ParsedForm | { error: string } {
 function validateAgainstCatalog(
   values: Map<number, number>,
   definitions: SliderDefinition[],
+  t: Dictionary['setAccionesErrores'],
 ): string | null {
   const byId = new Map(definitions.map((definition) => [definition.id, definition]));
 
   for (const [definitionId, value] of values) {
     const definition = byId.get(definitionId);
     if (!definition) {
-      return 'Hay un slider que no pertenece al juego seleccionado. Recarga la página.';
+      return t.sliderFueraDeCatalogo;
     }
     if (value < definition.min_value || value > definition.max_value) {
-      return `"${definition.name}" debe estar entre ${definition.min_value} y ${definition.max_value}.`;
+      return t.valorFueraDeRango(definition.name, definition.min_value, definition.max_value);
     }
   }
 
@@ -117,7 +129,9 @@ export async function createSet(
   _prevState: SetFormState,
   formData: FormData,
 ): Promise<SetFormState> {
-  const parsed = parseForm(formData);
+  const locale = localeFromFormData(formData);
+  const t = getDictionary(locale).setAccionesErrores;
+  const parsed = parseForm(formData, t);
   if ('error' in parsed) return parsed;
 
   const supabase = await createSupabaseServerClient();
@@ -125,14 +139,14 @@ export async function createSet(
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return { error: 'Tienes que iniciar sesión para crear un set.' };
+  if (!user) return { error: t.iniciarSesionParaCrear };
 
   const { data: definitions } = await supabase
     .from('slider_definitions')
     .select('*')
     .eq('game_id', parsed.gameId);
 
-  const catalogError = validateAgainstCatalog(parsed.values, definitions ?? []);
+  const catalogError = validateAgainstCatalog(parsed.values, definitions ?? [], t);
   if (catalogError) return { error: catalogError };
 
   const { data: set, error: setError } = await supabase
@@ -150,7 +164,7 @@ export async function createSet(
     .single();
 
   if (setError || !set) {
-    return { error: setError?.message ?? 'No se ha podido crear el set.' };
+    return { error: setError?.message ?? t.noCreado };
   }
 
   const created = set as unknown as { id: string; slug: string; profiles: { username: string } };
@@ -172,7 +186,7 @@ export async function createSet(
   const path = setPath(created.profiles.username, created.slug);
   revalidatePath('/');
   revalidatePath(path);
-  redirect(path);
+  redirect(localized(locale, path));
 }
 
 export async function updateSet(
@@ -180,7 +194,9 @@ export async function updateSet(
   _prevState: SetFormState,
   formData: FormData,
 ): Promise<SetFormState> {
-  const parsed = parseForm(formData);
+  const locale = localeFromFormData(formData);
+  const t = getDictionary(locale).setAccionesErrores;
+  const parsed = parseForm(formData, t);
   if ('error' in parsed) return parsed;
 
   const supabase = await createSupabaseServerClient();
@@ -188,7 +204,7 @@ export async function updateSet(
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return { error: 'Tienes que iniciar sesión.' };
+  if (!user) return { error: t.iniciarSesion };
 
   const { data: existing } = await supabase
     .from('slider_sets')
@@ -196,12 +212,12 @@ export async function updateSet(
     .eq('id', setId)
     .maybeSingle();
 
-  if (!existing) return { error: 'Este set ya no existe.' };
+  if (!existing) return { error: t.setNoExiste };
 
   const target = existing as unknown as typeof existing & { slug: string; profiles: { username: string } };
-  if (existing.owner_id !== user.id) return { error: 'Sólo el autor puede editar este set.' };
+  if (existing.owner_id !== user.id) return { error: t.soloAutorEdita };
   if (existing.game_id !== parsed.gameId) {
-    return { error: 'No se puede cambiar el juego de un set ya creado.' };
+    return { error: t.juegoNoSePuedeCambiar };
   }
 
   const { data: definitions } = await supabase
@@ -209,7 +225,7 @@ export async function updateSet(
     .select('*')
     .eq('game_id', parsed.gameId);
 
-  const catalogError = validateAgainstCatalog(parsed.values, definitions ?? []);
+  const catalogError = validateAgainstCatalog(parsed.values, definitions ?? [], t);
   if (catalogError) return { error: catalogError };
 
   // ¿Han cambiado los valores? Si el set ya estaba publicado, eso sube la
@@ -264,7 +280,7 @@ export async function updateSet(
   const path = setPath(target.profiles.username, target.slug);
   revalidatePath(path);
   revalidatePath('/');
-  redirect(path);
+  redirect(localized(locale, path));
 }
 
 async function setPublished(setId: string, isPublished: boolean) {
@@ -293,7 +309,7 @@ export async function unpublishSet(setId: string) {
   await setPublished(setId, false);
 }
 
-export async function deleteSet(setId: string) {
+export async function deleteSet(setId: string, locale: Locale = DEFAULT_LOCALE) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -308,7 +324,7 @@ export async function deleteSet(setId: string) {
     ? await supabase.from('profiles').select('username').eq('id', user.id).maybeSingle()
     : { data: null };
 
-  redirect(profile ? `/u/${profile.username}` : '/');
+  redirect(localized(locale, profile ? `/u/${profile.username}` : '/'));
 }
 
 /**
@@ -319,14 +335,19 @@ export async function deleteSet(setId: string) {
  * queda fuera, y lo que el destino tiene de más arranca con lo que trae el
  * juego de fábrica. Nada se publica sin que el autor lo vea.
  */
-export async function copySetToGame(setId: string, targetGameSlug: string) {
+export async function copySetToGame(
+  setId: string,
+  targetGameSlug: string,
+  locale: Locale = DEFAULT_LOCALE,
+) {
+  const t = getDictionary(locale).setAccionesErrores;
   const supabase = await createSupabaseServerClient();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect('/login');
+  if (!user) redirect(localized(locale, '/login'));
 
   const { data: source } = await supabase
     .from('slider_sets')
@@ -334,8 +355,8 @@ export async function copySetToGame(setId: string, targetGameSlug: string) {
     .eq('id', setId)
     .maybeSingle();
 
-  if (!source) throw new Error('Este set ya no existe.');
-  if (source.owner_id !== user.id) throw new Error('Sólo el autor puede copiar su set.');
+  if (!source) throw new Error(t.setNoExiste);
+  if (source.owner_id !== user.id) throw new Error(t.soloAutorCopia);
 
   const { data: targetGame } = await supabase
     .from('games')
@@ -343,8 +364,8 @@ export async function copySetToGame(setId: string, targetGameSlug: string) {
     .eq('slug', targetGameSlug)
     .maybeSingle();
 
-  if (!targetGame) throw new Error('Ese juego no existe.');
-  if (targetGame.id === source.game_id) throw new Error('El set ya es de ese juego.');
+  if (!targetGame) throw new Error(t.juegoNoExiste);
+  if (targetGame.id === source.game_id) throw new Error(t.yaEsDeEseJuego);
 
   const [{ data: values }, { data: targetDefinitions }] = await Promise.all([
     supabase
@@ -362,7 +383,7 @@ export async function copySetToGame(setId: string, targetGameSlug: string) {
   );
 
   if (plan.values.size === 0) {
-    throw new Error('Ningún valor de este set encaja en ese juego.');
+    throw new Error(t.ningunValorEncaja);
   }
 
   const { data: created, error: createError } = await supabase
@@ -386,7 +407,7 @@ export async function copySetToGame(setId: string, targetGameSlug: string) {
     .single();
 
   if (createError || !created) {
-    throw new Error(createError?.message ?? 'No se ha podido crear la copia.');
+    throw new Error(createError?.message ?? t.noCopiaCreada);
   }
 
   const copy = created as unknown as { id: string; slug: string; profiles: { username: string } };
@@ -405,7 +426,7 @@ export async function copySetToGame(setId: string, targetGameSlug: string) {
   }
 
   revalidatePath('/');
-  redirect(editSetPath(copy.profiles.username, copy.slug));
+  redirect(localized(locale, editSetPath(copy.profiles.username, copy.slug)));
 }
 
 /**

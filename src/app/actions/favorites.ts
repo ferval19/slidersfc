@@ -2,22 +2,31 @@
 
 import { revalidatePath } from 'next/cache';
 
+import { getDictionary } from '@/lib/i18n/dictionary';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export type FavoriteResult = { ok?: boolean; error?: string };
 
-/** Idempotente a propósito: se pide el estado que quieres, no un cambio. */
+/**
+ * Idempotente a propósito: se pide el estado que quieres, no un cambio.
+ *
+ * No es una Server Action de `<form>`, así que el idioma llega como
+ * argumento — igual que `signOut` en `app/actions/auth.ts`.
+ */
 export async function setFavorite(
   setId: string,
   favorite: boolean,
   pathname: string,
+  locale: Locale = DEFAULT_LOCALE,
 ): Promise<FavoriteResult> {
+  const t = getDictionary(locale).favoritoErrores;
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return { error: 'Tienes que iniciar sesión para guardar sets.' };
+  if (!user) return { error: t.iniciarSesion };
 
   if (favorite) {
     const { error } = await supabase

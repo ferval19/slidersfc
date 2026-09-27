@@ -27,7 +27,7 @@ export function FavoriteButton({
   const [saved, setSaved] = useState(mine);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
 
   if (loginHref) {
     return (
@@ -47,7 +47,7 @@ export function FavoriteButton({
     setError(null);
 
     startTransition(async () => {
-      const result = await setFavorite(setId, next, pathname);
+      const result = await setFavorite(setId, next, pathname, locale);
       if (result.error) {
         setSaved(!next);
         setError(result.error);

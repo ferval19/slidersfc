@@ -42,7 +42,8 @@ type Props = {
  * no porque nadie la esté escondiendo.
  */
 export function SetFormNav({ categories, touched, onGo }: Props) {
-  const { locale } = useI18n();
+  const { locale, t: dictionary } = useI18n();
+  const t = dictionary.set;
   const [sheetOpen, setSheetOpen] = useState(false);
   const observed = useActiveCategory(categories.map((entry) => entry.category));
 
@@ -79,7 +80,7 @@ export function SetFormNav({ categories, touched, onGo }: Props) {
   };
 
   const active = picked ?? observed;
-  const activeLabel = active ? categoryLabel(active, locale) : 'Valores';
+  const activeLabel = active ? categoryLabel(active, locale) : dictionary.setForm.valores;
   const totalTouched = Object.values(touched).reduce((sum, n) => sum + n, 0);
 
   return (
@@ -103,17 +104,17 @@ export function SetFormNav({ categories, touched, onGo }: Props) {
           <span className="display truncate text-xl">{activeLabel}</span>
           {totalTouched > 0 ? (
             <span className="value-pill shrink-0 text-xs text-ink-user">
-              {totalTouched} tocado{totalTouched === 1 ? '' : 's'}
+              {t.marcasTocadas(totalTouched)}
             </span>
           ) : null}
           <span aria-hidden className="eyebrow ml-auto shrink-0">
-            Índice ▾
+            {t.indice}
           </span>
         </button>
 
         {/* Tableta y escritorio: todas a la vez. */}
         <nav
-          aria-label="Categorías del set"
+          aria-label={t.categoriasDelSet}
           className="hidden min-w-0 flex-nowrap gap-1 overflow-x-auto px-5 py-2.5 sm:flex"
         >
           {categories.map(({ category }) => {
@@ -132,7 +133,7 @@ export function SetFormNav({ categories, touched, onGo }: Props) {
                     esta barra tiene y la de la ficha no puede tener. */}
                 {marks > 0 ? (
                   <span
-                    aria-label={`${marks} ${marks === 1 ? 'valor tocado' : 'valores tocados'}`}
+                    aria-label={t.marcasTocadas(marks)}
                     className="size-1.5 shrink-0 rounded-full bg-ink-user"
                   />
                 ) : null}

@@ -2,8 +2,31 @@ import type { Locale } from './i18n/locale';
 import type { CpuBehaviour, SliderScope } from './database.types';
 
 export const SITE_NAME = 'SlidersFC';
-export const SITE_TAGLINE = 'Sliders de EA SPORTS FC, con la comunidad comentando valor a valor.';
 export const SITE_BYLINE = 'by Full Manual FG';
+
+/**
+ * El eslogan y el remate del título van por idioma, a diferencia de
+ * `SITE_NAME` (marca) y `SITE_BYLINE` (firma): esos dos se leen igual en
+ * cualquier idioma, pero «Sliders de EA SPORTS FC» es una frase, no un nombre.
+ */
+const SITE_TITLE_SUFFIX: Record<Locale, string> = {
+  es: 'Sliders de EA SPORTS FC',
+  en: 'EA SPORTS FC sliders',
+};
+
+const SITE_TAGLINES: Record<Locale, string> = {
+  es: 'Sliders de EA SPORTS FC, con la comunidad comentando valor a valor.',
+  en: 'EA SPORTS FC sliders, with the community commenting value by value.',
+};
+
+/** El título por defecto de la web: el de la pestaña, el de Open Graph y el de X. */
+export function siteTitle(locale: Locale): string {
+  return `${SITE_NAME} — ${SITE_TITLE_SUFFIX[locale]}`;
+}
+
+export function siteTagline(locale: Locale): string {
+  return SITE_TAGLINES[locale];
+}
 
 /**
  * Las etiquetas de categorías y ámbitos viven aquí y no en el diccionario de

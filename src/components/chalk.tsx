@@ -28,15 +28,25 @@ export function ChalkFilters() {
 
 /**
  * Medio campo con una jugada pintada encima: los tuyos en amarillo, la línea
- * defensiva rival en rojo. Es la portada del hero.
+ * defensiva rival en rojo. Es la portada del hero, y también decora el perfil.
+ *
+ * `label` es opcional y en el idioma de quien la ve: sin él, el dibujo es pura
+ * decoración (`aria-hidden`), como el resto de los `Chalk*`. Antes llevaba la
+ * descripción fija en castellano — un lector de pantalla en inglés leyendo
+ * castellano es peor que no leer nada.
  */
-export function PitchDiagram({ className = '' }: { className?: string }) {
+export function PitchDiagram({
+  className = '',
+  label,
+}: {
+  className?: string;
+  label?: string;
+}) {
   return (
     <svg
       viewBox="0 0 400 520"
       className={className}
-      role="img"
-      aria-label="Medio campo dibujado a tiza con una jugada de ataque: tres delanteros, dos carriles de desmarque y la línea defensiva rival"
+      {...(label ? { role: 'img' as const, 'aria-label': label } : { 'aria-hidden': true })}
     >
       <g className="chalk-stroke" stroke="#f2efe4" strokeOpacity="0.5" strokeWidth="1.8">
         {/* Líneas de banda y fondo */}

@@ -23,7 +23,7 @@ export function SetOwnerActions({
   otherGames?: { slug: string; name: string }[];
 }) {
   const [pending, startTransition] = useTransition();
-  const { t: dictionary } = useI18n();
+  const { locale, t: dictionary } = useI18n();
   const t = dictionary.set;
 
   return (
@@ -64,7 +64,9 @@ export function SetOwnerActions({
           type="button"
           className="btn btn-quiet btn-sm"
           disabled={pending}
-          onClick={() => startTransition(async () => void (await copySetToGame(setId, game.slug)))}
+          onClick={() =>
+            startTransition(async () => void (await copySetToGame(setId, game.slug, locale)))
+          }
           title={t.copiarValoresTitle(game.name)}
         >
           <ChalkCarry className="size-3.5" />
@@ -82,7 +84,7 @@ export function SetOwnerActions({
           onClick={() => {
             if (!confirm(t.confirmarBorrado)) return;
             startTransition(async () => {
-              await deleteSet(setId);
+              await deleteSet(setId, locale);
             });
           }}
         >

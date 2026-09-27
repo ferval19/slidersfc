@@ -9,7 +9,7 @@ import { I18nProvider } from '@/components/i18n-provider';
 import { SetupNotice } from '@/components/setup-notice';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
-import { SITE_NAME, SITE_TAGLINE } from '@/lib/constants';
+import { SITE_NAME, siteTagline, siteTitle } from '@/lib/constants';
 import { lang } from 'next/root-params';
 
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
@@ -53,23 +53,23 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(siteUrl),
     title: {
-      default: `${SITE_NAME} — Sliders de EA SPORTS FC`,
+      default: siteTitle(locale),
       template: `%s · ${SITE_NAME}`,
     },
-    description: SITE_TAGLINE,
+    description: siteTagline(locale),
     keywords: ['sliders FC', 'sliders EA SPORTS FC', 'sliders FC 27', 'sliders FC 26', SITE_NAME],
     openGraph: {
       type: 'website',
       url: siteUrl,
       siteName: SITE_NAME,
-      title: `${SITE_NAME} — Sliders de EA SPORTS FC`,
-      description: SITE_TAGLINE,
+      title: siteTitle(locale),
+      description: siteTagline(locale),
       locale: OG_LOCALE[locale],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${SITE_NAME} — Sliders de EA SPORTS FC`,
-      description: SITE_TAGLINE,
+      title: siteTitle(locale),
+      description: siteTagline(locale),
     },
     robots: {
       index: true,
@@ -91,7 +91,7 @@ function websiteJsonLd(locale: Locale) {
     name: SITE_NAME,
     alternateName: 'Sliders FC',
     url: siteUrl,
-    description: SITE_TAGLINE,
+    description: siteTagline(locale),
     inLanguage: locale,
   };
 }
