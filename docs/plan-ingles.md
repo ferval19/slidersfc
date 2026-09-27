@@ -107,20 +107,17 @@ derivado. Para `sprint_speed` da igual, es «Sprint Speed» desde hace quince
 años. Para lo que **FC27 estrena** no hay precedente que valga, y ahí sigue
 haciendo falta una mirada al menú en inglés. Doce nombres, cuatro pantallas:
 
-| Slug | Castellano (leído) | Inglés (derivado) |
-| --- | --- | --- |
-| `master_shot_error` | Error de tiro (general) | Shot Error (Master) |
-| `master_shot_speed` | Velocidad y altura de tiro (general) | Shot Speed & Height (Master) |
-| `master_pass_error` | Error de pase (general) | Pass Error (Master) |
-| `master_pass_speed` | Velocidad y altura de pase (general) | Pass Speed & Height (Master) |
-| `shot_error` | Error en tiros normales | Normal Shot Error |
-| `pass_error` | Error en pases rasos normales | Normal Ground Pass Error |
-| `jog_dribbling` | Conducción al trote | Jog Dribbling |
-| `sprint_dribbling` | Conducciones en carrera | Sprint Dribbling |
-| `controlled_sprint_dribbling` | Conducciones controladas en carrera | Controlled Sprint Dribbling |
-| `jockey_speed` | Velocidad de brega normal | Normal Jockey Speed |
-| `physicality_impact` | Impacto del físico | Physicality Impact |
-| `cpu_professional_frequency` | Frecuencia de faltas tácticas | Professional Foul Frequency |
+**Resuelto el 27/09, y por las malas.** Una captura del menú en inglés
+publicada por @Matt10L en la comunidad de Operation Sports dio los nombres de
+verdad, y de los trece que estaban marcados como dudosos **los trece estaban
+mal**. No «Shot Error (Master)» sino **All Shooting Errors**; no «Interception
+Error» sino **Intercept Error**; no «Normal Shot Error» sino **Regular Shot
+Error**.
+
+La lección no es que la derivación fuera mala: para los otros cincuenta acertó.
+Es que acertó donde no importaba —los que llevan quince años llamándose igual—
+y falló entera donde sí, en lo que FC27 estrena. Marcarlos como dudosos fue lo
+que salvó el asunto.
 
 No bloquean: se puede empezar la fase 1 con estos doce como están y corregirlos
 cuando se miren. Es un `nameEn` en un fichero, no una migración.

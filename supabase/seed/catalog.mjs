@@ -50,10 +50,15 @@ export const games = [
 // mirado el juego en inglés.
 //
 // Para la mayoría da igual: `sprint_speed` es «Sprint Speed» en todos los FIFA
-// desde hace quince años. Donde SÍ importa es en lo que FC27 estrena y no
-// tiene precedente —los cuatro «(general)», los tipos de tiro y de pase, la
-// conducción y la brega—. Ésos están marcados en docs/plan-ingles.md como
-// pendientes de una mirada al menú en inglés.
+// desde hace quince años. Donde NO daba igual era en lo que FC27 estrena, y
+// ahí la derivación falló entera: de los trece que estaban marcados como
+// dudosos, **los trece estaban mal**. «Error de tiro (general)» no es «Shot
+// Error (Master)» sino «All Shooting Errors»; «Fallo al interceptar» no es
+// «Interception Error» sino «Intercept Error».
+//
+// Corregidos el 27/09 con una captura del menú en inglés publicada por
+// @Matt10L en la comunidad de Operation Sports. Esos trece ya no están
+// derivados: están leídos.
 //
 // Regla que no cambia: el día que se mire el juego, manda el juego.
 // ---------------------------------------------------------------------------
@@ -135,11 +140,11 @@ const fc27 = [
   // OJO: los nombres en español están reconstruidos a partir de la tarjeta de
   // @WilsdorfAndreas y de cómo se llamaban en FC26; no se han leído del menú.
   // Si en el juego se llaman de otra forma, se corrigen aquí y se regenera.
-  { slug: 'master_shot_error',         name: 'Error de tiro (general)', nameEn: 'Shot Error (Master)',              category: 'shooting', default: 50 },
-  { slug: 'master_shot_speed',         name: 'Velocidad y altura de tiro (general)', nameEn: 'Shot Speed & Height (Master)', category: 'shooting', default: 50 },
+  { slug: 'master_shot_error',         name: 'Error de tiro (general)', nameEn: 'All Shooting Errors',              category: 'shooting', default: 50 },
+  { slug: 'master_shot_speed',         name: 'Velocidad y altura de tiro (general)', nameEn: 'All Shooting Speed/Height', category: 'shooting', default: 50 },
 
-  { slug: 'shot_error',                name: 'Error en tiros normales', nameEn: 'Normal Shot Error',              category: 'shooting', default: 52 },
-  { slug: 'shot_speed',                name: 'Velocidad de tiros normales', nameEn: 'Normal Shot Speed',          category: 'shooting', default: 48 },
+  { slug: 'shot_error',                name: 'Error en tiros normales', nameEn: 'Regular Shot Error',              category: 'shooting', default: 52 },
+  { slug: 'shot_speed',                name: 'Velocidad de tiros normales', nameEn: 'Regular Shot Speed',          category: 'shooting', default: 48 },
   { slug: 'finesse_shot_error',        name: 'Error en tiros de calidad', nameEn: 'Finesse Shot Error',            category: 'shooting', default: 55 },
   { slug: 'finesse_shot_speed',        name: 'Velocidad de tiros de calidad', nameEn: 'Finesse Shot Speed',        category: 'shooting', default: 45 },
   { slug: 'chip_shot_error',           name: 'Error en vaselina', nameEn: 'Chip Shot Error',                    category: 'shooting', default: 60 },
@@ -151,18 +156,18 @@ const fc27 = [
   { slug: 'header_shot_error',         name: 'Fallo al rematar de cabeza', nameEn: 'Header Shot Error',           category: 'shooting', default: 40 },
 
   // PASE
-  { slug: 'master_pass_error',             name: 'Error de pase (general)', nameEn: 'Pass Error (Master)',               category: 'passing', default: 50 },
-  { slug: 'master_pass_speed',             name: 'Velocidad y altura de pase (general)', nameEn: 'Pass Speed & Height (Master)',  category: 'passing', default: 50 },
+  { slug: 'master_pass_error',             name: 'Error de pase (general)', nameEn: 'All Passing Errors',               category: 'passing', default: 50 },
+  { slug: 'master_pass_speed',             name: 'Velocidad y altura de pase (general)', nameEn: 'All Passing Speed/Height',  category: 'passing', default: 50 },
 
   { slug: 'pass_error',                    name: 'Error en pases rasos normales', nameEn: 'Normal Ground Pass Error',         category: 'passing', default: 55 },
   { slug: 'pass_speed',                    name: 'Velocidad de pases rasos normales', nameEn: 'Normal Ground Pass Speed',     category: 'passing', default: 45 },
   { slug: 'header_pass_error',             name: 'Fallo al pasar con la cabeza', nameEn: 'Header Pass Error',          category: 'passing', default: 60 },
-  { slug: 'through_pass_error',            name: 'Error en pases rasos al hueco', nameEn: 'Ground Through Pass Error',         category: 'passing', default: 55 },
-  { slug: 'through_pass_speed',            name: 'Velocidad de pases rasos al hueco', nameEn: 'Ground Through Pass Speed',     category: 'passing', default: 38 },
+  { slug: 'through_pass_error',            name: 'Error en pases rasos al hueco', nameEn: 'Through Ground Pass Error',         category: 'passing', default: 55 },
+  { slug: 'through_pass_speed',            name: 'Velocidad de pases rasos al hueco', nameEn: 'Through Ground Pass Speed',     category: 'passing', default: 38 },
   { slug: 'lobbed_through_pass_error',     name: 'Error en pases altos al hueco', nameEn: 'Lobbed Through Pass Error',         category: 'passing', default: 55 },
   { slug: 'lobbed_through_pass_height',    name: 'Altura de pases altos al hueco', nameEn: 'Lobbed Through Pass Height',        category: 'passing', default: 35 },
-  { slug: 'lob_pass_error',                name: 'Error en pases altos normales', nameEn: 'Normal Lob Pass Error',         category: 'passing', default: 55 },
-  { slug: 'lob_pass_height',               name: 'Altura de pases altos normales', nameEn: 'Normal Lob Pass Height',        category: 'passing', default: 35 },
+  { slug: 'lob_pass_error',                name: 'Error en pases altos normales', nameEn: 'Regular Lob Pass Error',         category: 'passing', default: 55 },
+  { slug: 'lob_pass_height',               name: 'Altura de pases altos normales', nameEn: 'Regular Lob Pass Height',        category: 'passing', default: 35 },
   { slug: 'cross_error',                   name: 'Error en centros', nameEn: 'Cross Error',                      category: 'passing', default: 60 },
   { slug: 'cross_height',                  name: 'Altura de centros', nameEn: 'Cross Height',                     category: 'passing', default: 55 },
 
@@ -185,8 +190,8 @@ const fc27 = [
   // CONTROL DEL BALÓN
   { slug: 'power_bar',                 name: 'Barra de potencia', nameEn: 'Power Bar',                   category: 'ball_control', sides: 'user', default: 50 },
   { slug: 'first_touch_error',         name: 'Error de control al primer toque', nameEn: 'First Touch Control Error',    category: 'ball_control', default: 85 },
-  { slug: 'interception_error',        name: 'Fallo al interceptar', nameEn: 'Interception Error',                category: 'ball_control', default: 90 },
-  { slug: 'deflection_error',          name: 'Error al desviar el balón', nameEn: 'Deflection Error',           category: 'ball_control', default: 99 },
+  { slug: 'interception_error',        name: 'Fallo al interceptar', nameEn: 'Intercept Error',                category: 'ball_control', default: 90 },
+  { slug: 'deflection_error',          name: 'Error al desviar el balón', nameEn: 'Ball Deflection Error',           category: 'ball_control', default: 99 },
   { slug: 'jog_dribbling',             name: 'Conducción al trote', nameEn: 'Jog Dribbling',                 category: 'ball_control', default: 50 },
   { slug: 'sprint_dribbling',          name: 'Conducciones en carrera', nameEn: 'Sprint Dribbling',             category: 'ball_control', default: 50 },
   { slug: 'controlled_sprint_dribbling', name: 'Conducciones controladas en carrera', nameEn: 'Controlled Sprint Dribbling', category: 'ball_control', default: 50 },
@@ -194,7 +199,7 @@ const fc27 = [
   // DEFENSA
   { slug: 'tackle_assistance',   name: 'Asistencia en entradas', nameEn: 'Tackle Assistance',        category: 'defending', default: 40 },
   { slug: 'physicality_impact',  name: 'Impacto del físico', nameEn: 'Physicality Impact',            category: 'defending', default: 99 },
-  { slug: 'jockey_speed',        name: 'Velocidad de brega normal', nameEn: 'Normal Jockey Speed',     category: 'defending', default: 50 },
+  { slug: 'jockey_speed',        name: 'Velocidad de brega normal', nameEn: 'Regular Jockey Speed',     category: 'defending', default: 50 },
   { slug: 'sprint_jockey_speed', name: 'Velocidad de brega corriendo', nameEn: 'Sprint Jockey Speed',  category: 'defending', default: 50 },
 
   // CONTROLES DE LA CPU — pestaña aparte, con CPU rival y CPU de tu equipo

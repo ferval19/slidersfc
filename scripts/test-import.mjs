@@ -214,13 +214,13 @@ const valueOf = (report, definitions, slug, scope) =>
 // menú en inglés, no los del catálogo en castellano.
 {
   const report = parseSliderText(
-    ['Sprint Speed 40 45', 'Shot Error (Master) 55 60', 'Finesse Shot Error 30 35'].join('\n'),
+    ['Sprint Speed 40 45', 'All Shooting Errors 55 60', 'Finesse Shot Error 30 35'].join('\n'),
     fc27,
   );
   const porSlug = Object.fromEntries(report.rows.map((row) => [row.slug, row]));
   check('reconoce un nombre inglés que coincide con el slug', Boolean(porSlug.sprint_speed));
   check(
-    'y uno que NO coincide con el slug, como «Shot Error (Master)»',
+    'y uno que NO coincide con el slug, como «All Shooting Errors»',
     Boolean(porSlug.master_shot_error),
   );
   check('y los tres a la vez, sin dejar líneas sueltas', report.unmatched.length === 0,
