@@ -1045,6 +1045,25 @@ sliders, y ya vivían ahí.
 Queda en castellano exactamente lo que tiene que quedar: los títulos, las
 descripciones y los comentarios que escribe la gente.
 
+### 27/09 · Qué versión estás viendo
+
+El selector de idioma estaba en el pie, donde no se ve hasta que bajas del
+todo. Sube al lado del logotipo: el idioma no es sólo un interruptor, es **el
+rótulo de la versión que estás mirando**, y la cabecera va pegada arriba, así
+que desde ahí se ve y se alcanza siempre. En el pie ya no está: dos mandos
+para lo mismo son dos sitios donde equivocarse.
+
+**Sin bandera, y a petición contraria.** Una bandera es un país, no un idioma:
+la de España le dice a un mexicano o a un argentino que ésta es «la versión de
+España», y la mitad larga de esta comunidad no está en España. Los emoji de
+bandera tampoco se dibujan en Windows —salen dos letras en una caja—, así que
+en muchos escritorios acabarías viendo justo lo que hay ahora, pero hecho sin
+querer. Y sería el único elemento a color de una web que es tiza sobre pizarra.
+
+Comprobado a 375 px con Playwright, que ya estaba instalado para los tests de
+punta a punta: entra sin desbordar, con la mitad activa en tiza y la otra
+apagada.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

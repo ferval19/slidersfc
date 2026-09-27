@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { lang } from 'next/root-params';
 
 import { Avatar } from '@/components/avatar';
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { Logo } from '@/components/logo';
 import { SITE_BYLINE } from '@/lib/constants';
 import { getDictionary } from '@/lib/i18n/dictionary';
@@ -12,7 +13,8 @@ import { getSessionProfile } from '@/lib/supabase/server';
 export async function SiteHeader() {
   const [session, localeParam] = await Promise.all([getSessionProfile(), lang()]);
   const locale = (localeParam ?? DEFAULT_LOCALE) as Locale;
-  const t = getDictionary(locale).header;
+  const dict = getDictionary(locale);
+  const t = dict.header;
 
   return (
     <header className="sticky top-0 z-30 bg-board/92 backdrop-blur">
@@ -21,6 +23,10 @@ export async function SiteHeader() {
           <Logo />
           <span className="eyebrow hidden sm:inline">{SITE_BYLINE}</span>
         </Link>
+
+        {/* Pegado al logotipo porque no es una preferencia de cuenta: es el
+            rótulo de qué versión de la web estás viendo. */}
+        <LanguageSwitcher locale={locale} label={dict.footer.cambiarIdioma} />
 
         {/* Se decide con la SESIÓN, no con el perfil: si la fila de perfil
             falta, /perfil la repara. Antes se mostraba «Entrar» a alguien que

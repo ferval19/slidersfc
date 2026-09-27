@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { lang } from 'next/root-params';
 
-import { LanguageSwitcher } from '@/components/language-switcher';
 import { SITE_BYLINE, SITE_NAME } from '@/lib/constants';
 import { getDictionary } from '@/lib/i18n/dictionary';
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
@@ -27,9 +26,6 @@ export async function SiteFooter() {
           >
             {t.queLlevaUnSet}
           </Link>
-          {/* Se busca, no se tropieza con él: por eso va aquí y no en la
-              cabecera, que ya está llena. */}
-          <LanguageSwitcher locale={locale} label={t.cambiarIdioma} />
         </div>
         <p className="max-w-sm text-xs text-chalk-dim">{t.disclaimer}</p>
       </div>

@@ -96,3 +96,11 @@ que esta página prohíbe.
 
 **Las marcas ajenas no se dibujan en tiza.** El logotipo de X va tal cual es.
 Una marca no es decoración, y redibujarla es falsificarla.
+
+**Y el idioma no se dibuja con banderas.** Va en dos letras, `ES` y `EN`,
+pegadas al logotipo. Una bandera es un país y no un idioma: la de España le
+dice a un mexicano o a un argentino que ésta es «la versión de España», y la
+mitad larga de esta comunidad no está en España. Además los emoji de bandera
+no se dibujan en Windows —salen dos letras en una caja—, o sea que en muchos
+escritorios acabarías viendo justo esto pero mal hecho. Y una bandera a color
+sería el único elemento a color de una web que es tiza sobre pizarra.
