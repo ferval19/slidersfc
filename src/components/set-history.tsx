@@ -1,5 +1,9 @@
+import { lang } from 'next/root-params';
+
 import { ChalkClipboard } from '@/components/chalk';
 import { SCOPE_LABELS } from '@/lib/constants';
+import { getDictionary } from '@/lib/i18n/dictionary';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import type { VersionEntry } from '@/lib/queries';
 
 /**
@@ -12,16 +16,19 @@ import type { VersionEntry } from '@/lib/queries';
  * Se enseña el cambio y no la foto de cada versión, que es lo que se guarda.
  * La v1 no sale: no estrena nada, es el set tal como se publicó.
  */
-export function SetHistory({ entries }: { entries: VersionEntry[] }) {
+export async function SetHistory({ entries }: { entries: VersionEntry[] }) {
   if (entries.length === 0) return null;
+
+  const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
+  const t = getDictionary(locale).set;
 
   return (
     <section className="py-9">
       <header className="flex items-center gap-3">
         <ChalkClipboard className="size-8 shrink-0 text-chalk-dim" />
         <div>
-          <p className="eyebrow">Cómo ha cambiado</p>
-          <h2 className="display text-3xl">Historial</h2>
+          <p className="eyebrow">{t.comoHaCambiado}</p>
+          <h2 className="display text-3xl">{t.historial}</h2>
         </div>
       </header>
 
@@ -30,11 +37,8 @@ export function SetHistory({ entries }: { entries: VersionEntry[] }) {
           <li key={entry.version} className="border-b border-chalk-line/60 pb-6 last:border-b-0">
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
               <span className="display text-2xl text-ink-user">v{entry.version}</span>
-              <span className="eyebrow">{formatDate(entry.createdAt)}</span>
-              <span className="eyebrow ml-auto">
-                {entry.changes.length}{' '}
-                {entry.changes.length === 1 ? 'valor tocado' : 'valores tocados'}
-              </span>
+              <span className="eyebrow">{formatDate(entry.createdAt, locale)}</span>
+              <span className="eyebrow ml-auto">{t.valorTocado(entry.changes.length)}</span>
             </div>
 
             {entry.note ? (
@@ -85,8 +89,8 @@ export function SetHistory({ entries }: { entries: VersionEntry[] }) {
   );
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('es-ES', {
+function formatDate(iso: string, locale: Locale) {
+  return new Date(iso).toLocaleDateString(locale === 'en' ? 'en-US' : 'es-ES', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',

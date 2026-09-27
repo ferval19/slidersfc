@@ -45,6 +45,8 @@ export type SliderDefinition = {
   category: string;
   applies_to: SliderScope;
   name: string;
+  /** El mismo slider en el menú en inglés. Nulo = se enseña el castellano. */
+  name_en: string | null;
   slug: string;
   min_value: number;
   max_value: number;

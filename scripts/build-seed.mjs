@@ -78,7 +78,7 @@ for (const game of games) {
     for (const scope of scopesFor(slider, game)) {
       rows.push(
         `  ((select id from public.games where slug = ${q(game.slug)}), ` +
-          `${q(slider.category)}, ${q(scope)}, ${q(slider.name)}, ${q(slider.slug)}, ` +
+          `${q(slider.category)}, ${q(scope)}, ${q(slider.name)}, ${slider.nameEn ? q(slider.nameEn) : 'null'}, ${q(slider.slug)}, ` +
           `${slider.min ?? game.range.min}, ${slider.max ?? game.range.max}, ` +
           `${defaultFor(slider, scope, game)}, ${sortOrder})`,
       );
@@ -92,12 +92,13 @@ for (const game of games) {
 
 lines.push(
   'insert into public.slider_definitions',
-  '  (game_id, category, applies_to, name, slug, min_value, max_value, default_value, sort_order)',
+  '  (game_id, category, applies_to, name, name_en, slug, min_value, max_value, default_value, sort_order)',
   'values',
   rows.join(',\n'),
   'on conflict (game_id, slug, applies_to) do update',
   '  set category      = excluded.category,',
   '      name          = excluded.name,',
+  '      name_en       = excluded.name_en,',
   '      min_value     = excluded.min_value,',
   '      max_value     = excluded.max_value,',
   '      default_value = excluded.default_value,',

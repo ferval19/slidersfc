@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 
 import { categoryAnchor } from '@/components/active-category';
 import { CATEGORY_DRAWINGS } from '@/components/chalk';
+import { useI18n } from '@/components/i18n-provider';
 import { categoryLabel } from '@/lib/constants';
 
 type Props = {
@@ -41,6 +42,8 @@ export function CategorySheet({
   marks,
   onSelect,
 }: Props) {
+  const { t } = useI18n();
+
   // Con la hoja abierta, el fondo no se mueve.
   useEffect(() => {
     if (!open) return;
@@ -78,7 +81,7 @@ export function CategorySheet({
     <div className="fixed inset-0 z-40 flex flex-col justify-end sm:hidden">
       <button
         type="button"
-        aria-label="Cerrar"
+        aria-label={t.comun.cerrar}
         onClick={onClose}
         className="absolute inset-0 bg-board-deep/80"
       />
@@ -86,13 +89,13 @@ export function CategorySheet({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Categorías del set"
+        aria-label={t.set.categoriasDelSet}
         className="relative max-h-[80vh] overflow-y-auto border-t border-chalk-line bg-board-raised pb-[env(safe-area-inset-bottom)]"
       >
         <div className="flex items-center justify-between gap-3 px-5 pt-5 pb-3">
-          <h2 className="display text-2xl">Ir a</h2>
+          <h2 className="display text-2xl">{t.set.irA}</h2>
           <button type="button" onClick={onClose} className="btn btn-quiet">
-            Cerrar
+            {t.comun.cerrar}
           </button>
         </div>
 
@@ -119,7 +122,7 @@ export function CategorySheet({
                   <span className="display flex-1 text-xl">{categoryLabel(category)}</span>
                   {marks && marks[category] > 0 ? (
                     <span className="value-pill text-xs text-ink-user">
-                      {marks[category]} tocado{marks[category] === 1 ? '' : 's'}
+                      {t.set.marcasTocadas(marks[category])}
                     </span>
                   ) : null}
                   <span className="eyebrow">{count}</span>

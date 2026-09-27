@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { lang } from 'next/root-params';
 
 import { Avatar } from '@/components/avatar';
 import { CompareTable } from '@/components/compare-table';
@@ -8,6 +9,7 @@ import { ShareButton } from '@/components/share-button';
 import { COMPARE_INK } from '@/components/slider-scale';
 import { buildCompareView } from '@/lib/compare';
 import { cpuBehaviourLabel } from '@/lib/constants';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import { comparePath, comparePickerPath, setPath } from '@/lib/paths';
 import { getSetDetail, type SetDetail } from '@/lib/queries';
 import { publicSiteUrl } from '@/lib/site-url';
@@ -45,7 +47,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function ComparePage({ params }: { params: Params }) {
-  const { a, b } = await load(params);
+  const [{ a, b }, localeParam] = await Promise.all([load(params), lang()]);
+  const locale = (localeParam ?? DEFAULT_LOCALE) as Locale;
   if (!a || !b) notFound();
 
   // Dos juegos distintos no se pueden comparar slider a slider: no son dos
@@ -79,6 +82,7 @@ export default async function ComparePage({ params }: { params: Params }) {
       : a.definitions.filter((definition) => definition.category !== 'cpu_controls'),
     a: plain(a),
     b: plain(b),
+    locale,
   });
 
   return (

@@ -31,3 +31,9 @@ export function switchLocalePath(locale: Locale, pathWithPrefix: string): string
   const sinPrefijo = pathWithPrefix.replace(/^\/en(?=\/|$)/, '') || '/';
   return localePath(locale, sinPrefijo);
 }
+
+/** El nombre del slider en el idioma que toca. Sin inglés, el castellano: feo pero se entiende. */
+export function sliderName(d: { name: string; name_en: string | null }, locale: Locale): string {
+  if (locale === 'en' && d.name_en) return d.name_en;
+  return d.name;
+}

@@ -5,6 +5,7 @@ import { useState, useTransition } from 'react';
 
 import { setFavorite } from '@/app/actions/favorites';
 import { ChalkStar } from '@/components/chalk';
+import { useI18n } from '@/components/i18n-provider';
 
 /**
  * Guardar el set de otro. No enseña cuánta gente lo ha guardado a propósito:
@@ -26,12 +27,13 @@ export function FavoriteButton({
   const [saved, setSaved] = useState(mine);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const { t } = useI18n();
 
   if (loginHref) {
     return (
       <Link href={loginHref} className="btn btn-quiet">
         <ChalkStar className="size-4" />
-        Guardar
+        {t.set.guardar}
       </Link>
     );
   }
@@ -63,7 +65,7 @@ export function FavoriteButton({
         className="btn btn-quiet"
       >
         <ChalkStar className="size-4" filled={saved} />
-        {saved ? 'Guardado' : 'Guardar'}
+        {saved ? t.set.guardado : t.set.guardar}
       </button>
       {error ? <span className="text-sm text-ink-rival">{error}</span> : null}
     </div>

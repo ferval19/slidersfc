@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { lang } from 'next/root-params';
 
 import { ConsoleMode } from '@/components/console-mode';
 import { getSetDetail } from '@/lib/queries';
 import { buildSetView } from '@/lib/set-view';
 import { conditionsSummary } from '@/lib/set-conditions';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import { setPath } from '@/lib/paths';
 
 type Params = Promise<{ username: string; slug: string }>;
@@ -18,10 +20,11 @@ export const metadata: Metadata = {
 export default async function ConsolePage({ params }: { params: Params }) {
   const { username, slug } = await params;
   const detail = await getSetDetail({ username, slug });
+  const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
 
   if (!detail) notFound();
 
-  const view = buildSetView(detail, null);
+  const view = buildSetView(detail, null, locale);
 
   return (
     <ConsoleMode

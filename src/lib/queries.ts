@@ -9,6 +9,8 @@ import type {
   SliderScope,
   SliderSet,
 } from '@/lib/database.types';
+import { sliderName } from '@/lib/i18n/locale';
+import type { Locale } from '@/lib/i18n/locale';
 
 export type SetListItem = SliderSet & {
   games: Pick<Game, 'slug' | 'name'> | null;
@@ -407,7 +409,7 @@ export async function getFavoriteSetsByUser(userId: string): Promise<SetListItem
   );
 }
 
-export function groupDefinitions(definitions: SliderDefinition[]) {
+export function groupDefinitions(definitions: SliderDefinition[], locale: Locale) {
   const byCategory = new Map<string, Map<string, GroupedSlider>>();
 
   for (const definition of definitions) {
@@ -419,7 +421,7 @@ export function groupDefinitions(definitions: SliderDefinition[]) {
     if (!sliders.has(definition.slug)) {
       sliders.set(definition.slug, {
         slug: definition.slug,
-        name: definition.name,
+        name: sliderName(definition, locale),
         scopes: [],
       });
     }

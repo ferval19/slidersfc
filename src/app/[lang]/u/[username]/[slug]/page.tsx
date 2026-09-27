@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
+import { lang } from 'next/root-params';
 
 import { Avatar } from '@/components/avatar';
 import { ChalkPad, ChalkScales } from '@/components/chalk';
@@ -21,8 +22,10 @@ import {
 } from '@/lib/queries';
 import { buildSetView } from '@/lib/set-view';
 import { conditionsSummary } from '@/lib/set-conditions';
+import { getDictionary } from '@/lib/i18n/dictionary';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import { jsonLd } from '@/lib/json-ld';
-import { comparePickerPath, consolePath, profilePath, setPath } from '@/lib/paths';
+import { comparePickerPath, consolePath, localized, profilePath, setPath } from '@/lib/paths';
 import { publicSiteUrl } from '@/lib/site-url';
 import { getCurrentUser } from '@/lib/supabase/server';
 
@@ -30,7 +33,10 @@ type Params = Promise<{ username: string; slug: string }>;
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { username, slug } = await params;
-  const detail = await getSetDetail({ username, slug });
+  const [detail, locale] = await Promise.all([
+    getSetDetail({ username, slug }),
+    lang() as Promise<Locale | undefined>,
+  ]);
 
   if (!detail) return { title: 'Set no encontrado' };
 
@@ -39,25 +45,26 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const description =
     detail.set.description?.replace(/\s+/g, ' ').slice(0, 180) ??
     `Set de sliders de ${detail.game.name}, por ${author}.`;
+  const path = localized(locale ?? DEFAULT_LOCALE, setPath(detail.owner.username, detail.set.slug));
 
   // La imagen la genera opengraph-image.tsx; Next la enlaza sola.
   return {
     title,
     description,
-    alternates: { canonical: setPath(detail.owner.username, detail.set.slug) },
+    alternates: { canonical: path },
     openGraph: {
       title,
       description,
       type: 'article',
-      url: setPath(detail.owner.username, detail.set.slug),
+      url: path,
       authors: [author],
     },
     twitter: { card: 'summary_large_image', title, description },
   };
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('es-ES', {
+function formatDate(iso: string, locale: Locale) {
+  return new Date(iso).toLocaleDateString(locale === 'en' ? 'en-US' : 'es-ES', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -67,16 +74,19 @@ function formatDate(iso: string) {
 export default async function SetDetailPage({ params }: { params: Params }) {
   const { username, slug } = await params;
 
-  const [detail, user, games] = await Promise.all([
+  const [detail, user, games, localeParam] = await Promise.all([
     getSetDetail({ username, slug }),
     getCurrentUser(),
     getGames(),
+    lang(),
   ]);
+  const locale = (localeParam ?? DEFAULT_LOCALE) as Locale;
+  const t = getDictionary(locale);
   if (!detail) {
     // Igual que en el perfil: un enlace compartido con el nombre de antes
     // sigue llevando al set.
     const current = await getUsernameAfterRename(username);
-    if (current) permanentRedirect(setPath(current, slug));
+    if (current) permanentRedirect(localized(locale, setPath(current, slug)));
     notFound();
   }
 
@@ -87,27 +97,27 @@ export default async function SetDetailPage({ params }: { params: Params }) {
     isFavorite(detail.set.id, user?.id ?? null),
   ]);
 
-  const view = buildSetView(detail, user?.id ?? null);
+  const view = buildSetView(detail, user?.id ?? null, locale);
   const isOwner = user?.id === detail.owner.id;
   const siteUrl = publicSiteUrl();
-  const shareUrl = `${siteUrl}${setPath(detail.owner.username, detail.set.slug)}`;
+  const shareUrl = `${siteUrl}${localized(locale, setPath(detail.owner.username, detail.set.slug))}`;
   const authorName = detail.owner.display_name ?? detail.owner.username;
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Inicio', item: `${siteUrl}/` },
+      { '@type': 'ListItem', position: 1, name: t.comun.inicio, item: `${siteUrl}${localized(locale, '/')}` },
       {
         '@type': 'ListItem',
         position: 2,
-        name: `Sliders de ${detail.game.name}`,
-        item: `${siteUrl}/juegos/${detail.game.slug}`,
+        name: t.set.slidersDeJuego(detail.game.name),
+        item: `${siteUrl}${localized(locale, `/juegos/${detail.game.slug}`)}`,
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: authorName,
-        item: `${siteUrl}${profilePath(detail.owner.username)}`,
+        item: `${siteUrl}${localized(locale, profilePath(detail.owner.username))}`,
       },
       {
         '@type': 'ListItem',
@@ -123,14 +133,14 @@ export default async function SetDetailPage({ params }: { params: Params }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} />
       <header className="flex flex-col gap-4 pb-8">
         <div className="flex flex-wrap items-center gap-2">
-          <Link href={`/juegos/${detail.game.slug}`} className="chip chip-active">
+          <Link href={localized(locale, `/juegos/${detail.game.slug}`)} className="chip chip-active">
             {detail.game.slug.toUpperCase()}
           </Link>
           {detail.set.version > 1 ? (
-            <span className="chip">Versión {detail.set.version}</span>
+            <span className="chip">{t.set.version(detail.set.version)}</span>
           ) : null}
           {!detail.set.is_published ? (
-            <span className="chip border-ink-user/40 text-ink-user">Borrador · sólo tú lo ves</span>
+            <span className="chip border-ink-user/40 text-ink-user">{t.set.borrador}</span>
           ) : null}
         </div>
 
@@ -143,7 +153,7 @@ export default async function SetDetailPage({ params }: { params: Params }) {
             size={30}
           />
           <Link
-            href={profilePath(detail.owner.username)}
+            href={localized(locale, profilePath(detail.owner.username))}
             className="font-bold text-chalk hover:text-ink-user"
           >
             {detail.owner.display_name ?? detail.owner.username}
@@ -159,10 +169,10 @@ export default async function SetDetailPage({ params }: { params: Params }) {
             </a>
           ) : null}
           <span>·</span>
-          <span>{formatDate(detail.set.created_at)}</span>
+          <span>{formatDate(detail.set.created_at, locale)}</span>
           <span>·</span>
           <span>
-            {view.totalComments} {view.totalComments === 1 ? 'comentario' : 'comentarios'}
+            {view.totalComments} {t.set.comentarios(view.totalComments)}
           </span>
         </div>
 
@@ -181,11 +191,11 @@ export default async function SetDetailPage({ params }: { params: Params }) {
         <div className="flex flex-col gap-3 pt-2">
           <div className="flex flex-wrap items-center gap-2">
             <Link
-              href={consolePath(detail.owner.username, detail.set.slug)}
+              href={localized(locale, consolePath(detail.owner.username, detail.set.slug))}
               className="btn btn-primary"
             >
               <ChalkPad className="size-4" />
-              Meter en la consola
+              {t.set.meterEnConsola}
             </Link>
 
             {detail.set.is_published ? (
@@ -199,14 +209,17 @@ export default async function SetDetailPage({ params }: { params: Params }) {
             {/* La pregunta que se hace quien llega aquí desde otro set no es
                 qué valores tiene éste, sino en qué se diferencia del suyo. */}
             <Link
-              href={comparePickerPath({
-                username: detail.owner.username,
-                slug: detail.set.slug ?? '',
-              })}
+              href={localized(
+                locale,
+                comparePickerPath({
+                  username: detail.owner.username,
+                  slug: detail.set.slug ?? '',
+                }),
+              )}
               className="btn btn-quiet"
             >
               <ChalkScales className="size-4" />
-              Comparar
+              {t.set.comparar}
             </Link>
 
             {/* El autor no se ve el botón: el SQL prohíbe guardarse el set
@@ -214,9 +227,13 @@ export default async function SetDetailPage({ params }: { params: Params }) {
             {!isOwner ? (
               <FavoriteButton
                 setId={detail.set.id}
-                pathname={setPath(detail.owner.username, detail.set.slug)}
+                pathname={localized(locale, setPath(detail.owner.username, detail.set.slug))}
                 mine={favorited}
-                loginHref={user ? undefined : `/login?next=${setPath(detail.owner.username, detail.set.slug)}`}
+                loginHref={
+                  user
+                    ? undefined
+                    : localized(locale, `/login?next=${setPath(detail.owner.username, detail.set.slug)}`)
+                }
               />
             ) : null}
           </div>
@@ -241,11 +258,9 @@ export default async function SetDetailPage({ params }: { params: Params }) {
           escalón más bajo que el de la portada y sin aire de sobra por medio. */}
       <section className="pt-6 pb-9">
         <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-          <h2 className="display text-3xl">Valores</h2>
+          <h2 className="display text-3xl">{t.set.valores}</h2>
           <p className="max-w-prose flex-1 text-xs text-chalk-dim">
-            {view.hasReference
-              ? 'La marca gris es lo que trae el juego de fábrica: lo que se separe de ella es lo que ha tocado el autor. Toca un número para comentarlo.'
-              : 'Toca cualquier número para leer y dejar comentarios sobre ese valor concreto.'}
+            {view.hasReference ? t.set.ayudaValoresConReferencia : t.set.ayudaValoresSinReferencia}
           </p>
         </div>
 
@@ -253,7 +268,7 @@ export default async function SetDetailPage({ params }: { params: Params }) {
           title={detail.set.title}
           conditions={conditionsSummary(detail.set)}
           categories={view.blocks.map((block) => block.category)}
-          consoleHref={consolePath(detail.owner.username, detail.set.slug)}
+          consoleHref={localized(locale, consolePath(detail.owner.username, detail.set.slug))}
         />
 
         <SliderTable
@@ -280,23 +295,20 @@ export default async function SetDetailPage({ params }: { params: Params }) {
       <div className="chalk-rule" />
 
       <section className="py-9">
-        <h2 className="display text-4xl">Sobre el set en general</h2>
-        <p className="mt-1 text-xs text-chalk-dim">
-          Para hablar del conjunto. Si tu comentario es sobre un valor concreto, mejor déjalo
-          en su slider.
-        </p>
+        <h2 className="display text-4xl">{t.set.sobreElSet}</h2>
+        <p className="mt-1 text-xs text-chalk-dim">{t.set.sobreElSetAyuda}</p>
 
         <div className="mt-5 flex flex-col gap-6">
           {view.generalComments.length > 0 ? (
             <CommentList comments={view.generalComments} />
           ) : (
-            <p className="text-sm text-chalk-dim">Todavía no hay comentarios generales.</p>
+            <p className="text-sm text-chalk-dim">{t.set.sinComentariosGenerales}</p>
           )}
 
           <CommentComposer
             setId={detail.set.id}
             canComment={Boolean(user)}
-            placeholder="¿Qué tal te ha funcionado este set?"
+            placeholder={t.set.placeholderComentarioGeneral}
           />
         </div>
       </section>

@@ -1,4 +1,8 @@
+import { lang } from 'next/root-params';
+
 import { ChalkCamera, ChalkShield, ChalkStopwatch } from '@/components/chalk';
+import { getDictionary } from '@/lib/i18n/dictionary';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import { DIFFICULTIES } from '@/lib/set-conditions';
 import type { SliderSet } from '@/lib/database.types';
 
@@ -16,25 +20,28 @@ type Props = {
  * Si no hay ninguna, no se dibuja nada. Un hueco con «sin especificar» tres
  * veces es ruido.
  */
-export function SetConditions({ set }: Props) {
+export async function SetConditions({ set }: Props) {
+  const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
+  const t = getDictionary(locale).set;
+
   const difficulty = DIFFICULTIES.find((candidate) => candidate.value === set.difficulty);
 
   const camera = set.camera
     ? [
         set.camera,
-        set.camera_height === null ? null : `altura ${set.camera_height}`,
-        set.camera_zoom === null ? null : `zoom ${set.camera_zoom}`,
+        set.camera_height === null ? null : t.altura(set.camera_height),
+        set.camera_zoom === null ? null : t.zoom(set.camera_zoom),
       ]
         .filter(Boolean)
         .join(' · ')
     : null;
 
   const items = [
-    difficulty ? { icon: ChalkShield, label: 'Dificultad', value: difficulty.label } : null,
+    difficulty ? { icon: ChalkShield, label: t.dificultad, value: difficulty.label } : null,
     set.half_length
-      ? { icon: ChalkStopwatch, label: 'Tiempos', value: `${set.half_length} minutos` }
+      ? { icon: ChalkStopwatch, label: t.tiempos, value: t.minutos(set.half_length) }
       : null,
-    camera ? { icon: ChalkCamera, label: 'Cámara', value: camera } : null,
+    camera ? { icon: ChalkCamera, label: t.camara, value: camera } : null,
   ].filter((item): item is NonNullable<typeof item> => item !== null);
 
   if (items.length === 0) return null;

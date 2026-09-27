@@ -1,8 +1,10 @@
 import { ImageResponse } from 'next/og';
+import { lang } from 'next/root-params';
 
 import { CompareCard, type CompareCardData } from '@/components/compare-card';
 import { SHARE_CARD_SIZE } from '@/components/share-card';
 import { buildCompareView, topDifferences } from '@/lib/compare';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import { displayFont, monoFont } from '@/lib/og-fonts';
 import { createSupabaseAnonClient } from '@/lib/supabase/anon';
 
@@ -19,11 +21,12 @@ export default async function Image({
   params: Promise<{ ua: string; sa: string; ub: string; sb: string }>;
 }) {
   const { ua, sa, ub, sb } = await params;
+  const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
 
   const [display, mono, data] = await Promise.all([
     displayFont(),
     monoFont(),
-    loadCardData(ua, sa, ub, sb),
+    loadCardData(ua, sa, ub, sb, locale),
   ]);
 
   return new ImageResponse(<CompareCard data={data} />, {
@@ -73,6 +76,7 @@ async function loadCardData(
   sa: string,
   ub: string,
   sb: string,
+  locale: Locale,
 ): Promise<CompareCardData> {
   const fallback: CompareCardData = {
     gameName: 'SlidersFC',
@@ -122,6 +126,7 @@ async function loadCardData(
       definitions: comparableDefinitions,
       a: plain(valuesA.data),
       b: plain(valuesB.data),
+      locale,
     });
 
     return {

@@ -189,7 +189,8 @@ npm run dev
 | `npm run test:compare` | Prueba el modelo de comparar dos sets |
 | `npm run test:conditions` | Prueba la validación de dificultad, duración y cámara |
 | `npm run test:backup` | Vuelca, repone en una base vacía y comprueba que ha vuelto todo |
-| `npm test` | Los seis anteriores, en orden |
+| `npm run test:i18n` | Comprueba que `en.ts` tiene las mismas claves que `es.ts` y ninguna cadena sin traducir |
+| `npm test` | Los siete anteriores, en orden |
 | `npm run backup` | Copia de seguridad a `copias/`: JSON + SQL de reposición |
 | `npm run test:e2e` | Tests de Playwright (navegador real). Necesita `.env.test.local` — ver [docs/testing-e2e.md](docs/testing-e2e.md) |
 | `npm run test:e2e:ui` | Lo mismo, en modo interactivo |
