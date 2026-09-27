@@ -30,8 +30,15 @@ export async function handleAuthCallback(
 ) {
   const { searchParams, origin } = request.nextUrl;
   const langParam = (await params).lang ?? '';
-  const locale = isLocale(langParam) ? langParam : DEFAULT_LOCALE;
+  let locale = isLocale(langParam) ? langParam : DEFAULT_LOCALE;
   const next = safeNextPath(searchParams.get('next'));
+  // El idioma viaja en la query y no en la ruta. Supabase valida las URL de
+  // retorno contra una lista exacta —están en el README—, así que meter
+  // `/en/` delante habría roto el registro en inglés hasta que alguien
+  // añadiera tres direcciones más a mano en su panel. El correo vuelve
+  // siempre a la misma puerta y el idioma se lee aquí.
+  const desdeQuery = searchParams.get('lang');
+  if (desdeQuery && isLocale(desdeQuery)) locale = desdeQuery;
 
   const fail = (message: string) =>
     NextResponse.redirect(`${origin}${localePath(locale, `/login?error=${encodeURIComponent(message)}`)}`);

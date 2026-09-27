@@ -509,6 +509,14 @@ se escribe igual en los dos (`SlidersFC`, `EA SPORTS FC`, `X`, `Error 404`).
 tiene que ser recíproco, y si una de las dos versiones se despista, Google
 trata las dos como duplicado y elige él cuál enseña.
 
+**Las vueltas de Supabase llevan el idioma en la query, no en la ruta.** Los
+correos de confirmación y el retorno de X apuntan siempre a `/auth/confirm` y
+`/auth/callback` sin prefijo, con `&lang=en` detrás. El motivo no es de gusto:
+Supabase valida las URL de retorno contra una **lista exacta** —está en el
+README— y meter `/en/` delante habría roto el registro en inglés hasta que
+alguien añadiera tres direcciones más a mano en su panel. Una puerta, y el
+idioma se lee al entrar.
+
 **El nombre de un slider se resuelve en un solo sitio: `sliderName()`.** Hay
 tres agrupados distintos —la ficha, el formulario y el importador— porque cada
 uno necesita otra forma, y eso está bien. Lo que no puede repetirse es de dónde

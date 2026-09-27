@@ -170,7 +170,7 @@ export type VersionEntry = {
  * que lo que llegue a la página sea legible tal cual. La v1 no aparece: no
  * estrena nada, es el set tal como se publicó.
  */
-export async function getSetHistory(setId: string): Promise<VersionEntry[]> {
+export async function getSetHistory(setId: string, locale: Locale): Promise<VersionEntry[]> {
   return safeRead(
     'getSetHistory',
     async (supabase) => {
@@ -182,7 +182,7 @@ export async function getSetHistory(setId: string): Promise<VersionEntry[]> {
           .order('version', { ascending: false }),
         supabase
           .from('slider_set_changes')
-          .select('version, from_value, to_value, slider_definitions ( name, applies_to, sort_order )')
+          .select('version, from_value, to_value, slider_definitions ( name, name_en, applies_to, sort_order )')
           .eq('slider_set_id', setId),
       ]);
 
@@ -192,6 +192,7 @@ export async function getSetHistory(setId: string): Promise<VersionEntry[]> {
         to_value: number;
         slider_definitions: {
           name: string;
+          name_en: string | null;
           applies_to: SliderScope;
           sort_order: number;
         } | null;
@@ -213,7 +214,7 @@ export async function getSetHistory(setId: string): Promise<VersionEntry[]> {
           .sort((a, b) => (a.slider_definitions?.sort_order ?? 0) - (b.slider_definitions?.sort_order ?? 0))
           .filter((row) => row.slider_definitions !== null)
           .map((row) => ({
-            name: row.slider_definitions!.name,
+            name: sliderName(row.slider_definitions!, locale),
             scope: row.slider_definitions!.applies_to,
             from: row.from_value,
             to: row.to_value,

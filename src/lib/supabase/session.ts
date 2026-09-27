@@ -51,13 +51,21 @@ export async function updateSession(request: NextRequest) {
   }
 
   const { pathname } = request.nextUrl;
+
+  // El idioma va delante en inglés (`/en/sets/nuevo`), así que se separa antes
+  // de comparar: si no, ninguna ruta en inglés entraba en la lista de
+  // protegidas y el guardián no guardaba nada de ese lado.
+  const prefijo = pathname.startsWith('/en/') || pathname === '/en' ? '/en' : '';
+  const sinIdioma = prefijo ? pathname.slice(prefijo.length) || '/' : pathname;
+
   const needsAuth =
-    PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix)) ||
-    pathname.endsWith('/editar');
+    PROTECTED_PREFIXES.some((prefix) => sinIdioma.startsWith(prefix)) ||
+    sinIdioma.endsWith('/editar');
 
   if (!user && needsAuth) {
     const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = '/login';
+    // Al acceso del mismo idioma, y de vuelta a donde ibas.
+    loginUrl.pathname = `${prefijo}/login`;
     loginUrl.searchParams.set('next', pathname);
     return NextResponse.redirect(loginUrl);
   }

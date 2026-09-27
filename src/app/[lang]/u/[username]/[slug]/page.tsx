@@ -95,7 +95,7 @@ export default async function SetDetailPage({ params }: { params: Params }) {
   // El historial y el estado de favorito se piden con el set ya resuelto:
   // los dos necesitan su id.
   const [history, favorited] = await Promise.all([
-    getSetHistory(detail.set.id),
+    getSetHistory(detail.set.id, locale),
     isFavorite(detail.set.id, user?.id ?? null),
   ]);
 

@@ -1,23 +1,32 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+import { lang } from 'next/root-params';
 
 import { updateProfile } from '@/app/actions/profile';
 import { ProfileForm } from '@/components/profile-form';
+import { getDictionary } from '@/lib/i18n/dictionary';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
+import { localized } from '@/lib/paths';
 import { getSiteOrigin } from '@/lib/site-url';
 import { getSessionProfile } from '@/lib/supabase/server';
 
-export const metadata: Metadata = {
-  title: 'Editar perfil',
-  robots: { index: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
+
+  return {
+    title: getDictionary(locale).cuentaPerfil.metaTitle,
+    robots: { index: false },
+  };
+}
 
 export default async function EditProfilePage() {
+  const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
   const { user, profile } = await getSessionProfile();
 
-  if (!user) redirect('/login?next=/cuenta/perfil');
+  if (!user) redirect(localized(locale, '/login?next=/cuenta/perfil'));
   // Sesión sin fila de perfil: /perfil la crea. Vale con que exista; desde la
   // página pública se vuelve aquí en un clic.
-  if (!profile) redirect('/perfil');
+  if (!profile) redirect(localized(locale, '/perfil'));
 
   const origin = await getSiteOrigin();
 

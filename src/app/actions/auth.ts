@@ -46,7 +46,7 @@ export async function signInWithEmail(
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(next)}`,
+      emailRedirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(next)}&lang=${locale}`,
     },
   });
 
@@ -119,7 +119,7 @@ export async function signInWithTwitter(formData: FormData) {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'twitter',
     options: {
-      redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
+      redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}&lang=${locale}`,
     },
   });
 
@@ -204,7 +204,7 @@ export async function signUpWithPassword(
 
   const { data, error } = await supabase.auth.signUp({
     ...credentials,
-    options: { emailRedirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(next)}` },
+    options: { emailRedirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(next)}&lang=${locale}` },
   });
 
   if (error) return { error: authErrorMessage(error, locale) };
@@ -233,7 +233,7 @@ export async function requestPasswordReset(
   const origin = await getSiteOrigin();
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/confirm?next=${encodeURIComponent('/cuenta/contrasena')}`,
+    redirectTo: `${origin}/auth/confirm?next=${encodeURIComponent('/cuenta/contrasena')}&lang=${locale}`,
   });
 
   if (error) return { error: authErrorMessage(error, locale) };
