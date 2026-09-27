@@ -17,6 +17,8 @@ export const MIGRATIONS_ANTES = [
   'supabase/migrations/20260911120100_rls.sql',
   'supabase/migrations/20260911120200_profiles_trigger.sql',
   'supabase/migrations/20260920100000_cpu_behaviour.sql',
+  // Antes del catálogo: crea la columna que el catálogo escribe.
+  'supabase/migrations/20260927120000_slider_name_en.sql',
 ];
 
 export const CATALOG = 'supabase/seed/01_catalog.sql';

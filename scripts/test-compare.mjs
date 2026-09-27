@@ -63,7 +63,7 @@ const find = (definitions, slug, scope) =>
     { slug: 'marcaje', name: 'Marcaje', category: 'Defensa', scopes: ['user', 'cpu'] },
   ]);
   const a = { [find(definitions, 'velocidad', 'user').id]: 40, [find(definitions, 'velocidad', 'cpu').id]: 45 };
-  const view = buildCompareView({ definitions, a, b: { ...a } });
+  const view = buildCompareView({ definitions, a, b: { ...a }, locale: 'es' });
 
   check('sets iguales: nada difiere', view.differing === 0, `${view.differing}`);
   check('sets iguales: todos los spread a 0', view.rows.every((row) => row.spread === 0));
@@ -78,7 +78,7 @@ const find = (definitions, slug, scope) =>
   const idCpu = find(definitions, 'velocidad', 'cpu').id;
   const a = { [idUser]: 40, [idCpu]: 45 };
   const b = { [idUser]: 55, [idCpu]: 45 };
-  const view = buildCompareView({ definitions, a, b });
+  const view = buildCompareView({ definitions, a, b, locale: 'es' });
   const row = view.rows[0];
   const userCell = row.cells.find((cell) => cell.scope === 'user');
 
@@ -95,7 +95,7 @@ const find = (definitions, slug, scope) =>
   const idCpu = find(definitions, 'agresividad', 'cpu').id;
   const a = { [idUser]: 50, [idCpu]: 50 };
   const b = { [idUser]: 50, [idCpu]: 70 };
-  const view = buildCompareView({ definitions, a, b });
+  const view = buildCompareView({ definitions, a, b, locale: 'es' });
 
   check('sólo difiere la CPU: cuenta como distinta', view.differing === 1, `${view.differing}`);
 }
@@ -109,7 +109,7 @@ const find = (definitions, slug, scope) =>
   const idUser = find(definitions, 'solo_usuario', 'user').id;
   const a = { [idUser]: 30 };
   const b = { [idUser]: 30 };
-  const view = buildCompareView({ definitions, a, b });
+  const view = buildCompareView({ definitions, a, b, locale: 'es' });
   const row = view.rows.find((candidate) => candidate.slug === 'solo_usuario');
   const cpuCell = row.cells.find((cell) => cell.scope === 'cpu');
 
@@ -131,7 +131,7 @@ const find = (definitions, slug, scope) =>
       defaults: { user: 42 },
     },
   ]);
-  const view = buildCompareView({ definitions, a: {}, b: {} });
+  const view = buildCompareView({ definitions, a: {}, b: {}, locale: 'es' });
   const cell = view.rows[0].cells[0];
 
   check('sin valor guardado: se usa el default_value', cell.a === 42 && cell.b === 42, `${cell.a} / ${cell.b}`);
@@ -146,7 +146,7 @@ const find = (definitions, slug, scope) =>
   const idCpu = find(definitions, 'velocidad', 'cpu').id;
   const a = { [idUser]: 40, [idCpu]: 40 };
   const b = { [idUser]: 45, [idCpu]: 70 };
-  const view = buildCompareView({ definitions, a, b });
+  const view = buildCompareView({ definitions, a, b, locale: 'es' });
 
   check('spread es el máximo de la fila', view.rows[0].spread === 30, `${view.rows[0].spread}`);
 }
@@ -157,7 +157,7 @@ const find = (definitions, slug, scope) =>
     { slug: 'velocidad', name: 'Velocidad', category: 'Ritmo', scopes: ['user', 'cpu'], defaults: { user: 50, cpu: 50 } },
     { slug: 'marcaje', name: 'Marcaje', category: 'Defensa', scopes: ['user'], defaults: { user: 50 } },
   ]);
-  const view = buildCompareView({ definitions, a: {}, b: {} });
+  const view = buildCompareView({ definitions, a: {}, b: {}, locale: 'es' });
 
   check('hasReference false cuando todos los default coinciden', view.hasReference === false);
 }
@@ -165,7 +165,7 @@ const find = (definitions, slug, scope) =>
   const definitions = definitionsFrom([
     { slug: 'velocidad', name: 'Velocidad', category: 'Ritmo', scopes: ['user', 'cpu'], defaults: { user: 50, cpu: 60 } },
   ]);
-  const view = buildCompareView({ definitions, a: {}, b: {} });
+  const view = buildCompareView({ definitions, a: {}, b: {}, locale: 'es' });
 
   check('hasReference true cuando los default difieren', view.hasReference === true);
 }
@@ -180,7 +180,7 @@ const find = (definitions, slug, scope) =>
     { slug: 'aceleracion', name: 'Aceleración', category: 'Zona', scopes: ['user'] },
     { slug: 'presion', name: 'Presión', category: 'Ataque', scopes: ['user'] },
   ]);
-  const view = buildCompareView({ definitions, a: {}, b: {} });
+  const view = buildCompareView({ definitions, a: {}, b: {}, locale: 'es' });
 
   check(
     'categorías por sort_order, no alfabético',
@@ -200,7 +200,7 @@ const find = (definitions, slug, scope) =>
     { slug: 'velocidad', name: 'Velocidad', category: 'Ritmo', scopes: ['user'] },
     { slug: 'marcaje', name: 'Marcaje', category: 'Defensa', scopes: ['user'] },
   ]);
-  const view = buildCompareView({ definitions, a: {}, b: {} });
+  const view = buildCompareView({ definitions, a: {}, b: {}, locale: 'es' });
   const flattened = view.blocks.flatMap((block) => block.rows.map((row) => row.slug));
 
   check('rows.length === total', view.rows.length === view.total, `${view.rows.length} / ${view.total}`);
@@ -212,7 +212,7 @@ const find = (definitions, slug, scope) =>
 
 // --- definitions vacío no rompe -------------------------------------------
 {
-  const view = buildCompareView({ definitions: [], a: {}, b: {} });
+  const view = buildCompareView({ definitions: [], a: {}, b: {}, locale: 'es' });
 
   check(
     'definitions vacío no rompe',
@@ -258,7 +258,7 @@ const find = (definitions, slug, scope) =>
     [idCpuPases]: 50,
     [idPresion]: 45,
   };
-  const view = buildCompareView({ definitions, a, b });
+  const view = buildCompareView({ definitions, a, b, locale: 'es' });
   const top = topDifferences(view, 10);
 
   check(

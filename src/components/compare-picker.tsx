@@ -3,6 +3,10 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
+import { getDictionary } from '@/lib/i18n/dictionary';
+import type { Locale } from '@/lib/i18n/locale';
+import { localized } from '@/lib/paths';
+
 export type PickerOption = {
   /** `usuario/slug`, que es lo que va en la ruta. */
   value: string;
@@ -24,10 +28,13 @@ export type PickerOption = {
 export function ComparePicker({
   options,
   initialA = '',
+  locale,
 }: {
   options: PickerOption[];
   initialA?: string;
+  locale: Locale;
 }) {
+  const t = getDictionary(locale);
   const [a, setA] = useState(initialA);
   const [b, setB] = useState('');
 
@@ -48,9 +55,11 @@ export function ComparePicker({
   return (
     <div className="panel flex flex-col gap-5 p-5 sm:p-6">
       <Field
-        label="El primero"
+        label={t.comparar.elPrimero}
         value={a}
         options={options}
+        placeholder={t.comparar.eligeUnSet}
+        draftTag={t.comparar.borradorTag}
         onChange={(next) => {
           setA(next);
           // Si el nuevo juego no es el del segundo, el segundo deja de valer.
@@ -60,26 +69,28 @@ export function ComparePicker({
       />
 
       <Field
-        label="El segundo"
+        label={t.comparar.elSegundo}
         value={b}
         options={optionsB}
+        placeholder={t.comparar.eligeUnSet}
+        draftTag={t.comparar.borradorTag}
         onChange={setB}
         hint={
           a && optionsB.length === 0
-            ? `Todavía no hay otro set de ${byValue.get(a)?.gameName} con el que compararlo.`
+            ? t.comparar.ningunOtroSetDe(byValue.get(a)?.gameName ?? '')
             : game
-              ? `Sólo sets de ${byValue.get(a)?.gameName}: los sliders de un juego no son los de otro.`
+              ? t.comparar.soloSetsDe(byValue.get(a)?.gameName ?? '')
               : undefined
         }
       />
 
       {ready ? (
-        <Link href={`/comparar/${a}/${b}`} className="btn btn-primary self-start">
-          Comparar
+        <Link href={localized(locale, `/comparar/${a}/${b}`)} className="btn btn-primary self-start">
+          {t.set.comparar}
         </Link>
       ) : (
         <button type="button" className="btn btn-primary self-start" disabled>
-          Comparar
+          {t.set.comparar}
         </button>
       )}
     </div>
@@ -92,12 +103,16 @@ function Field({
   options,
   onChange,
   hint,
+  placeholder,
+  draftTag,
 }: {
   label: string;
   value: string;
   options: PickerOption[];
   onChange: (value: string) => void;
   hint?: string;
+  placeholder: string;
+  draftTag: string;
 }) {
   return (
     <label className="flex flex-col gap-1.5">
@@ -107,11 +122,11 @@ function Field({
         onChange={(event) => onChange(event.target.value)}
         className="field"
       >
-        <option value="">Elige un set…</option>
+        <option value="">{placeholder}</option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.title} — @{option.owner}
-            {option.isDraft ? ' (borrador)' : ''} · {option.gameName}
+            {option.isDraft ? ` ${draftTag}` : ''} · {option.gameName}
           </option>
         ))}
       </select>

@@ -2,6 +2,7 @@ import { orderCategories } from '@/lib/category-order';
 import { sortScopes } from '@/lib/constants';
 import { groupDefinitions, type SetDetail } from '@/lib/queries';
 import type { CpuBehaviour, SliderScope } from '@/lib/database.types';
+import type { Locale } from '@/lib/i18n/locale';
 
 /**
  * Convierte el detalle de un set (con Maps y filas de Postgres) en una
@@ -73,7 +74,7 @@ export type SetView = {
 
 export const GENERAL_KEY = 'general';
 
-export function buildSetView(detail: SetDetail, currentUserId: string | null): SetView {
+export function buildSetView(detail: SetDetail, currentUserId: string | null, locale: Locale): SetView {
   const { definitions, values, comments, set } = detail;
 
   const scopes = sortScopes([
@@ -106,7 +107,7 @@ export function buildSetView(detail: SetDetail, currentUserId: string | null): S
     }
   }
 
-  const grouped = groupDefinitions(definitions);
+  const grouped = groupDefinitions(definitions, locale);
 
   // El orden de las categorías sale del `sort_order` del catálogo, que es el
   // del menú del juego: la gente va metiendo los valores mientras consulta.

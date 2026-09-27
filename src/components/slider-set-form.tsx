@@ -11,15 +11,17 @@ import {
 } from "@/components/chalk";
 import { ChalkChevrons, ChalkUndo } from "@/components/chalk";
 import { categoryAnchor } from "@/components/active-category";
+import { useI18n } from "@/components/i18n-provider";
 import { ImportPanel } from "@/components/import-panel";
 import { SetFormNav } from "@/components/set-form-nav";
 import { SliderControl } from "@/components/slider-control";
 import { ScaleLegend } from "@/components/slider-scale";
 import {
   categoryLabel,
-  CPU_BEHAVIOURS,
+  cpuBehaviours,
   SCOPE_INK,
-  SCOPE_LABELS,
+  scopeLabel,
+  scopeLabels,
   sortScopes,
 } from "@/lib/constants";
 import { orderCategories } from "@/lib/category-order";
@@ -63,6 +65,7 @@ export function SliderSetForm({
   lockGame = false,
   submitLabel = "Publicar set",
 }: Props) {
+  const { locale } = useI18n();
   const [state, formAction, pending] = useActionState(action, initialState);
 
   const [gameId, setGameId] = useState<number>(
@@ -360,7 +363,7 @@ export function SliderSetForm({
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-5">
-            <ScaleLegend scopes={scopes} labels={SCOPE_LABELS} />
+            <ScaleLegend scopes={scopes} labels={scopeLabels(locale)} />
             <button
               type="button"
               onClick={() =>
@@ -432,7 +435,7 @@ export function SliderSetForm({
                   <Drawing className="size-7 shrink-0 text-chalk-dim" />
                 ) : null}
                 <h3 className="display text-2xl">
-                  {categoryLabel(block.category)}
+                  {categoryLabel(block.category, locale)}
                 </h3>
                 <span className="eyebrow ml-auto">{block.rows.length}</span>
                 <span
@@ -454,7 +457,7 @@ export function SliderSetForm({
                     según los equipos.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {CPU_BEHAVIOURS.map((behaviour) => (
+                    {cpuBehaviours(locale).map((behaviour) => (
                       <button
                         key={behaviour.value}
                         type="button"
@@ -468,7 +471,7 @@ export function SliderSetForm({
                   </div>
                   <p className="mt-2.5 text-xs text-chalk-dim">
                     {
-                      CPU_BEHAVIOURS.find(
+                      cpuBehaviours(locale).find(
                         (behaviour) => behaviour.value === cpuBehaviour,
                       )?.hint
                     }
@@ -585,6 +588,8 @@ const SliderRow = memo(
     hasReference: boolean;
     onChange: (definitionId: number, value: number) => void;
   }) {
+    const { locale } = useI18n();
+
     return (
       <li className="grid gap-x-6 gap-y-1.5 border-b border-chalk-line/60 py-3.5 last:border-b-0 sm:grid-cols-[minmax(8rem,12rem)_1fr]">
         <span className="pt-1 text-sm leading-tight font-semibold">
@@ -600,8 +605,8 @@ const SliderRow = memo(
               <SliderControl
                 key={scope}
                 name={`v_${definition.id}`}
-                label={SCOPE_LABELS[scope]}
-                ariaLabel={`${row.name} — ${SCOPE_LABELS[scope]}`}
+                label={scopeLabel(scope, locale)}
+                ariaLabel={`${row.name} — ${scopeLabel(scope, locale)}`}
                 value={
                   values[String(definition.id)] ?? definition.default_value
                 }

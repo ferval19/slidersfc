@@ -186,7 +186,7 @@ prueba de arriba.
 Poner FC27 en inglés y capturar los menús de sliders, igual que con las 18
 capturas de septiembre. **Sigue sin hacer.** Nada empieza sin esto.
 
-### Fase 1 — El armazón y lo que aterriza un enlace · 2-3 sesiones
+### Fase 1 — El armazón y lo que aterriza un enlace · **HECHA el 27/09**
 El prefijo `/en`, el diccionario, la prueba de claves, el selector, el `lang` y
 el `hreflang`, y el catálogo bilingüe.
 
@@ -199,7 +199,13 @@ de X no aterriza en la portada, aterriza en el set que le han pasado.
 El catálogo no se puede dejar para después: una ficha con la interfaz en inglés
 y los sliders en castellano no sirve de nada.
 
-### Fase 2 — Lo que se escribe · 1-2 sesiones
+### Fase 2 — Lo que se escribe · pendiente
+
+Del camino de escribir ya está hecho **el acceso entero** —entrar, registrarse,
+recuperar la contraseña y sus ~41 errores— porque es el que va de leer a
+comentar, y con cero comentarios de desconocidos no convenía tenerlo roto.
+Queda el formulario de sets, el perfil y la guía.
+
 Formulario de sets, perfil, acceso y sus ~45 errores, y la guía. Es para quien
 ya ha decidido quedarse.
 

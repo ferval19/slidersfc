@@ -474,6 +474,49 @@ juego desdobla rival y compañero —quien pega un set de FC26 en FC27 escribe
 «CPU»—, y los números por encima de 100 se descartan, que si no un «8 minutos»
 o un «2026» entran como valor.
 
+### Los dos idiomas
+
+Castellano en la raíz (`/u/pepe/su-set`), inglés bajo `/en`. Las rutas viven
+**una sola vez**, en `src/app/[lang]/`, y el proxy reescribe `/x` a `/es/x` por
+dentro. Reescribir y no redirigir: los enlaces en castellano llevan semanas
+circulando y moverlos a `/es` los habría roto todos.
+
+El idioma se lee con **`next/root-params`**: `[lang]` es un parámetro de raíz y
+cualquier Server Component puede pedirlo sin que haya que pasarlo por props por
+sesenta ficheros. Es lo que hizo asumible el cambio.
+
+**Tres sitios donde `root-params` no llega**, y cada uno costó un 500 con las
+cuatro comprobaciones en verde:
+
+| Dónde | Cómo llega el idioma |
+| --- | --- |
+| Componentes de cliente | `useI18n()`, del `I18nProvider` del layout |
+| Route Handlers (incluidas las imágenes de OpenGraph) | por `params`: `[lang]` es un segmento de la ruta |
+| Server Actions | en el propio formulario, un `<input type="hidden" name="locale">` |
+
+**Al `I18nProvider` se le pasa el idioma, nunca el diccionario.** El diccionario
+lleva funciones —los plurales— y una función no cruza del servidor al cliente.
+El proveedor lo resuelve él; el precio es que los dos idiomas van en el paquete
+del navegador, unos kilobytes de cadenas cortas.
+
+**Dos redes contra la traducción a medias.** `en.ts` se declara
+`const en: Dictionary`, así que a TypeScript le falta una clave y no compila. Y
+`npm run test:i18n` caza la otra mitad: una cadena inglesa **idéntica** a la
+castellana, que es como se ve una que se olvidó. Hay lista blanca para lo que
+se escribe igual en los dos (`SlidersFC`, `EA SPORTS FC`, `X`, `Error 404`).
+
+**`hreflang` sale de `alternates(locale, path)`** y no copiado en cada página:
+tiene que ser recíproco, y si una de las dos versiones se despista, Google
+trata las dos como duplicado y elige él cuál enseña.
+
+**Lo que no se traduce nunca**: títulos, descripciones y comentarios de los
+sets, las notas de versión y los nombres de usuario. Son de quien los escribe.
+La web es bilingüe en el envoltorio y multilingüe en el contenido.
+
+**Los nombres de los sliders son dato, no traducción**: `slider_definitions`
+tiene `name` (leído del menú en castellano) y `name_en`, que admite nulo — sin
+inglés se enseña el castellano, que es feo pero se entiende.
+
 **La botonera de la ficha tiene dos escalones, no ocho botones iguales.**
 Arriba, lo que hace cualquiera con el set: meterlo en la consola —que es a lo
 que se viene—, compartirlo, comparar y guardarlo. Debajo, y sólo si es tuyo,

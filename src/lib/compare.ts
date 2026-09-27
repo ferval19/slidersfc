@@ -15,6 +15,7 @@
  */
 
 import type { SliderDefinition, SliderScope } from './database.types';
+import type { Locale } from './i18n/locale';
 
 export type CompareCell = {
   scope: SliderScope;
@@ -60,6 +61,16 @@ export type CompareView = {
 /** Duplicado de `@/lib/constants`: ese módulo no es puro para este propósito. */
 const SCOPE_ORDER: SliderScope[] = ['user', 'cpu', 'cpu_opponent', 'cpu_teammate'];
 
+/**
+ * Duplicado de `sliderName` en `@/lib/i18n/locale`: mismo motivo que
+ * `SCOPE_ORDER` — este módulo sólo importa tipos para seguir siendo puro, y
+ * `locale.ts` es un módulo de valores.
+ */
+function sliderName(d: { name: string; name_en: string | null }, locale: Locale): string {
+  if (locale === 'en' && d.name_en) return d.name_en;
+  return d.name;
+}
+
 type SlugGroup = {
   slug: string;
   name: string;
@@ -73,7 +84,7 @@ type SlugGroup = {
  * el `sort_order` más bajo de sus sliders (el primero que aparece en el menú
  * del juego), y con la definición de cada ámbito para leer su valor.
  */
-function buildGroups(definitions: SliderDefinition[]) {
+function buildGroups(definitions: SliderDefinition[], locale: Locale) {
   const groups = new Map<string, SlugGroup>();
 
   for (const definition of definitions) {
@@ -81,7 +92,7 @@ function buildGroups(definitions: SliderDefinition[]) {
     if (!group) {
       group = {
         slug: definition.slug,
-        name: definition.name,
+        name: sliderName(definition, locale),
         category: definition.category,
         sortOrder: definition.sort_order,
         byScope: {},
@@ -126,8 +137,9 @@ export function buildCompareView(input: {
   /** id de definición (como string) → valor, para cada set. */
   a: Record<string, number>;
   b: Record<string, number>;
+  locale: Locale;
 }): CompareView {
-  const { definitions, a, b } = input;
+  const { definitions, a, b, locale } = input;
 
   if (definitions.length === 0) {
     return {
@@ -154,7 +166,7 @@ export function buildCompareView(input: {
   const min = Math.min(...definitions.map((definition) => definition.min_value));
   const max = Math.max(...definitions.map((definition) => definition.max_value));
 
-  const groups = buildGroups(definitions);
+  const groups = buildGroups(definitions, locale);
 
   const categoryOrder = orderByLowestSortOrder(
     [...groups.values()].map((group) => ({ key: group.category, sortOrder: group.sortOrder })),

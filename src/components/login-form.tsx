@@ -12,6 +12,8 @@ import {
   type AuthFormState,
   type CodeFormState,
 } from '@/app/actions/auth';
+import { useI18n } from '@/components/i18n-provider';
+import { localized } from '@/lib/paths';
 
 const initialState: AuthFormState = {};
 const initialCodeState: CodeFormState = {};
@@ -19,23 +21,28 @@ const initialCodeState: CodeFormState = {};
 type Mode = 'entrar' | 'crear' | 'enlace';
 
 export function LoginForm({ next }: { next: string }) {
+  const { locale, t } = useI18n();
   const [mode, setMode] = useState<Mode>('entrar');
 
   return (
     <div className="flex flex-col gap-6">
       <form action={signInWithTwitter}>
         <input type="hidden" name="next" value={next} />
+        {/* Una Server Action no puede preguntar el idioma por su cuenta
+            (no hay `root-params` fuera de un Server Component): viaja aquí,
+            explícito, en el propio formulario. */}
+        <input type="hidden" name="locale" value={locale} />
         <button type="submit" className="btn btn-quiet w-full">
           <svg aria-hidden viewBox="0 0 24 24" className="size-4 fill-current">
             <path d="M18.9 2H22l-6.8 7.8L22.8 22h-6.1l-4.8-6.3L6.3 22H3.2l7.1-8.1L2.6 2h6.2l4.5 5.9L18.9 2Zm-1.1 18h1.7L7.4 3.7H5.6L17.8 20Z" />
           </svg>
-          Continuar con X
+          {t.login.continuarConX}
         </button>
       </form>
 
       <div className="flex items-center gap-3">
         <span className="h-px flex-1 bg-chalk-line" />
-        <span className="eyebrow">o con tu correo</span>
+        <span className="eyebrow">{t.login.oConTuCorreo}</span>
         <span className="h-px flex-1 bg-chalk-line" />
       </div>
 
@@ -63,6 +70,7 @@ function PasswordForm({
   next: string;
   onModeChange: (mode: Mode) => void;
 }) {
+  const { locale, t } = useI18n();
   const creating = mode === 'crear';
   const [state, formAction, pending] = useActionState(
     creating ? signUpWithPassword : signInWithPassword,
@@ -84,42 +92,43 @@ function PasswordForm({
             onClick={() => onModeChange(option)}
             className={`chip flex-1 justify-center py-2 ${mode === option ? 'chip-active' : ''}`}
           >
-            {option === 'entrar' ? 'Entrar' : 'Crear cuenta'}
+            {option === 'entrar' ? t.login.pestanaEntrar : t.login.pestanaCrear}
           </button>
         ))}
       </div>
 
       <form action={formAction} className="flex flex-col gap-3">
         <input type="hidden" name="next" value={next} />
+        <input type="hidden" name="locale" value={locale} />
 
         <label className="flex flex-col gap-1.5">
-          <span className="eyebrow">Correo</span>
+          <span className="eyebrow">{t.login.correo}</span>
           <input
             type="email"
             name="email"
             required
             autoComplete="email"
-            placeholder="tu@email.com"
+            placeholder={t.login.correoPlaceholder}
             className="field"
           />
         </label>
 
         <label className="flex flex-col gap-1.5">
-          <span className="eyebrow">Contraseña</span>
+          <span className="eyebrow">{t.login.contrasena}</span>
           <input
             type="password"
             name="password"
             required
             minLength={8}
             autoComplete={creating ? 'new-password' : 'current-password'}
-            placeholder={creating ? 'Mínimo 8 caracteres' : ''}
+            placeholder={creating ? t.login.contrasenaPlaceholderMinimo : ''}
             className="field"
           />
         </label>
 
         {creating ? (
           <label className="flex flex-col gap-1.5">
-            <span className="eyebrow">Repite la contraseña</span>
+            <span className="eyebrow">{t.login.repiteLaContrasena}</span>
             <input
               type="password"
               name="password_confirm"
@@ -138,7 +147,7 @@ function PasswordForm({
         ) : null}
 
         <button type="submit" className="btn btn-primary mt-1" disabled={pending}>
-          {pending ? 'Un momento…' : creating ? 'Crear mi cuenta' : 'Entrar'}
+          {pending ? t.login.unMomento : creating ? t.login.crearMiCuenta : t.login.entrar}
         </button>
       </form>
 
@@ -148,11 +157,14 @@ function PasswordForm({
           onClick={() => onModeChange('enlace')}
           className="font-semibold text-chalk-dim underline-offset-4 hover:text-chalk hover:underline"
         >
-          Prefiero un enlace por correo
+          {t.login.prefieroEnlacePorCorreo}
         </button>
         {!creating ? (
-          <Link href="/recuperar" className="underline-offset-4 hover:text-chalk hover:underline">
-            ¿Olvidaste tu contraseña?
+          <Link
+            href={localized(locale, '/recuperar')}
+            className="underline-offset-4 hover:text-chalk hover:underline"
+          >
+            {t.login.olvidasteTuContrasena}
           </Link>
         ) : null}
       </div>
@@ -162,6 +174,7 @@ function PasswordForm({
 
 /** Enlace mágico, sin contraseña. */
 function MagicLinkForm({ next, onBack }: { next: string; onBack: () => void }) {
+  const { locale, t } = useI18n();
   const [state, formAction, pending] = useActionState(signInWithEmail, initialState);
 
   if (state.sent) return <SentPanel email={state.sent} next={next} />;
@@ -169,15 +182,16 @@ function MagicLinkForm({ next, onBack }: { next: string; onBack: () => void }) {
   return (
     <form action={formAction} className="flex flex-col gap-3">
       <input type="hidden" name="next" value={next} />
+      <input type="hidden" name="locale" value={locale} />
 
       <label className="flex flex-col gap-1.5">
-        <span className="eyebrow">Correo</span>
+        <span className="eyebrow">{t.login.correo}</span>
         <input
           type="email"
           name="email"
           required
           autoComplete="email"
-          placeholder="tu@email.com"
+          placeholder={t.login.correoPlaceholder}
           className="field"
         />
       </label>
@@ -189,7 +203,7 @@ function MagicLinkForm({ next, onBack }: { next: string; onBack: () => void }) {
       ) : null}
 
       <button type="submit" className="btn btn-primary" disabled={pending}>
-        {pending ? 'Enviando…' : 'Enviarme un enlace'}
+        {pending ? t.login.enviando : t.login.enviarmeUnEnlace}
       </button>
 
       <button
@@ -197,7 +211,7 @@ function MagicLinkForm({ next, onBack }: { next: string; onBack: () => void }) {
         onClick={onBack}
         className="self-start text-xs font-semibold text-chalk-dim underline-offset-4 hover:text-chalk hover:underline"
       >
-        Volver a la contraseña
+        {t.login.volverALaContrasena}
       </button>
     </form>
   );
@@ -217,37 +231,33 @@ export function SentPanel({
   next: string;
   confirming?: boolean;
 }) {
+  const { locale, t } = useI18n();
   const [state, formAction, pending] = useActionState(verifyEmailCode, initialCodeState);
 
   return (
     <div className="flex flex-col gap-6">
       <div className="panel p-6">
-        <p className="eyebrow">Revisa tu correo</p>
+        <p className="eyebrow">{t.login.revisaTuCorreo}</p>
         <h2 className="display mt-2 text-3xl">
-          {confirming ? 'Confirma tu cuenta' : 'Te lo hemos enviado'}
+          {confirming ? t.login.confirmaTuCuenta : t.login.teLoHemosEnviado}
         </h2>
         <p className="mt-3 text-sm text-chalk-dim">
-          {confirming
-            ? 'Tu cuenta está creada. Abre el enlace que te hemos mandado a '
-            : 'A '}
+          {confirming ? t.login.confirmandoBodyInicio : t.login.noConfirmandoBodyInicio}
           <span className="text-chalk">{email}</span>
-          {confirming ? ' para poder entrar.' : '. Abre el enlace en este mismo navegador y entrarás directo.'}
+          {confirming ? t.login.confirmandoBodyFin : t.login.noConfirmandoBodyFin}
         </p>
       </div>
 
       <form action={formAction} className="panel flex flex-col gap-3 p-6">
         <input type="hidden" name="email" value={email} />
         <input type="hidden" name="next" value={next} />
+        <input type="hidden" name="locale" value={locale} />
 
-        <p className="eyebrow">¿El enlace no funciona?</p>
-        <p className="text-sm text-chalk-dim">
-          Escribe aquí el código de 6 dígitos del correo. Funciona desde cualquier
-          navegador o dispositivo, y no se gasta si tu gestor de correo abre el enlace
-          por su cuenta.
-        </p>
+        <p className="eyebrow">{t.login.elEnlaceNoFunciona}</p>
+        <p className="text-sm text-chalk-dim">{t.login.ayudaCodigo}</p>
 
         <label className="mt-1 flex flex-col gap-1.5">
-          <span className="eyebrow">Código</span>
+          <span className="eyebrow">{t.login.codigo}</span>
           <input
             name="token"
             inputMode="numeric"
@@ -266,7 +276,7 @@ export function SentPanel({
         ) : null}
 
         <button type="submit" className="btn btn-primary mt-1 self-start" disabled={pending}>
-          {pending ? 'Comprobando…' : 'Entrar con el código'}
+          {pending ? t.login.comprobando : t.login.entrarConElCodigo}
         </button>
       </form>
     </div>

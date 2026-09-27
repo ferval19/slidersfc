@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from 'react';
 
+import { useI18n } from '@/components/i18n-provider';
 import { parseSliderText } from '@/lib/import-sliders';
-import { SCOPE_INK, SCOPE_LABELS } from '@/lib/constants';
+import { SCOPE_INK, scopeLabel } from '@/lib/constants';
 import type { SliderDefinition } from '@/lib/database.types';
 
 type Props = {
@@ -23,6 +24,7 @@ Marcaje: usuario 65, CPU 70`;
  * entendido, porque el texto de origen no siempre dice lo que parece.
  */
 export function ImportPanel({ definitions, onApply }: Props) {
+  const { locale } = useI18n();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
 
@@ -87,7 +89,7 @@ export function ImportPanel({ definitions, onApply }: Props) {
                     {row.values.map((value) => (
                       <span
                         key={value.scope}
-                        title={SCOPE_LABELS[value.scope]}
+                        title={scopeLabel(value.scope, locale)}
                         className={`value-pill px-1.5 py-0.5 ${SCOPE_INK[value.scope].text}`}
                       >
                         {value.value}

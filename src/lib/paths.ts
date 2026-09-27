@@ -7,6 +7,8 @@
  * cada vez que se añade una ruta.
  */
 
+import { localePath, type Locale } from '@/lib/i18n/locale';
+
 export function profilePath(username: string) {
   return `/u/${username}`;
 }
@@ -54,4 +56,9 @@ export function resolveSetPath(
   username?: string | null,
 ) {
   return username && set.slug ? setPath(username, set.slug) : `/sets/${set.id}`;
+}
+
+/** El mismo camino, con el prefijo del idioma si hace falta. */
+export function localized(locale: Locale, path: string): string {
+  return localePath(locale, path);
 }

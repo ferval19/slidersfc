@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 import { authErrorFrom } from '@/lib/auth-errors';
+import { localeFromPathname, localePath } from '@/lib/i18n/locale';
 
 /**
  * Recoge las vueltas de Supabase Auth caigan donde caigan.
@@ -32,14 +33,20 @@ export function AuthRelay() {
     const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
 
     // Las rutas de /auth ya saben qué hacer con todo esto.
-    if (pathname.startsWith('/auth/')) return;
+    if (pathname.startsWith('/auth/') || pathname.startsWith('/en/auth/')) return;
 
-    // 1. Errores. /login queda fuera porque su ?error= es nuestro, ya
-    //    traducido, y volver a interpretarlo lo cambiaría por el genérico.
-    if (pathname !== '/login') {
-      const message = authErrorFrom(query) ?? authErrorFrom(hash);
+    // `pathname` ya trae el prefijo si toca (lo pone el navegador, no la
+    // reescritura interna del proxy, que el cliente nunca ve): de aquí sale
+    // el idioma con el que hay que volver a /login o a /auth/*.
+    const locale = localeFromPathname(pathname);
+
+    // 1. Errores. /login (y /en/login) quedan fuera porque su ?error= es
+    //    nuestro, ya traducido, y volver a interpretarlo lo cambiaría por el
+    //    genérico.
+    if (pathname !== '/login' && pathname !== '/en/login') {
+      const message = authErrorFrom(query, locale) ?? authErrorFrom(hash, locale);
       if (message) {
-        router.replace(`/login?error=${encodeURIComponent(message)}`);
+        router.replace(`${localePath(locale, '/login')}?error=${encodeURIComponent(message)}`);
         return;
       }
     }
@@ -57,7 +64,7 @@ export function AuthRelay() {
     const code = query.get('code');
     if (code) {
       window.location.replace(
-        `/auth/confirm?code=${encodeURIComponent(code)}&next=${encodeURIComponent(next)}`,
+        `${localePath(locale, '/auth/confirm')}?code=${encodeURIComponent(code)}&next=${encodeURIComponent(next)}`,
       );
       return;
     }
@@ -66,7 +73,7 @@ export function AuthRelay() {
     //    arrastrar a mano porque una redirección normal no lo conserva.
     if (hash.get('access_token') && hash.get('refresh_token')) {
       window.location.replace(
-        `/auth/finalizar?next=${encodeURIComponent(next)}#${hash.toString()}`,
+        `${localePath(locale, '/auth/finalizar')}?next=${encodeURIComponent(next)}#${hash.toString()}`,
       );
     }
   }, [pathname, router]);

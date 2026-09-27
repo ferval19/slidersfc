@@ -1,0 +1,218 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound, permanentRedirect } from 'next/navigation';
+import { lang } from 'next/root-params';
+
+import { Avatar } from '@/components/avatar';
+import { ChalkPiece } from '@/components/chalk';
+import { EmptyState } from '@/components/empty-state';
+import { SetCard } from '@/components/set-card';
+import { SignOutButton } from '@/components/sign-out-button';
+import {
+  getFavoriteSetsByUser,
+  getProfileByUsername,
+  getSetsByOwner,
+  getUsernameAfterRename,
+} from '@/lib/queries';
+import { getDictionary } from '@/lib/i18n/dictionary';
+import { alternates } from '@/lib/i18n/alternates';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
+import { jsonLd } from '@/lib/json-ld';
+import { editProfilePath, localized, profilePath } from '@/lib/paths';
+import { publicSiteUrl } from '@/lib/site-url';
+import { getCurrentUser } from '@/lib/supabase/server';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}): Promise<Metadata> {
+  const [{ username }, localeParam] = await Promise.all([params, lang()]);
+  const locale = (localeParam ?? DEFAULT_LOCALE) as Locale;
+  const profile = await getProfileByUsername(username);
+
+  if (!profile) return { title: getDictionary(locale).perfil.perfilNoEncontrado };
+
+  const name = profile.display_name ?? profile.username;
+
+  return {
+    title: `${name} (@${profile.username})`,
+    description: profile.bio ?? `Sets de sliders publicados por ${name} en SlidersFC.`,
+    alternates: alternates(locale, profilePath(profile.username)),
+    openGraph: {
+      title: `${name} en SlidersFC`,
+      description: profile.bio ?? `Sets de sliders publicados por ${name}.`,
+      type: 'profile',
+    },
+  };
+}
+
+export default async function ProfilePage({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}) {
+  const [{ username }, localeParam] = await Promise.all([params, lang()]);
+  const locale = (localeParam ?? DEFAULT_LOCALE) as Locale;
+  const t = getDictionary(locale);
+
+  const profile = await getProfileByUsername(username);
+
+  if (!profile) {
+    // Puede ser el nombre de antes de alguien: los enlaces que ya circulan no
+    // tienen por qué morir porque se haya cambiado el nombre.
+    const current = await getUsernameAfterRename(username);
+    if (current) permanentRedirect(localized(locale, profilePath(current)));
+    notFound();
+  }
+
+  const [sets, favorites, user] = await Promise.all([
+    getSetsByOwner(profile.id),
+    getFavoriteSetsByUser(profile.id),
+    getCurrentUser(),
+  ]);
+  const isMe = user?.id === profile.id;
+
+  const published = sets.filter((set) => set.is_published);
+  const drafts = sets.filter((set) => !set.is_published);
+
+  const siteUrl = publicSiteUrl();
+  const name = profile.display_name ?? profile.username;
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t.comun.inicio, item: `${siteUrl}${localized(locale, '/')}` },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name,
+        item: `${siteUrl}${localized(locale, profilePath(profile.username))}`,
+      },
+    ],
+  };
+
+  return (
+    <div className="mx-auto max-w-6xl px-5 py-12">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }} />
+      <header className="flex flex-wrap items-start gap-5 pb-8">
+        <Avatar url={profile.avatar_url} name={profile.display_name ?? profile.username} size={64} />
+
+        <div className="min-w-0 flex-1">
+          <h1 className="display text-[clamp(2.25rem,6vw,3.5rem)]">
+            {profile.display_name ?? profile.username}
+          </h1>
+          <p className="mt-1 text-sm text-chalk-dim">
+            @{profile.username}
+            {profile.twitter_handle ? (
+              <>
+                {' · '}
+                <a
+                  href={`https://x.com/${profile.twitter_handle}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-chalk"
+                >
+                  X: @{profile.twitter_handle}
+                </a>
+              </>
+            ) : null}
+            {profile.youtube_url ? (
+              <>
+                {' · '}
+                <a
+                  href={profile.youtube_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-chalk"
+                >
+                  YouTube: {profile.youtube_url.replace('https://www.youtube.com/', '')}
+                </a>
+              </>
+            ) : null}
+          </p>
+          {profile.bio ? <p className="mt-3 max-w-prose text-sm text-chalk/90">{profile.bio}</p> : null}
+        </div>
+
+        {isMe ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href={localized(locale, editProfilePath())} className="btn btn-quiet">
+              <ChalkPiece className="size-4" />
+              {t.perfil.editarPerfil}
+            </Link>
+            <SignOutButton />
+          </div>
+        ) : null}
+      </header>
+
+      <section className="py-8">
+        <h2 className="display text-3xl">
+          {published.length} {t.perfil.setPublicado(published.length)}
+        </h2>
+
+        <div className="mt-5">
+          {published.length === 0 ? (
+            <EmptyState
+              title={isMe ? t.perfil.aunNoHasPublicadoNada : t.perfil.esteUsuarioNoTieneSetsPublicos}
+              body={isMe ? t.perfil.creaTuPrimerSet : t.perfil.cuandoPubliqueUnSet}
+              action={
+                isMe ? { href: localized(locale, '/sets/nuevo'), label: t.perfil.crearMiPrimerSet } : undefined
+              }
+            />
+          ) : (
+            <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {published.map((set) => (
+                <SetCard key={set.id} set={set} locale={locale} />
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
+
+      {isMe && drafts.length > 0 ? (
+        <>
+          <div className="chalk-rule" />
+          <section className="py-9">
+            <h2 className="display text-3xl">
+              {t.perfil.borradores} <span className="text-chalk-dim">· {t.perfil.soloLosVesTu}</span>
+            </h2>
+            <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {drafts.map((set) => (
+                <SetCard key={set.id} set={set} locale={locale} />
+              ))}
+            </ul>
+          </section>
+        </>
+      ) : null}
+
+      {/* En el perfil propio, vacío invita a guardar; en el de otro no se
+          pinta nada: no hace falta anunciar que alguien no ha guardado nada. */}
+      {favorites.length > 0 || isMe ? (
+        <>
+          <div className="chalk-rule" />
+          <section className="py-9">
+            <h2 className="display text-3xl">
+              {t.perfil.favoritos} <span className="text-chalk-dim">· {favorites.length}</span>
+            </h2>
+
+            <div className="mt-5">
+              {favorites.length === 0 ? (
+                <EmptyState
+                  title={t.perfil.aunNoHasGuardadoNada}
+                  body={t.perfil.cuandoVeasUnSet}
+                  action={{ href: localized(locale, '/'), label: t.perfil.verLaPortada }}
+                />
+              ) : (
+                <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {favorites.map((set) => (
+                    <SetCard key={set.id} set={set} locale={locale} />
+                  ))}
+                </ul>
+              )}
+            </div>
+          </section>
+        </>
+      ) : null}
+    </div>
+  );
+}

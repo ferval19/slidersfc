@@ -28,8 +28,14 @@ const DELTA_DOWN = '#ff7d94';
 
 export type CompareCardData = {
   gameName: string;
-  differing: number;
-  total: number;
+  /**
+   * Ya resueltos en el idioma que toca por quien construye los datos
+   * (`opengraph-image.tsx`, que sí puede leer `lang()`): esta tarjeta la
+   * dibuja Satori, y su trabajo es pintar, no decidir idioma.
+   */
+  title: string;
+  /** Sólo se usa si `rows` viene vacío: los dos sets son idénticos. */
+  matchMessage: string;
   a: { title: string; author: string };
   b: { title: string; author: string };
   rows: { name: string; a: number | null; b: number | null; delta: number }[];
@@ -41,8 +47,7 @@ function formatDelta(delta: number) {
 }
 
 export function CompareCard({ data }: { data: CompareCardData }) {
-  const title =
-    data.differing === 0 ? 'Son el mismo set' : `Se separan en ${data.differing} de ${data.total}`;
+  const { title } = data;
 
   // Mismo truco que en ShareCard: el título manda en el alto disponible.
   const titleSize = title.length > 40 ? 64 : title.length > 26 ? 80 : 100;
@@ -145,9 +150,7 @@ export function CompareCard({ data }: { data: CompareCardData }) {
       {/* Las filas donde más se separan, o el aviso de que no hay ninguna */}
       <div style={{ display: 'flex', width: '100%', flexDirection: 'column', flexShrink: 0 }}>
         {data.rows.length === 0 ? (
-          <div style={{ display: 'flex', fontSize: 22, color: CHALK_DIM }}>
-            Los {data.total} valores coinciden.
-          </div>
+          <div style={{ display: 'flex', fontSize: 22, color: CHALK_DIM }}>{data.matchMessage}</div>
         ) : (
           data.rows.map((row) => (
             <div

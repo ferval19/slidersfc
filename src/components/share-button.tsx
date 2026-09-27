@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { ChalkCheck, ChalkShare } from '@/components/chalk';
+import { useI18n } from '@/components/i18n-provider';
 
 /**
  * Compartir un enlace. Usa el diálogo nativo del sistema cuando existe
@@ -20,6 +21,7 @@ export function ShareButton({
   text: string;
 }) {
   const [copied, setCopied] = useState(false);
+  const { t } = useI18n();
 
   const share = async () => {
     if (navigator.share) {
@@ -37,7 +39,7 @@ export function ShareButton({
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2200);
     } catch {
-      window.prompt('Copia el enlace:', url);
+      window.prompt(t.set.copiaElEnlace, url);
     }
   };
 
@@ -45,7 +47,7 @@ export function ShareButton({
     <div className="flex flex-wrap items-center gap-2">
       <button type="button" onClick={share} className="btn btn-quiet">
         {copied ? <ChalkCheck className="size-4" /> : <ChalkShare className="size-4" />}
-        {copied ? '¡Enlace copiado!' : 'Compartir'}
+        {copied ? t.set.enlaceCopiado : t.set.compartir}
       </button>
 
       <a
@@ -57,7 +59,7 @@ export function ShareButton({
         <svg aria-hidden viewBox="0 0 24 24" className="size-3.5 fill-current">
           <path d="M18.9 2H22l-6.8 7.8L22.8 22h-6.1l-4.8-6.3L6.3 22H3.2l7.1-8.1L2.6 2h6.2l4.5 5.9L18.9 2Zm-1.1 18h1.7L7.4 3.7H5.6L17.8 20Z" />
         </svg>
-        En X
+        {t.set.enX}
       </a>
     </div>
   );

@@ -4,7 +4,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { useI18n } from '@/components/i18n-provider';
 import { authErrorFrom, authErrorMessage } from '@/lib/auth-errors';
+import { localized } from '@/lib/paths';
 import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 
 /**
@@ -15,6 +17,7 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/client';
  */
 export function AuthHashHandler({ next }: { next: string }) {
   const router = useRouter();
+  const { locale, t } = useI18n();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -26,7 +29,7 @@ export function AuthHashHandler({ next }: { next: string }) {
       const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
       const accessToken = params.get('access_token');
       const refreshToken = params.get('refresh_token');
-      const hashError = authErrorFrom(params);
+      const hashError = authErrorFrom(params, locale);
 
       if (hashError) {
         if (!cancelled) setError(hashError);
@@ -35,9 +38,7 @@ export function AuthHashHandler({ next }: { next: string }) {
 
       if (!accessToken || !refreshToken) {
         if (!cancelled) {
-          setError(
-            'El enlace no traía datos de sesión. Suele pasar cuando se abre en otro navegador o cuando ya ha caducado: pide uno nuevo.',
-          );
+          setError(t.authFinalizar.enlaceSinDatosDeSesion);
         }
         return;
       }
@@ -50,7 +51,7 @@ export function AuthHashHandler({ next }: { next: string }) {
         });
 
         if (sessionError) {
-          if (!cancelled) setError(authErrorMessage(sessionError));
+          if (!cancelled) setError(authErrorMessage(sessionError, locale));
           return;
         }
 
@@ -59,7 +60,7 @@ export function AuthHashHandler({ next }: { next: string }) {
       } catch (cause) {
         if (!cancelled) {
           setError(
-            authErrorMessage(cause instanceof Error ? { message: cause.message } : null),
+            authErrorMessage(cause instanceof Error ? { message: cause.message } : null, locale),
           );
         }
       }
@@ -70,19 +71,19 @@ export function AuthHashHandler({ next }: { next: string }) {
     return () => {
       cancelled = true;
     };
-  }, [next, router]);
+  }, [next, router, locale, t]);
 
   if (error) {
     return (
       <div className="panel p-6">
-        <p className="eyebrow">No se ha podido entrar</p>
+        <p className="eyebrow">{t.authFinalizar.noSeHaPodidoEntrar}</p>
         <p className="mt-3 text-sm text-chalk/90">{error}</p>
-        <Link href="/login" className="btn btn-primary mt-5">
-          Pedir otro enlace
+        <Link href={localized(locale, '/login')} className="btn btn-primary mt-5">
+          {t.authFinalizar.pedirOtroEnlace}
         </Link>
       </div>
     );
   }
 
-  return <p className="text-sm text-chalk-dim">Iniciando sesión…</p>;
+  return <p className="text-sm text-chalk-dim">{t.authFinalizar.iniciandoSesion}</p>;
 }

@@ -1,8 +1,16 @@
 import Link from 'next/link';
+import { lang } from 'next/root-params';
 
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { SITE_BYLINE, SITE_NAME } from '@/lib/constants';
+import { getDictionary } from '@/lib/i18n/dictionary';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
+import { localized } from '@/lib/paths';
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
+  const t = getDictionary(locale).footer;
+
   return (
     <footer className="mt-24">
       <div className="chalk-rule" />
@@ -13,13 +21,17 @@ export function SiteFooter() {
           <p className="eyebrow">
             {SITE_NAME} · {SITE_BYLINE}
           </p>
-          <Link href="/guia" className="eyebrow text-chalk underline underline-offset-4 hover:text-ink-user">
-            Qué lleva un set
+          <Link
+            href={localized(locale, '/guia')}
+            className="eyebrow text-chalk underline underline-offset-4 hover:text-ink-user"
+          >
+            {t.queLlevaUnSet}
           </Link>
+          {/* Se busca, no se tropieza con él: por eso va aquí y no en la
+              cabecera, que ya está llena. */}
+          <LanguageSwitcher locale={locale} label={t.cambiarIdioma} />
         </div>
-        <p className="max-w-sm text-xs text-chalk-dim">
-          Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.
-        </p>
+        <p className="max-w-sm text-xs text-chalk-dim">{t.disclaimer}</p>
       </div>
     </footer>
   );

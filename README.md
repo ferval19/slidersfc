@@ -68,7 +68,10 @@ Editor del dashboard, o con la CLI (`supabase db push`):
     versiones de un set
 13. `supabase/migrations/20260922120000_set_favorites.sql` — guardar en
     favoritos el set de otro
-14. `supabase/storage/01_avatars.sql` — almacén de las fotos de perfil. Va
+14. `supabase/migrations/20260927120000_slider_name_en.sql` — el nombre inglés
+    de cada slider. **Va antes del catálogo**: crea la columna que el catálogo
+    escribe. Después hay que reaplicar `supabase/seed/01_catalog.sql`
+15. `supabase/storage/01_avatars.sql` — almacén de las fotos de perfil. Va
     aparte de las migraciones porque es configuración de Storage y
     `npm run test:sql` no puede probarla
 
@@ -189,7 +192,8 @@ npm run dev
 | `npm run test:compare` | Prueba el modelo de comparar dos sets |
 | `npm run test:conditions` | Prueba la validación de dificultad, duración y cámara |
 | `npm run test:backup` | Vuelca, repone en una base vacía y comprueba que ha vuelto todo |
-| `npm test` | Los seis anteriores, en orden |
+| `npm run test:i18n` | Comprueba que `en.ts` tiene las mismas claves que `es.ts` y ninguna cadena sin traducir |
+| `npm test` | Los siete anteriores, en orden |
 | `npm run backup` | Copia de seguridad a `copias/`: JSON + SQL de reposición |
 | `npm run test:e2e` | Tests de Playwright (navegador real). Necesita `.env.test.local` — ver [docs/testing-e2e.md](docs/testing-e2e.md) |
 | `npm run test:e2e:ui` | Lo mismo, en modo interactivo |
@@ -956,6 +960,38 @@ comparación.
 
 De paso, `ShareSet` pasa a llamarse `ShareButton` y recibe el texto en lugar de
 componerlo: ya no comparte sólo sets.
+
+### 27/09 · La web en castellano y en inglés
+
+Fernando lleva tiempo viendo interacción con público inglés. Lo que se lee ya
+está en los dos idiomas: portada, ficha de un set, comparación, modo consola,
+página de juego, las tarjetas que se ven al compartir y el acceso entero.
+
+**El castellano se queda en la raíz.** Las rutas viven una sola vez, bajo
+`app/[lang]/`, y el proxy reescribe `/u/pepe/su-set` a `/es/u/pepe/su-set` por
+dentro. Reescribir y no redirigir: los enlaces llevan semanas circulando por X
+y por grupos, y moverlos a `/es` los habría roto todos — que es exactamente lo
+que `username_history` existe para evitar.
+
+**Los nombres de los sliders no se tradujeron: se recuperaron.** Los slugs del
+catálogo ya eran los nombres ingleses en minúsculas, porque de ahí salieron.
+Traducir del castellano habría dado «Speed» donde EA dice «Sprint Speed».
+
+**Lo que no se traduce, y es la decisión que sostiene todo**: los títulos, las
+descripciones y los comentarios de los sets. Son de quien los escribe, y
+traducir el comentario de otro es ponerle palabras en la boca. La web queda
+bilingüe en el envoltorio y multilingüe en el contenido, que es lo que ya son
+los foros de sliders de verdad.
+
+**Y la lección de la semana: tres veces la página dio 500 con `tsc`, eslint,
+`npm test` y `next build` en verde.** Las tres eran fronteras: un diccionario
+con funciones cruzando del servidor al cliente, y `next/root-params` llamado
+desde un Route Handler, que no lo admite. Ninguna herramienta estática ve eso.
+Se ven levantando el servidor y pidiendo la página, y por eso ahora eso también
+es parte de dar un cambio por bueno.
+
+Queda para otra tanda el formulario de sets, el perfil y la guía: son para
+quien ya ha decidido quedarse.
 
 ---
 

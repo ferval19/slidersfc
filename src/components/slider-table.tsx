@@ -4,15 +4,17 @@ import { useState } from 'react';
 
 import { CATEGORY_DRAWINGS } from '@/components/chalk';
 import { CommentComposer, CommentList } from '@/components/comment-thread';
+import { useI18n } from '@/components/i18n-provider';
 import { ScaleLegend, ScaleTrack } from '@/components/slider-scale';
 import { categoryAnchor, useActiveCategory } from '@/components/active-category';
 import { CategorySheet } from '@/components/category-sheet';
 import {
   categoryLabel,
-  CPU_BEHAVIOURS,
+  cpuBehaviours,
   SCOPE_INK,
-  SCOPE_LABELS,
-  SCOPE_SHORT_LABELS,
+  scopeLabel,
+  scopeLabels,
+  scopeShortLabel,
 } from '@/lib/constants';
 import type { CategoryBlockView, CommentView } from '@/lib/set-view';
 import type { CpuBehaviour, SliderScope } from '@/lib/database.types';
@@ -54,6 +56,7 @@ export function SliderTable({
   const [openId, setOpenId] = useState<number | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const active = useActiveCategory(blocks.map((block) => block.category));
+  const { t, locale } = useI18n();
 
   return (
     <div className="flex flex-col gap-10">
@@ -70,7 +73,7 @@ export function SliderTable({
       {/* La leyenda general. Los rótulos de columna ya no van aquí: cada
           categoría lleva los suyos, para no perderlos al bajar. */}
       <div className="sm:-mt-4">
-        <ScaleLegend scopes={scopes} labels={SCOPE_LABELS} withReference={hasReference} />
+        <ScaleLegend scopes={scopes} labels={scopeLabels(locale)} withReference={hasReference} />
       </div>
 
       {blocks.map((block) => {
@@ -81,7 +84,7 @@ export function SliderTable({
         // set toca cosas que no toca.
         const cpuIsAutomatic =
           block.category === 'cpu_controls' && hasCpuBehaviour && cpuBehaviour !== 'custom';
-        const behaviour = CPU_BEHAVIOURS.find((candidate) => candidate.value === cpuBehaviour);
+        const behaviour = cpuBehaviours(locale).find((candidate) => candidate.value === cpuBehaviour);
 
         return (
           // `scroll-mt` descuenta la cabecera y la barra pegada: sin él, al
@@ -102,18 +105,18 @@ export function SliderTable({
                 tocándola se abre el índice. */}
             <header className="relative z-10 flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-chalk-line bg-board pt-2 pb-3 max-sm:sticky max-sm:top-[var(--header-h)]">
               {Drawing ? <Drawing className="size-7 shrink-0 text-chalk-dim" /> : null}
-              <h3 className="display text-2xl">{categoryLabel(block.category)}</h3>
+              <h3 className="display text-2xl">{categoryLabel(block.category, locale)}</h3>
               {block.category === 'cpu_controls' && hasCpuBehaviour && behaviour ? (
                 <span className="chip chip-active ml-auto">{behaviour.label}</span>
               ) : null}
 
               <span aria-hidden className="eyebrow ml-auto sm:hidden">
-                Índice ▾
+                {t.set.indice}
               </span>
               <button
                 type="button"
                 onClick={() => setSheetOpen(true)}
-                aria-label={`${categoryLabel(block.category)} — ir a otra categoría`}
+                aria-label={t.set.irAOtraCategoria(categoryLabel(block.category, locale))}
                 className="absolute inset-0 sm:hidden"
               />
             </header>
@@ -134,7 +137,7 @@ export function SliderTable({
                     key={scope}
                     className={`${VALUE_COL} text-center font-mono text-[0.625rem] leading-tight font-semibold tracking-[0.08em] uppercase ${SCOPE_INK[scope].text}`}
                   >
-                    {SCOPE_LABELS[scope]}
+                    {scopeLabel(scope, locale)}
                   </span>
                 ))}
               </div>
@@ -169,10 +172,10 @@ export function SliderTable({
                               <span
                                 key={cell.scope}
                                 className={`${VALUE_COL} text-center text-chalk-dim/40`}
-                                title={`${SCOPE_LABELS[cell.scope]}: no aplica`}
+                                title={t.set.noAplica(scopeLabel(cell.scope, locale))}
                               >
                                 <span className="eyebrow block text-[0.5625rem] sm:hidden">
-                                  {SCOPE_SHORT_LABELS[cell.scope]}
+                                  {scopeShortLabel(cell.scope, locale)}
                                 </span>
                                 <span className="text-sm">—</span>
                               </span>
@@ -188,7 +191,7 @@ export function SliderTable({
                               type="button"
                               onClick={() => setOpenId(isOpen ? null : cell.definitionId)}
                               aria-expanded={isOpen}
-                              title={`${row.name} · ${SCOPE_LABELS[cell.scope]} — comentarios`}
+                              title={t.set.verComentarios(row.name, scopeLabel(cell.scope, locale))}
                               className={`relative ${VALUE_COL} rounded-[2px] border py-1.5 transition-colors ${ink.text} ${
                                 isOpen
                                   ? `${ink.border} bg-board-deep`
@@ -196,7 +199,7 @@ export function SliderTable({
                               }`}
                             >
                               <span className="eyebrow block text-[0.5625rem] sm:hidden">
-                                {SCOPE_SHORT_LABELS[cell.scope]}
+                                {scopeShortLabel(cell.scope, locale)}
                               </span>
                               <span className="value-pill text-base">{cell.value ?? '–'}</span>
                               {cell.commentCount > 0 ? (
@@ -213,7 +216,7 @@ export function SliderTable({
                     {active ? (
                       <div className="mb-4 border-l-2 bg-board-deep/70 px-4 py-4" style={{ borderColor: SCOPE_INK[active.scope].hex }}>
                         <p className="eyebrow mb-3">
-                          {row.name} · {SCOPE_LABELS[active.scope]} · {active.value ?? '–'}
+                          {row.name} · {scopeLabel(active.scope, locale)} · {active.value ?? '–'}
                         </p>
 
                         <div className="flex flex-col gap-4">
@@ -222,9 +225,7 @@ export function SliderTable({
                               comments={commentsByDefinition[String(active.definitionId)] ?? []}
                             />
                           ) : (
-                            <p className="text-sm text-chalk-dim">
-                              Nadie ha comentado este valor todavía.
-                            </p>
+                            <p className="text-sm text-chalk-dim">{t.set.sinComentariosValor}</p>
                           )}
 
                           <CommentComposer
@@ -232,7 +233,7 @@ export function SliderTable({
                             definitionId={active.definitionId}
                             canComment={canComment}
                             compact
-                            placeholder={`¿Por qué ${active.value ?? '—'} en ${row.name}?`}
+                            placeholder={t.set.placeholderComentarioValor(active.value ?? '—', row.name)}
                           />
                         </div>
                       </div>

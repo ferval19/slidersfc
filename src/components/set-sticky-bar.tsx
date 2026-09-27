@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { categoryAnchor, useActiveCategory } from '@/components/active-category';
 import { ChalkPad } from '@/components/chalk';
+import { useI18n } from '@/components/i18n-provider';
 import { categoryShortLabel } from '@/lib/constants';
 
 type Props = {
@@ -28,6 +29,7 @@ export function SetStickyBar({ title, conditions, categories, consoleHref }: Pro
   const sentinel = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const active = useActiveCategory(categories);
+  const { t, locale } = useI18n();
 
   /**
    * Aparecer o no, según si el testigo del final de la cabecera ha subido.
@@ -83,7 +85,7 @@ export function SetStickyBar({ title, conditions, categories, consoleHref }: Pro
           {/* Sin envolver: si las categorías se parten en dos líneas, la barra
               deja de ser una barra. Si no caben, se desplazan. */}
           <nav
-            aria-label="Categorías del set"
+            aria-label={t.set.categoriasDelSet}
             className="flex min-w-0 flex-1 flex-nowrap gap-1 overflow-x-auto"
           >
             {categories.map((category) => (
@@ -92,7 +94,7 @@ export function SetStickyBar({ title, conditions, categories, consoleHref }: Pro
                 href={`#${categoryAnchor(category)}`}
                 className={`chip chip-tight shrink-0 ${active === category ? 'chip-active' : ''}`}
               >
-                {categoryShortLabel(category)}
+                {categoryShortLabel(category, locale)}
               </a>
             ))}
           </nav>
@@ -102,7 +104,7 @@ export function SetStickyBar({ title, conditions, categories, consoleHref }: Pro
               acción que ya ha visto quien ha bajado hasta aquí. */}
           <a href={consoleHref} className="btn btn-primary shrink-0 px-3 py-2">
             <ChalkPad className="size-4" />
-            Consola
+            {t.set.consola}
           </a>
         </div>
       </div>

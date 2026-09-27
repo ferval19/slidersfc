@@ -4,24 +4,32 @@ import { usePathname } from 'next/navigation';
 import { useActionState, useEffect, useRef } from 'react';
 
 import { Avatar } from '@/components/avatar';
+import { useI18n } from '@/components/i18n-provider';
 import { postComment, type CommentFormState } from '@/app/actions/comments';
+import type { Dictionary } from '@/lib/i18n/dictionary';
+import type { Locale } from '@/lib/i18n/locale';
 import type { CommentView } from '@/lib/set-view';
 import Link from 'next/link';
 
 const initialState: CommentFormState = {};
 
-function relativeDate(iso: string) {
+function relativeDate(iso: string, locale: Locale, t: Dictionary['comun']) {
   const date = new Date(iso);
   const diffDays = Math.floor((Date.now() - date.getTime()) / 86_400_000);
 
   if (diffDays === 0) {
-    return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString(locale === 'en' ? 'en-US' : 'es-ES', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
-  if (diffDays < 7) return `hace ${diffDays} ${diffDays === 1 ? 'día' : 'días'}`;
-  return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+  if (diffDays < 7) return t.haceDias(diffDays);
+  return date.toLocaleDateString(locale === 'en' ? 'en-US' : 'es-ES', { day: 'numeric', month: 'short' });
 }
 
 export function CommentList({ comments }: { comments: CommentView[] }) {
+  const { locale, t } = useI18n();
+
   if (comments.length === 0) return null;
 
   return (
@@ -43,13 +51,11 @@ export function CommentList({ comments }: { comments: CommentView[] }) {
                   {comment.author.displayName ?? comment.author.username}
                 </Link>
               ) : (
-                <span className="font-bold text-chalk">Usuario borrado</span>
+                <span className="font-bold text-chalk">{t.comun.usuarioBorrado}</span>
               )}
-              <span className="text-chalk-dim">{relativeDate(comment.createdAt)}</span>
+              <span className="text-chalk-dim">{relativeDate(comment.createdAt, locale, t.comun)}</span>
               {comment.isStale ? (
-                <span className="eyebrow text-ink-user">
-                  de la v{comment.setVersion}
-                </span>
+                <span className="eyebrow text-ink-user">{t.set.deLaVersion(comment.setVersion)}</span>
               ) : null}
             </p>
             <p className="mt-1.5 text-sm leading-relaxed whitespace-pre-wrap text-chalk/90">{comment.body}</p>
@@ -76,6 +82,7 @@ export function CommentComposer({
   const [state, formAction, pending] = useActionState(postComment, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   const pathname = usePathname();
+  const { t } = useI18n();
 
   useEffect(() => {
     if (state.ok) formRef.current?.reset();
@@ -88,9 +95,9 @@ export function CommentComposer({
           href={`/login?next=${encodeURIComponent(pathname)}`}
           className="font-semibold text-ink-user hover:underline"
         >
-          Entra
+          {t.comun.entra}
         </Link>{' '}
-        para comentar.
+        {t.set.paraComentar}
       </p>
     );
   }
@@ -118,7 +125,7 @@ export function CommentComposer({
       ) : null}
       <div className="flex items-center gap-3">
         <button type="submit" className="btn btn-primary" disabled={pending}>
-          {pending ? 'Enviando…' : 'Comentar'}
+          {pending ? t.comun.enviando : t.set.comentarBoton}
         </button>
       </div>
     </form>

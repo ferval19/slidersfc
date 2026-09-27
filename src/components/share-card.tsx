@@ -31,8 +31,13 @@ export type ShareCardData = {
   gameName: string;
   authorName: string;
   authorHandle: string;
-  sliderCount: number;
-  commentCount: number;
+  /**
+   * Ya resueltos en el idioma que toca por quien construye los datos
+   * (`opengraph-image.tsx`, que sí puede leer `lang()`): esta tarjeta la
+   * dibuja Satori, y su trabajo es pintar, no decidir idioma.
+   */
+  slidersLabel: string;
+  commentsLabel: string | null;
   rows: ShareCardRow[];
 };
 
@@ -99,11 +104,9 @@ export function ShareCard({ data }: { data: ShareCardData }) {
             <span style={{ marginLeft: 12 }}>@{data.authorHandle}</span>
           ) : null}
           <span style={{ marginLeft: 12 }}>·</span>
-          <span style={{ marginLeft: 12 }}>{data.sliderCount} sliders</span>
-          {data.commentCount > 0 ? (
-            <span style={{ marginLeft: 12 }}>
-              · {data.commentCount} {data.commentCount === 1 ? 'comentario' : 'comentarios'}
-            </span>
+          <span style={{ marginLeft: 12 }}>{data.slidersLabel}</span>
+          {data.commentsLabel ? (
+            <span style={{ marginLeft: 12 }}>· {data.commentsLabel}</span>
           ) : null}
         </div>
       </div>

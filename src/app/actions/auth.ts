@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 
 import { authErrorMessage } from '@/lib/auth-errors';
+import { getDictionary } from '@/lib/i18n/dictionary';
+import { DEFAULT_LOCALE, isLocale, localePath, type Locale } from '@/lib/i18n/locale';
 import { getSiteOrigin, safeNextPath } from '@/lib/site-url';
 import { isProviderEnabled } from '@/lib/supabase/providers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
@@ -11,16 +13,31 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 export type AuthFormState = { error?: string; sent?: string };
 export type CodeFormState = { error?: string };
 
+/**
+ * Una Server Action no es un Server Component: no puede llamar a
+ * `next/root-params` para saber en qué idioma está quien la ha llamado. Así
+ * que el idioma viaja en el propio formulario, con un `<input type="hidden"
+ * name="locale">` puesto por el componente de cliente que lo envía — es
+ * explícito, y no depende de cabeceras que un proxy o un CDN podrían no
+ * conservar igual.
+ */
+function localeFromFormData(formData: FormData): Locale {
+  const value = String(formData.get('locale') ?? '');
+  return isLocale(value) ? value : DEFAULT_LOCALE;
+}
+
 /** Magic link por email: sin contraseñas que guardar ni recordar. */
 export async function signInWithEmail(
   _prevState: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
+  const locale = localeFromFormData(formData);
+  const t = getDictionary(locale).auth;
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
   const next = safeNextPath(formData.get('next'));
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { error: 'Escribe un email válido.' };
+    return { error: t.escribeUnEmailValido };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -33,7 +50,7 @@ export async function signInWithEmail(
     },
   });
 
-  if (error) return { error: authErrorMessage(error) };
+  if (error) return { error: authErrorMessage(error, locale) };
 
   return { sent: email };
 }
@@ -52,12 +69,14 @@ export async function verifyEmailCode(
   _prevState: CodeFormState,
   formData: FormData,
 ): Promise<CodeFormState> {
+  const locale = localeFromFormData(formData);
+  const t = getDictionary(locale).auth;
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
   const token = String(formData.get('token') ?? '').replace(/\D/g, '');
   const next = safeNextPath(formData.get('next'));
 
-  if (!email) return { error: 'Falta el correo al que se envió el código.' };
-  if (token.length < 6) return { error: 'El código tiene 6 dígitos.' };
+  if (!email) return { error: t.faltaElCorreoDelCodigo };
+  if (token.length < 6) return { error: t.elCodigoTieneSeisDigitos };
 
   const supabase = await createSupabaseServerClient();
 
@@ -70,24 +89,27 @@ export async function verifyEmailCode(
     const { error } = await supabase.auth.verifyOtp({ email, token, type });
     if (!error) {
       revalidatePath('/', 'layout');
-      redirect(next);
+      redirect(localePath(locale, next));
     }
     lastError = error;
   }
 
-  return { error: authErrorMessage(lastError) };
+  return { error: authErrorMessage(lastError, locale) };
 }
 
 export async function signInWithTwitter(formData: FormData) {
+  const locale = localeFromFormData(formData);
+  const t = getDictionary(locale).auth;
   const next = safeNextPath(formData.get('next'));
 
   // Se comprueba antes de salir del sitio: con el proveedor desactivado,
   // Supabase responde un 400 crudo y la persona se queda sin vuelta atrás.
   if (!(await isProviderEnabled('twitter'))) {
     redirect(
-      `/login?error=${encodeURIComponent(
-        'El acceso con X no está activado todavía. Entra con tu correo mientras tanto.',
-      )}&next=${encodeURIComponent(next)}`,
+      localePath(
+        locale,
+        `/login?error=${encodeURIComponent(t.xNoActivadoTodavia)}&next=${encodeURIComponent(next)}`,
+      ),
     );
   }
 
@@ -102,20 +124,20 @@ export async function signInWithTwitter(formData: FormData) {
   });
 
   if (error || !data.url) {
-    const message = error
-      ? authErrorMessage(error)
-      : 'No se ha podido iniciar el acceso con X.';
-    redirect(`/login?error=${encodeURIComponent(message)}`);
+    const message = error ? authErrorMessage(error, locale) : t.xNoSeHaPodidoIniciar;
+    redirect(localePath(locale, `/login?error=${encodeURIComponent(message)}`));
   }
 
+  // `data.url` es el dominio de X, no una ruta interna: no lleva prefijo de
+  // idioma.
   redirect(data.url);
 }
 
-export async function signOut() {
+export async function signOut(locale: Locale = DEFAULT_LOCALE) {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
   revalidatePath('/', 'layout');
-  redirect('/');
+  redirect(localePath(locale, '/'));
 }
 
 // ---------------------------------------------------------------------------
@@ -129,16 +151,16 @@ export async function signOut() {
 
 const MIN_PASSWORD = 8;
 
-function readCredentials(formData: FormData) {
+function readCredentials(formData: FormData, t: ReturnType<typeof getDictionary>['auth']) {
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
   const password = String(formData.get('password') ?? '');
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { error: 'Escribe un email válido.' as const };
+    return { error: t.escribeUnEmailValido };
   }
 
   if (password.length < MIN_PASSWORD) {
-    return { error: `La contraseña debe tener al menos ${MIN_PASSWORD} caracteres.` as const };
+    return { error: t.contrasenaMinimo(MIN_PASSWORD) };
   }
 
   return { email, password };
@@ -148,28 +170,32 @@ export async function signInWithPassword(
   _prevState: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
-  const credentials = readCredentials(formData);
+  const locale = localeFromFormData(formData);
+  const t = getDictionary(locale).auth;
+  const credentials = readCredentials(formData, t);
   if ('error' in credentials) return credentials;
 
   const next = safeNextPath(formData.get('next'));
   const supabase = await createSupabaseServerClient();
 
   const { error } = await supabase.auth.signInWithPassword(credentials);
-  if (error) return { error: authErrorMessage(error) };
+  if (error) return { error: authErrorMessage(error, locale) };
 
   revalidatePath('/', 'layout');
-  redirect(next);
+  redirect(localePath(locale, next));
 }
 
 export async function signUpWithPassword(
   _prevState: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
-  const credentials = readCredentials(formData);
+  const locale = localeFromFormData(formData);
+  const t = getDictionary(locale).auth;
+  const credentials = readCredentials(formData, t);
   if ('error' in credentials) return credentials;
 
   if (String(formData.get('password')) !== String(formData.get('password_confirm'))) {
-    return { error: 'Las dos contraseñas no coinciden.' };
+    return { error: t.lasDosContrasenasNoCoinciden };
   }
 
   const next = safeNextPath(formData.get('next'));
@@ -181,24 +207,26 @@ export async function signUpWithPassword(
     options: { emailRedirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(next)}` },
   });
 
-  if (error) return { error: authErrorMessage(error) };
+  if (error) return { error: authErrorMessage(error, locale) };
 
   // Con «Confirm email» activado, Supabase no devuelve sesión: hay que
   // confirmar el correo antes. Sin él, la cuenta queda lista y se entra.
   if (!data.session) return { sent: credentials.email };
 
   revalidatePath('/', 'layout');
-  redirect(next);
+  redirect(localePath(locale, next));
 }
 
 export async function requestPasswordReset(
   _prevState: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
+  const locale = localeFromFormData(formData);
+  const t = getDictionary(locale).auth;
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { error: 'Escribe un email válido.' };
+    return { error: t.escribeUnEmailValido };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -208,7 +236,7 @@ export async function requestPasswordReset(
     redirectTo: `${origin}/auth/confirm?next=${encodeURIComponent('/cuenta/contrasena')}`,
   });
 
-  if (error) return { error: authErrorMessage(error) };
+  if (error) return { error: authErrorMessage(error, locale) };
 
   return { sent: email };
 }
@@ -218,21 +246,23 @@ export async function updatePassword(
   _prevState: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
+  const locale = localeFromFormData(formData);
+  const t = getDictionary(locale).auth;
   const password = String(formData.get('password') ?? '');
 
   if (password.length < MIN_PASSWORD) {
-    return { error: `La contraseña debe tener al menos ${MIN_PASSWORD} caracteres.` };
+    return { error: t.contrasenaMinimo(MIN_PASSWORD) };
   }
 
   if (password !== String(formData.get('password_confirm'))) {
-    return { error: 'Las dos contraseñas no coinciden.' };
+    return { error: t.lasDosContrasenasNoCoinciden };
   }
 
   const supabase = await createSupabaseServerClient();
 
   const { error } = await supabase.auth.updateUser({ password });
-  if (error) return { error: authErrorMessage(error) };
+  if (error) return { error: authErrorMessage(error, locale) };
 
   revalidatePath('/', 'layout');
-  redirect('/perfil');
+  redirect(localePath(locale, '/perfil'));
 }
