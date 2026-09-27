@@ -199,10 +199,18 @@ export function ScaleLegend({
   scopes,
   labels,
   withReference = false,
+  referenceLabel,
 }: {
   scopes: SliderScope[];
   labels: Record<SliderScope, string>;
   withReference?: boolean;
+  /**
+   * El texto de «De fábrica». Va como prop y no por `useI18n()` porque este
+   * componente lo pintan tanto Server Components (la guía) como de cliente
+   * (la tabla de un set), y el hook sólo funciona en los segundos — igual que
+   * `labels`, que ya viaja así por lo mismo.
+   */
+  referenceLabel?: string;
 }) {
   return (
     <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
@@ -219,7 +227,7 @@ export function ScaleLegend({
       {withReference ? (
         <li className="flex items-center gap-2">
           <span className="h-4 w-[2px] rounded-full bg-chalk opacity-45" />
-          <span className="eyebrow">De fábrica</span>
+          <span className="eyebrow">{referenceLabel}</span>
         </li>
       ) : null}
     </ul>

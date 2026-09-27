@@ -73,7 +73,12 @@ export function SliderTable({
       {/* La leyenda general. Los rótulos de columna ya no van aquí: cada
           categoría lleva los suyos, para no perderlos al bajar. */}
       <div className="sm:-mt-4">
-        <ScaleLegend scopes={scopes} labels={scopeLabels(locale)} withReference={hasReference} />
+        <ScaleLegend
+          scopes={scopes}
+          labels={scopeLabels(locale)}
+          withReference={hasReference}
+          referenceLabel={t.comparar.deFabrica}
+        />
       </div>
 
       {blocks.map((block) => {

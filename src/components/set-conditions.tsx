@@ -3,7 +3,7 @@ import { lang } from 'next/root-params';
 import { ChalkCamera, ChalkShield, ChalkStopwatch } from '@/components/chalk';
 import { getDictionary } from '@/lib/i18n/dictionary';
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
-import { DIFFICULTIES } from '@/lib/set-conditions';
+import { difficultyLabel } from '@/lib/set-conditions';
 import type { SliderSet } from '@/lib/database.types';
 
 type Props = {
@@ -24,7 +24,7 @@ export async function SetConditions({ set }: Props) {
   const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
   const t = getDictionary(locale).set;
 
-  const difficulty = DIFFICULTIES.find((candidate) => candidate.value === set.difficulty);
+  const difficulty = set.difficulty ? { label: difficultyLabel(set.difficulty, locale) } : null;
 
   const camera = set.camera
     ? [

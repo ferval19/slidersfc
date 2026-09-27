@@ -6,6 +6,8 @@ import { useActionState, useRef, useState } from 'react';
 
 import type { ProfileFormState } from '@/app/actions/profile';
 import { PitchDiagram } from '@/components/chalk';
+import type { Dictionary } from '@/lib/i18n/dictionary';
+import { useI18n } from '@/components/i18n-provider';
 import { AVATAR_BUCKET, avatarObjectPath } from '@/lib/avatar-storage';
 import { ACCEPTED_IMAGE_TYPES, prepareAvatar } from '@/lib/image';
 import {
@@ -28,6 +30,8 @@ type Props = {
 const initialState: ProfileFormState = {};
 
 export function ProfileForm({ action, profile, siteHost }: Props) {
+  const { locale, t: dictionary } = useI18n();
+  const t = dictionary.perfilForm;
   const [state, formAction, pending] = useActionState(action, initialState);
 
   const [username, setUsername] = useState(profile.username);
@@ -67,7 +71,7 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
       const { data } = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(path);
       setAvatarUrl(data.publicUrl);
     } catch (error) {
-      setUploadError(uploadMessage(error));
+      setUploadError(uploadMessage(error, t));
     } finally {
       setUploading(false);
       // Para que elegir dos veces el mismo fichero vuelva a disparar el evento.
@@ -78,6 +82,7 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
   return (
     <form action={formAction} className="flex flex-col gap-10">
       <input type="hidden" name="avatar_url" value={avatarUrl} />
+      <input type="hidden" name="locale" value={locale} />
 
       {/* ------------------------------------------------------------------
           La ficha. Es lo primero porque es lo que se está editando: la foto se
@@ -85,7 +90,7 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
           como van a salir en la página pública.
       ------------------------------------------------------------------ */}
       <section>
-        <p className="eyebrow">Así te verán</p>
+        <p className="eyebrow">{t.asiTeVeran}</p>
 
         <div className="panel relative mt-3 overflow-hidden p-6 sm:p-8">
           {/* El campo asoma por la esquina. La máscara le come el borde: sin
@@ -315,17 +320,13 @@ export function ProfileForm({ action, profile, siteHost }: Props) {
  * Traduce lo que devuelve Storage. El caso del almacén que falta merece
  * mensaje propio: es la puesta en marcha a medias, no un fallo de la persona.
  */
-function uploadMessage(error: unknown) {
+function uploadMessage(error: unknown, t: Dictionary['perfilForm']) {
   const message = error instanceof Error ? error.message : String(error);
 
-  if (/bucket not found/i.test(message)) {
-    return 'Falta crear el almacén de avatares en Supabase (supabase/storage/01_avatars.sql).';
-  }
+  if (/bucket not found/i.test(message)) return t.faltaAlmacen;
   if (/exceeded the maximum allowed size|payload too large/i.test(message)) {
-    return 'La foto pesa demasiado incluso reducida. Prueba con otra.';
+    return t.fotoDemasiadoGrande;
   }
-  if (/row-level security|not authorized|403/i.test(message)) {
-    return 'No tienes permiso para subir la foto. Vuelve a entrar e inténtalo otra vez.';
-  }
-  return message || 'No se ha podido subir la foto.';
+  if (/row-level security|not authorized|403/i.test(message)) return t.sinPermiso;
+  return message || t.noSeHaPodidoSubir;
 }

@@ -338,4 +338,256 @@ export const es = {
     esperarSegundos: (seconds: number) =>
       `Por seguridad hay que esperar ${seconds} segundo${seconds === 1 ? '' : 's'} antes de pedir otro enlace.`,
   },
+  setForm: {
+    titulo: 'Título',
+    tituloPlaceholder: 'Full manual · Leyenda · 8 min',
+    juego: 'Juego',
+    juegoNoSePuedeCambiar: 'El juego no se puede cambiar después de crear el set.',
+    descripcion: 'Descripción',
+    descripcionPlaceholder:
+      'Cómo se comporta el partido con estos valores, y qué controles usas. Lo de la dificultad, los tiempos y la cámara va aquí abajo.',
+    comoLoJuegas: 'Cómo lo juegas',
+    comoLoJuegasAyuda:
+      'Opcional, pero es lo que hace que tus valores signifiquen lo mismo para quien los copie.',
+    dificultad: 'Dificultad',
+    sinEspecificar: 'Sin especificar',
+    duracionDeCadaTiempo: 'Duración de cada tiempo',
+    duracionPlaceholder: '8',
+    duracionAyuda: 'En minutos. Si juegas con un rango, ponlo: 7-8.',
+    camara: 'Cámara',
+    camaraPlaceholder: 'Co-op',
+    altura: 'Altura',
+    zoom: 'Zoom',
+    valores: 'Valores',
+    slidersSinTocar: (n: number) => `${n} sliders. Lo que no toques se queda en su valor por defecto.`,
+    desplegarTodo: 'Desplegar todo',
+    plegarTodo: 'Plegar todo',
+    restablecer: 'Restablecer',
+    comportamientoCpuAyuda:
+      'Cómo se comporta la CPU. Los sliders de abajo sólo se usan en «Personalizado»; en los otros dos los ajusta el juego según los equipos.',
+    queHasCambiado: 'Qué has cambiado',
+    queHasCambiadoPlaceholder:
+      'Bajé la velocidad dos puntos: los contragolpes eran imposibles de defender.',
+    queHasCambiadoAyuda:
+      'Opcional. Si tocas algún valor, esto queda en el historial del set junto a lo que has cambiado. Es lo que convierte una lista de números en algo que se entiende.',
+    guardando: 'Guardando…',
+    guardarBorrador: 'Guardar borrador',
+    borradorSoloTuLoVes: 'Un borrador sólo lo ves tú hasta que lo publiques.',
+    publicarSet: 'Publicar set',
+    guardarCambios: 'Guardar cambios',
+  },
+  importPanel: {
+    pegarUnSetEscrito: 'Pegar un set escrito',
+    cerrar: 'Cerrar',
+    ayuda:
+      'De Notion, de un mensaje, de donde sea. Un slider por línea, con su nombre y uno o dos valores. Si sólo pones un valor, va a los dos lados.',
+    placeholder: 'Velocidad\t35\t35\nAceleración\t48\t50\nMarcaje: usuario 65, CPU 70',
+    textoDelSet: 'Texto del set',
+    reconocidos: (total: number) => `de ${total} sliders reconocidos.`,
+    sinReconocer: 'Sin reconocer',
+    yLineasMas: (n: number) => `y ${n} línea(s) más.`,
+    valoresFueraDeRango: (n: number) =>
+      `${n} ${n === 1 ? 'valor estaba' : 'valores estaban'} fuera del rango del juego y se ${n === 1 ? 'ha' : 'han'} recortado.`,
+    rellenarConEsto: 'Rellenar con esto',
+    vaciar: 'Vaciar',
+    loQueNoSeReconozca: 'Lo que no se reconozca se queda como está. Puedes retocarlo después.',
+  },
+  sliderControl: {
+    valorAria: (ariaLabel: string) => `${ariaLabel} (valor)`,
+    unoMenos: (ariaLabel: string) => `${ariaLabel}: uno menos`,
+    unoMas: (ariaLabel: string) => `${ariaLabel}: uno más`,
+  },
+  nuevoSet: {
+    metaTitle: 'Nuevo set',
+    metaDescription: 'Publica tu set de sliders en SlidersFC.',
+    faltaCatalogoTitulo: 'Falta el catálogo de sliders',
+    faltaCatalogoBody:
+      'No hay juegos en la base de datos. Aplica los ficheros de supabase/seed antes de crear sets.',
+    eyebrow: 'Nuevo set',
+    titulo: 'Publica tus sliders',
+    intro:
+      'Cuenta en la descripción con qué dificultad y duración de tiempos juegas: sin eso, los valores no significan lo mismo para quien los copie.',
+  },
+  editarSet: {
+    metaTitle: 'Editar set',
+    eyebrow: 'Editar set',
+    yaPublicado: (nextVersion: number, currentVersion: number) =>
+      `Este set ya está publicado. Si cambias algún valor, la versión pasará a v${nextVersion} y los comentarios anteriores quedarán marcados como «de la v${currentVersion}». La dirección del set no cambia.`,
+  },
+  perfilForm: {
+    asiTeVeran: 'Así te verán',
+    cambiarLaFoto: 'Cambiar la foto',
+    cambiar: 'Cambiar',
+    quitar: 'Quitar',
+    sinBiografia: 'Sin biografía. Lo que escribas abajo sale aquí.',
+    ayudaFoto:
+      'Pincha en la foto para cambiarla. Se recorta en cuadrado y se guarda a 512 px: JPG, PNG o WEBP.',
+    nombre: 'Nombre',
+    nombrePlaceholder: 'Full Manual FG',
+    nombreAyuda: 'Como quieres que te llamen. Si lo dejas vacío, sale tu nombre de usuario.',
+    nombreDeUsuario: 'Nombre de usuario',
+    usernamePlaceholder: 'fullmanualfg',
+    renombradoAyuda:
+      'Cambia la dirección de tu perfil y la de todos tus sets. Los enlaces que ya hayas compartido seguirán funcionando: llevarán a la nueva.',
+    usernameAyuda: 'Minúsculas, números y guión bajo. Es lo que aparece en la dirección de tus sets.',
+    biografia: 'Biografía',
+    biografiaPlaceholder:
+      'Cómo juegas: dificultad, duración de los tiempos, cámara, mando o teclado. Es lo que da sentido a tus valores.',
+    cuentaDeX: 'Cuenta de X',
+    twitterPlaceholder: 'FullManualFG',
+    twitterAyuda: 'Puedes pegar el enlace entero; se queda con el nombre.',
+    canalDeYoutube: 'Canal de YouTube',
+    youtubePlaceholder: '@FullManualFG',
+    youtubeAyudaMalo: 'Eso no parece un canal. Pega el enlace de tu canal, o tu @nombre.',
+    youtubeAyudaNormal:
+      'Tu @nombre o el enlace del canal. El de un vídeo no vale: tiene que ser el canal.',
+    guardando: 'Guardando…',
+    guardarPerfil: 'Guardar perfil',
+    cancelar: 'Cancelar',
+    faltaAlmacen: 'Falta crear el almacén de avatares en Supabase (supabase/storage/01_avatars.sql).',
+    fotoDemasiadoGrande: 'La foto pesa demasiado incluso reducida. Prueba con otra.',
+    sinPermiso: 'No tienes permiso para subir la foto. Vuelve a entrar e inténtalo otra vez.',
+    noSeHaPodidoSubir: 'No se ha podido subir la foto.',
+  },
+  cuentaPerfil: {
+    metaTitle: 'Editar perfil',
+    eyebrow: 'Tu ficha',
+    titulo: 'Editar perfil',
+    intro:
+      'Quien abre un set tuyo quiere saber quién lo firma y cómo juega. Es lo que separa unos valores sueltos de unos valores en los que fiarse.',
+  },
+  perfilErrores: {
+    usernameCorto: 'El nombre de usuario necesita al menos 3 caracteres.',
+    usernameInvalido: (max: number) =>
+      `El nombre de usuario sólo admite letras sin acentos, números y guión bajo, y como mucho ${max} caracteres.`,
+    nombreLargo: (max: number) => `El nombre no puede pasar de ${max} caracteres.`,
+    biografiaLarga: (max: number) => `La biografía no puede pasar de ${max} caracteres.`,
+    twitterInvalido: (max: number) =>
+      `La cuenta de X sólo admite letras, números y guión bajo (${max} como mucho).`,
+    youtubeNoSeReconoce: 'El canal de YouTube no se reconoce. Pega el enlace de tu canal o tu @nombre.',
+    youtubeDemasiadoLargo: 'El enlace del canal es demasiado largo.',
+    fotoDesdeAqui: 'La foto tiene que subirse desde aquí.',
+  },
+
+  setAccionesErrores: {
+    tituloLongitud: 'El título debe tener entre 3 y 120 caracteres.',
+    descripcionLongitud: 'La descripción no puede pasar de 2000 caracteres.',
+    elegirJuegoValido: 'Elige un juego válido.',
+    notaLongitud: 'La nota del cambio no puede pasar de 500 caracteres.',
+    sinValores: 'No se han recibido valores de sliders.',
+    sliderFueraDeCatalogo: 'Hay un slider que no pertenece al juego seleccionado. Recarga la página.',
+    valorFueraDeRango: (name: string, min: number, max: number) =>
+      `"${name}" debe estar entre ${min} y ${max}.`,
+    iniciarSesionParaCrear: 'Tienes que iniciar sesión para crear un set.',
+    noCreado: 'No se ha podido crear el set.',
+    iniciarSesion: 'Tienes que iniciar sesión.',
+    setNoExiste: 'Este set ya no existe.',
+    soloAutorEdita: 'Sólo el autor puede editar este set.',
+    juegoNoSePuedeCambiar: 'No se puede cambiar el juego de un set ya creado.',
+    noCopiaCreada: 'No se ha podido crear la copia.',
+    soloAutorCopia: 'Sólo el autor puede copiar su set.',
+    juegoNoExiste: 'Ese juego no existe.',
+    yaEsDeEseJuego: 'El set ya es de ese juego.',
+    ningunValorEncaja: 'Ningún valor de este set encaja en ese juego.',
+  },
+  comentarioErrores: {
+    faltaSet: 'Falta el set al que comentar.',
+    escribeAlgo: 'Escribe algo antes de enviar.',
+    longitudMaxima: 'El comentario no puede pasar de 2000 caracteres.',
+    sliderNoValido: 'Slider no válido.',
+    iniciarSesion: 'Tienes que iniciar sesión para comentar.',
+    setNoExiste: 'Este set ya no existe.',
+  },
+  favoritoErrores: {
+    iniciarSesion: 'Tienes que iniciar sesión para guardar sets.',
+  },
+  guia: {
+    metaTitle: 'Qué lleva un set',
+    metaDescription:
+      'Todo lo que se puede contar de un set de sliders en SlidersFC, campo por campo, y por qué cada cosa importa.',
+    ogTitle: 'Qué lleva un set — SlidersFC',
+    ogDescription: 'Campo por campo, qué se puede contar de un set de sliders y por qué importa.',
+    titulo: 'Qué lleva un set',
+    intro:
+      'Un set de sliders son unos números, y unos números solos no le sirven a nadie. Esto es todo lo que se puede contar de un set aquí, campo por campo, y por qué cada cosa importa. Casi nada es obligatorio: cuanto más pongas, más útil le resulta a quien se lo lleve.',
+    obligatorio: 'Obligatorio',
+    loBasicoTitulo: 'Lo básico',
+    tituloNombre: 'Título',
+    tituloBodyInicio:
+      'Lo que se ve en la lista y lo que se comparte. Es lo único que se pide de verdad, junto con el juego. Un buen título ya dice a quién va dirigido: ',
+    tituloEjemplo: '«Full manual · Leyenda · 8 min»',
+    tituloBodyFin: ' se entiende sin abrirlo.',
+    juegoNombre: 'Juego',
+    juegoBody:
+      'FC 27 o FC 26. No se puede cambiar después de crear el set, porque los valores cuelgan de la lista de sliders de ese juego y no son la misma lista. Si quieres llevarte un set al juego nuevo, en su ficha hay un botón que lo copia y empareja lo que encaja.',
+    descripcionNombre: 'Descripción',
+    descripcionBody:
+      'Para qué sirve el set y cómo se comporta el partido con él. También los controles que usas: manual o asistido cambia el resultado tanto como cualquier slider.',
+    borradorPublicadoNombre: 'Borrador o publicado',
+    borradorPublicadoBody:
+      'Un borrador sólo lo ves tú. Sirve para ir afinando sin que nadie lo vea a medias, y para compararlo con otro mientras lo trabajas.',
+    comoLoJuegasTitulo: 'Cómo lo juegas',
+    opcionalPeroFalta: 'Opcional, pero es lo que más falta hace',
+    comoLoJuegasIntro:
+      'Los mismos valores en otra dificultad no dan el mismo partido. Sin esto, quien copie tu set no sabe si le va a funcionar.',
+    dificultadNombre: 'Dificultad',
+    dificultadBodyInicio: 'Las seis del juego: ',
+    dificultadBodyFin:
+      '. Es lo que más cambia el comportamiento de la CPU, muy por encima de cualquier slider suelto.',
+    duracionNombre: 'Duración de cada tiempo',
+    duracionBodyInicio:
+      'En minutos. Se puede poner un rango si juegas con uno —',
+    duracionCodigo: '7-8',
+    duracionBodyFin:
+      '— porque mucha gente no usa siempre el mismo. La duración manda en el ritmo: unos valores afinados a 6 minutos se desmontan a 15.',
+    camaraNombre: 'Cámara',
+    camaraBodyInicio:
+      'El nombre y, si los ajustas, su altura y su zoom —las dos van de 0 a 20—. El campo sugiere las del juego (',
+    camaraBodyFin:
+      '…) pero admite cualquier cosa, porque cada menú las llama a su manera. Lo único que se pide es que si pones altura o zoom digas de qué cámara, porque unos números sueltos no dicen nada.',
+    losValoresTitulo: 'Los valores',
+    elGruesoDelSet: 'El grueso del set',
+    losValoresIntro:
+      'FC 27 trae 65 sliders y FC 26, 29. Salen en el orden exacto del menú del juego, para que puedas ir metiéndolos mientras los consultas.',
+    asiSeLee: 'Así se lee',
+    notaMarcaGris:
+      'La marca gris es lo que trae el juego de fábrica. Cuando tu muesca la tapa, ese slider está sin tocar; cuando se separa, ahí has metido mano. En la primera fila coinciden los tres.',
+    ladosNombre: 'Lados',
+    ladosBody:
+      'Casi todos los sliders van por duplicado: lo que se aplica a tu equipo y lo que se aplica a la CPU. Alguno es sólo tuyo, como la barra de potencia, y sale con un guion en el lado de la CPU.',
+    maestrosNombre: 'Los cuatro maestros',
+    maestrosBody:
+      'En FC 27, encima de los tiros y de los pases hay cuatro reguladores que escalan el grupo entero. El juego pide dejarlos en 50 y tocar sólo los de cada tipo — si los mueves, tus valores no significan lo mismo en otra consola, así que van guardados como cualquier otro.',
+    pegarNombre: 'Pegar un set escrito',
+    pegarBody:
+      'En vez de teclear 129 valores, se puede pegar el texto tal como lo tengas: una tabla de Notion, un mensaje, una lista con viñetas. Antes de aplicar nada se ve qué ha entendido y qué líneas no ha reconocido.',
+    soloFc27: 'Sólo FC 27',
+    comportamientoCpuIntro:
+      'FC 27 deja elegir cómo se comporta la CPU, y sólo en uno de los tres modos sirven de algo los sliders de esa pestaña.',
+    comportamientoCpuOutro:
+      'Si eliges táctico o dinámico, esos dieciséis sliders desaparecen de la ficha: enseñarlos sería decir que tu set toca cosas que no toca. Tus valores no se borran — vuelven al poner personalizado.',
+    loQueAportaTitulo: 'Lo que aporta la gente',
+    despuesDePublicar: 'Después de publicar',
+    comentariosValorNombre: 'Comentarios valor a valor',
+    comentariosValorBody:
+      'Cada número abre su propio hilo. Es la razón de ser de esto: no «me gusta tu set», sino «ese 35 de velocidad a mí se me queda corto con equipos de segunda». El comentario vive pegado a la muesca de la que habla.',
+    comentariosGeneralesNombre: 'Comentarios generales',
+    comentariosGeneralesBody: 'Para lo que no va de un valor concreto, debajo del todo.',
+    versionesNombre: 'Versiones',
+    versionesBody:
+      'Si cambias valores de un set ya publicado, los comentarios anteriores se marcan como de la versión antigua. Nadie queda respondiendo a unos números que ya no están.',
+    loQueSaleSoloTitulo: 'Lo que sale solo',
+    noHayQueRellenarlo: 'No hay que rellenarlo',
+    direccionNombre: 'La dirección',
+    direccionCodigo: '/u/tu-nombre/el-titulo-del-set',
+    direccionBodyFin:
+      ', generada del título. No cambia aunque cambies el título después, para que un enlace compartido no se rompa. Y si cambias tu nombre de usuario, el antiguo sigue llevando al sitio.',
+    imagenNombre: 'La imagen para compartir',
+    imagenBody:
+      'Al pegar el enlace en WhatsApp o en X sale una tarjeta con los valores dibujados, no un recuadro vacío. Se genera sola con el contenido del set.',
+    verLosQueHay: 'Ver los que hay',
+    sampleVelocidad: 'Velocidad',
+    sampleErrorTiros: 'Error en tiros de calidad',
+    sampleAlturaLinea: 'Altura de la línea',
+  },
 };

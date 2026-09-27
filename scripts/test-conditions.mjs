@@ -11,7 +11,7 @@
  */
 
 import {
-  DIFFICULTIES,
+  difficulties,
   conditionsSummary,
   normalizeHalfLength,
   validateConditions,
@@ -72,7 +72,7 @@ check('una dificultad que no existe se rechaza', 'error' in run({ difficulty: 'i
   const result = run({ difficulty: 'imposible' });
   check('con el mensaje correcto', 'error' in result && result.error === 'Esa dificultad no existe.');
 }
-check('cubre las seis dificultades del menú', DIFFICULTIES.length === 6);
+check('cubre las seis dificultades del menú', difficulties().length === 6);
 
 // --- Duración dentro de validateConditions ---------------------------------
 {

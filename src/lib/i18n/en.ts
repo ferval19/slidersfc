@@ -336,6 +336,252 @@ const en: Dictionary = {
     esperarSegundos: (seconds: number) =>
       `For security, wait ${seconds} second${seconds === 1 ? '' : 's'} before requesting another link.`,
   },
+  setForm: {
+    titulo: 'Title',
+    tituloPlaceholder: 'Full manual · Legendary · 8 min',
+    juego: 'Game',
+    juegoNoSePuedeCambiar: "The game can't be changed after the set is created.",
+    descripcion: 'Description',
+    descripcionPlaceholder:
+      'How the match plays with these values, and which controls you use. Difficulty, half length and camera go further down.',
+    comoLoJuegas: 'How you play it',
+    comoLoJuegasAyuda:
+      "Optional, but it's what makes your values mean the same thing to whoever copies them.",
+    dificultad: 'Difficulty',
+    sinEspecificar: 'Not specified',
+    duracionDeCadaTiempo: 'Half length',
+    duracionPlaceholder: '8',
+    duracionAyuda: 'In minutes. If you play a range, enter it: 7-8.',
+    camara: 'Camera',
+    camaraPlaceholder: 'Co-op',
+    altura: 'Height',
+    zoom: 'Zoom',
+    valores: 'Values',
+    slidersSinTocar: (n: number) => `${n} sliders. Anything you don't touch stays at its default.`,
+    desplegarTodo: 'Expand all',
+    plegarTodo: 'Collapse all',
+    restablecer: 'Reset',
+    comportamientoCpuAyuda:
+      'How the CPU behaves. The sliders below are only used under "Custom" — in the other two, the game sets them by team.',
+    queHasCambiado: 'What changed',
+    queHasCambiadoPlaceholder: 'Dropped speed by two points: counterattacks were impossible to defend.',
+    queHasCambiadoAyuda:
+      "Optional. If you change any value, this goes into the set's history along with what you changed. It's what turns a list of numbers into something people understand.",
+    guardando: 'Saving…',
+    guardarBorrador: 'Save draft',
+    borradorSoloTuLoVes: "A draft is only visible to you until you publish it.",
+    publicarSet: 'Publish set',
+    guardarCambios: 'Save changes',
+  },
+  importPanel: {
+    pegarUnSetEscrito: 'Paste a written set',
+    cerrar: 'Close',
+    ayuda:
+      "From Notion, from a message, wherever. One slider per line, with its name and one or two values. If you only give one value, it goes to both sides.",
+    placeholder: 'Speed\t35\t35\nAcceleration\t48\t50\nMarking: user 65, CPU 70',
+    textoDelSet: 'Set text',
+    reconocidos: (total: number) => `of ${total} sliders recognized.`,
+    sinReconocer: 'Not recognized',
+    yLineasMas: (n: number) => `and ${n} more line(s).`,
+    valoresFueraDeRango: (n: number) =>
+      `${n} value${n === 1 ? '' : 's'} ${n === 1 ? 'was' : 'were'} out of the game's range and got clamped.`,
+    rellenarConEsto: 'Fill in with this',
+    vaciar: 'Clear',
+    loQueNoSeReconozca: "Anything not recognized stays as it is. You can fix it up afterward.",
+  },
+  sliderControl: {
+    valorAria: (ariaLabel: string) => `${ariaLabel} (value)`,
+    unoMenos: (ariaLabel: string) => `${ariaLabel}: one less`,
+    unoMas: (ariaLabel: string) => `${ariaLabel}: one more`,
+  },
+  nuevoSet: {
+    metaTitle: 'New set',
+    metaDescription: 'Publish your slider set on SlidersFC.',
+    faltaCatalogoTitulo: 'Missing the slider catalog',
+    faltaCatalogoBody: "There are no games in the database. Apply the supabase/seed files before creating sets.",
+    eyebrow: 'New set',
+    titulo: 'Publish your sliders',
+    intro:
+      "Say in the description which difficulty and half length you play with: without that, the values don't mean the same thing to whoever copies them.",
+  },
+  editarSet: {
+    metaTitle: 'Edit set',
+    eyebrow: 'Edit set',
+    yaPublicado: (nextVersion: number, currentVersion: number) =>
+      `This set is already published. If you change any value, the version will bump to v${nextVersion} and earlier comments will be marked as "from v${currentVersion}". The set's address doesn't change.`,
+  },
+  perfilForm: {
+    asiTeVeran: "This is how you'll be seen",
+    cambiarLaFoto: 'Change the photo',
+    cambiar: 'Change',
+    quitar: 'Remove',
+    sinBiografia: 'No bio. Whatever you write below shows up here.',
+    ayudaFoto: 'Tap the photo to change it. It gets cropped to a square and saved at 512px: JPG, PNG or WEBP.',
+    nombre: 'Name',
+    nombrePlaceholder: 'Full Manual FG',
+    nombreAyuda: "What you want to be called. Leave it empty and your username shows instead.",
+    nombreDeUsuario: 'Username',
+    usernamePlaceholder: 'fullmanualfg',
+    renombradoAyuda:
+      "This changes the address of your profile and all your sets. Links you've already shared will keep working — they'll lead to the new one.",
+    usernameAyuda: "Lowercase letters, numbers and underscore. It's what shows in the address of your sets.",
+    biografia: 'Bio',
+    biografiaPlaceholder:
+      "How you play: difficulty, half length, camera, controller or keyboard. It's what gives your values context.",
+    cuentaDeX: 'X account',
+    twitterPlaceholder: 'FullManualFG',
+    twitterAyuda: "You can paste the whole link — only the name is kept.",
+    canalDeYoutube: 'YouTube channel',
+    youtubePlaceholder: '@FullManualFG',
+    youtubeAyudaMalo: "That doesn't look like a channel. Paste your channel link, or your @handle.",
+    youtubeAyudaNormal: "Your @handle or the channel link. A video link doesn't work — it has to be the channel.",
+    guardando: 'Saving…',
+    guardarPerfil: 'Save profile',
+    cancelar: 'Cancel',
+    faltaAlmacen: 'The avatar storage bucket is missing in Supabase (supabase/storage/01_avatars.sql).',
+    fotoDemasiadoGrande: "The photo is too heavy even after resizing. Try a different one.",
+    sinPermiso: "You don't have permission to upload the photo. Sign in again and try once more.",
+    noSeHaPodidoSubir: "Couldn't upload the photo.",
+  },
+  cuentaPerfil: {
+    metaTitle: 'Edit profile',
+    eyebrow: 'Your profile',
+    titulo: 'Edit profile',
+    intro:
+      "Whoever opens one of your sets wants to know who's behind it and how they play. It's what separates loose values from values worth trusting.",
+  },
+  perfilErrores: {
+    usernameCorto: 'The username needs at least 3 characters.',
+    usernameInvalido: (max: number) =>
+      `The username only allows unaccented letters, numbers and underscore, and ${max} characters at most.`,
+    nombreLargo: (max: number) => `The name can't be longer than ${max} characters.`,
+    biografiaLarga: (max: number) => `The bio can't be longer than ${max} characters.`,
+    twitterInvalido: (max: number) => `The X account only allows letters, numbers and underscore (${max} at most).`,
+    youtubeNoSeReconoce: "The YouTube channel isn't recognized. Paste your channel link or your @handle.",
+    youtubeDemasiadoLargo: 'The channel link is too long.',
+    fotoDesdeAqui: 'The photo has to be uploaded from here.',
+  },
+
+  setAccionesErrores: {
+    tituloLongitud: 'The title must be between 3 and 120 characters.',
+    descripcionLongitud: "The description can't be longer than 2000 characters.",
+    elegirJuegoValido: 'Choose a valid game.',
+    notaLongitud: "The change note can't be longer than 500 characters.",
+    sinValores: 'No slider values were received.',
+    sliderFueraDeCatalogo: "There's a slider that doesn't belong to the selected game. Reload the page.",
+    valorFueraDeRango: (name: string, min: number, max: number) =>
+      `"${name}" must be between ${min} and ${max}.`,
+    iniciarSesionParaCrear: 'You need to sign in to create a set.',
+    noCreado: "Couldn't create the set.",
+    iniciarSesion: 'You need to sign in.',
+    setNoExiste: "This set doesn't exist anymore.",
+    soloAutorEdita: 'Only the author can edit this set.',
+    juegoNoSePuedeCambiar: "You can't change the game of a set that already exists.",
+    noCopiaCreada: "Couldn't create the copy.",
+    soloAutorCopia: 'Only the author can copy their set.',
+    juegoNoExiste: "That game doesn't exist.",
+    yaEsDeEseJuego: 'The set is already for that game.',
+    ningunValorEncaja: "None of this set's values fit that game.",
+  },
+  comentarioErrores: {
+    faltaSet: 'Missing the set to comment on.',
+    escribeAlgo: 'Write something before sending.',
+    longitudMaxima: "The comment can't be longer than 2000 characters.",
+    sliderNoValido: 'Invalid slider.',
+    iniciarSesion: 'You need to sign in to comment.',
+    setNoExiste: "This set doesn't exist anymore.",
+  },
+  favoritoErrores: {
+    iniciarSesion: 'You need to sign in to save sets.',
+  },
+  guia: {
+    metaTitle: 'What goes into a set',
+    metaDescription:
+      'Everything you can say about a slider set on SlidersFC, field by field, and why each one matters.',
+    ogTitle: 'What goes into a set — SlidersFC',
+    ogDescription: 'Field by field, what you can say about a slider set and why it matters.',
+    titulo: 'What goes into a set',
+    intro:
+      "A slider set is a bunch of numbers, and numbers alone are no use to anyone. This is everything you can say about a set here, field by field, and why each one matters. Almost nothing is required — the more you fill in, the more useful it is to whoever takes it.",
+    obligatorio: 'Required',
+    loBasicoTitulo: 'The basics',
+    tituloNombre: 'Title',
+    tituloBodyInicio:
+      "What shows up in the list and what gets shared. It's the only thing that's really required, along with the game. A good title already says who it's for: ",
+    tituloEjemplo: '"Full manual · Legendary · 8 min"',
+    tituloBodyFin: ' makes sense without opening it.',
+    juegoNombre: 'Game',
+    juegoBody:
+      "FC 27 or FC 26. It can't be changed after the set is created, because the values hang off that game's slider list, and the two lists aren't the same. If you want to bring a set to the new game, its page has a button that copies it and matches whatever fits.",
+    descripcionNombre: 'Description',
+    descripcionBody:
+      "What the set is for and how the match plays with it. Also the controls you use: manual or assisted changes the outcome as much as any slider.",
+    borradorPublicadoNombre: 'Draft or published',
+    borradorPublicadoBody:
+      "A draft is only visible to you. It's for fine-tuning without anyone seeing it half-done, and for comparing it against another while you work on it.",
+    comoLoJuegasTitulo: 'How you play it',
+    opcionalPeroFalta: "Optional, but the one that's missed the most",
+    comoLoJuegasIntro:
+      "The same values on another difficulty don't produce the same match. Without this, whoever copies your set doesn't know if it'll work for them.",
+    dificultadNombre: 'Difficulty',
+    dificultadBodyInicio: "The game's six: ",
+    dificultadBodyFin:
+      ". It's what changes the CPU's behaviour the most, well above any single slider.",
+    duracionNombre: 'Half length',
+    duracionBodyInicio: 'In minutes. You can enter a range if you play with one —',
+    duracionCodigo: '7-8',
+    duracionBodyFin:
+      "— because a lot of people don't always play the same one. Half length drives the pace: values tuned for 6 minutes fall apart at 15.",
+    camaraNombre: 'Camera',
+    camaraBodyInicio:
+      "The name and, if you adjust them, its height and zoom — both run from 0 to 20. The field suggests the game's own (",
+    camaraBodyFin:
+      ") but takes anything, because every menu names them its own way. The only thing asked is that if you set a height or zoom, you say which camera — loose numbers on their own say nothing.",
+    losValoresTitulo: 'The values',
+    elGruesoDelSet: 'The bulk of the set',
+    losValoresIntro:
+      "FC 27 has 65 sliders and FC 26 has 29. They come out in the exact order of the game's menu, so you can enter them while checking it.",
+    asiSeLee: 'How to read it',
+    notaMarcaGris:
+      "The gray mark is the game's factory preset. When your notch covers it, that slider is untouched; when it moves away, that's where you've made a change. In the first row, all three line up.",
+    ladosNombre: 'Sides',
+    ladosBody:
+      "Almost every slider comes in a pair: what applies to your team and what applies to the CPU. A few are yours alone, like the power bar, and show a dash on the CPU side.",
+    maestrosNombre: 'The four master sliders',
+    maestrosBody:
+      "In FC 27, above shooting and passing there are four sliders that scale the whole group. The game asks you to leave them at 50 and only touch the ones for each type — move them and your values stop meaning the same thing on another console, so they're saved like any other.",
+    pegarNombre: 'Paste a written set',
+    pegarBody:
+      "Instead of typing 129 values by hand, you can paste the text as you have it: a Notion table, a message, a bulleted list. Before anything is applied, you see what it understood and which lines it didn't recognize.",
+    soloFc27: 'FC 27 only',
+    comportamientoCpuIntro:
+      "FC 27 lets you choose how the CPU behaves, and only in one of the three modes do the sliders on that tab do anything.",
+    comportamientoCpuOutro:
+      "Pick tactical or dynamic and those sixteen sliders disappear from the page: showing them would claim your set touches things it doesn't. Your values aren't erased — they come back when you switch to custom.",
+    loQueAportaTitulo: 'What the community adds',
+    despuesDePublicar: 'After publishing',
+    comentariosValorNombre: 'Value-by-value comments',
+    comentariosValorBody:
+      'Every number opens its own thread. That\'s the whole point of this: not "nice set," but "that 35 speed feels too low for me against second-tier teams." The comment lives right next to the value it talks about.',
+    comentariosGeneralesNombre: 'General comments',
+    comentariosGeneralesBody: "For anything that isn't about one specific value, right at the bottom.",
+    versionesNombre: 'Versions',
+    versionesBody:
+      "If you change values on a set that's already published, earlier comments get marked as belonging to the old version. No one's left replying to numbers that aren't there anymore.",
+    loQueSaleSoloTitulo: 'What happens automatically',
+    noHayQueRellenarlo: 'Nothing to fill in',
+    direccionNombre: 'The address',
+    direccionCodigo: '/u/your-name/the-set-title',
+    direccionBodyFin:
+      ", generated from the title. It doesn't change even if you change the title afterward, so a shared link never breaks. And if you change your username, the old one still leads to the same place.",
+    imagenNombre: 'The share image',
+    imagenBody:
+      "Paste the link into WhatsApp or X and a card with the values drawn out shows up, not an empty box. It's generated on its own from the set's content.",
+    verLosQueHay: "See what's there",
+    sampleVelocidad: 'Speed',
+    sampleErrorTiros: 'Finesse Shot Error',
+    sampleAlturaLinea: 'Line Height',
+  },
 };
 
 export { en };

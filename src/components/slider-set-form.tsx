@@ -25,7 +25,7 @@ import {
   sortScopes,
 } from "@/lib/constants";
 import { orderCategories } from "@/lib/category-order";
-import { CAMERAS, DIFFICULTIES } from "@/lib/set-conditions";
+import { CAMERAS, difficulties } from "@/lib/set-conditions";
 import type {
   CpuBehaviour,
   Game,
@@ -52,7 +52,6 @@ type Props = {
   };
   /** En edición el juego no se puede cambiar: los valores cuelgan de él. */
   lockGame?: boolean;
-  submitLabel?: string;
 };
 
 const initialState: SetFormState = {};
@@ -63,9 +62,12 @@ export function SliderSetForm({
   definitionsByGame,
   initial,
   lockGame = false,
-  submitLabel = "Publicar set",
 }: Props) {
-  const { locale } = useI18n();
+  const { locale, t: dictionary } = useI18n();
+  const t = dictionary.setForm;
+  // Al editar un set ya publicado el botón dice «Guardar cambios»: publicar
+  // ya no es lo que hace, porque el set publicado ya existe.
+  const submitLabel = initial?.isPublished ? t.guardarCambios : t.publicarSet;
   const [state, formAction, pending] = useActionState(action, initialState);
 
   const [gameId, setGameId] = useState<number>(
@@ -184,6 +186,7 @@ export function SliderSetForm({
 
   return (
     <form action={formAction} className="flex flex-col gap-10">
+      <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="game_id" value={gameId} />
       <input
         type="hidden"
@@ -195,20 +198,20 @@ export function SliderSetForm({
       <section className="panel flex flex-col gap-5 p-5 sm:p-6">
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5 sm:col-span-2">
-            <span className="eyebrow">Título</span>
+            <span className="eyebrow">{t.titulo}</span>
             <input
               name="title"
               required
               minLength={3}
               maxLength={120}
               defaultValue={initial?.title}
-              placeholder="Full manual · Leyenda · 8 min"
+              placeholder={t.tituloPlaceholder}
               className="field"
             />
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="eyebrow">Juego</span>
+            <span className="eyebrow">{t.juego}</span>
             <select
               value={gameId}
               onChange={(event) => changeGame(Number(event.target.value))}
@@ -222,20 +225,18 @@ export function SliderSetForm({
               ))}
             </select>
             {lockGame ? (
-              <span className="text-xs text-chalk-dim">
-                El juego no se puede cambiar después de crear el set.
-              </span>
+              <span className="text-xs text-chalk-dim">{t.juegoNoSePuedeCambiar}</span>
             ) : null}
           </label>
 
           <label className="flex flex-col gap-1.5 sm:col-span-2">
-            <span className="eyebrow">Descripción</span>
+            <span className="eyebrow">{t.descripcion}</span>
             <textarea
               name="description"
               rows={5}
               maxLength={2000}
               defaultValue={initial?.description}
-              placeholder="Cómo se comporta el partido con estos valores, y qué controles usas. Lo de la dificultad, los tiempos y la cámara va aquí abajo."
+              placeholder={t.descripcionPlaceholder}
               className="field resize-y"
             />
           </label>
@@ -248,26 +249,23 @@ export function SliderSetForm({
             los mismos sliders en otra dificultad no dan el mismo partido. */}
         <div className="flex flex-col gap-5">
           <div>
-            <p className="eyebrow">Cómo lo juegas</p>
-            <p className="mt-1.5 text-xs text-chalk-dim">
-              Opcional, pero es lo que hace que tus valores signifiquen lo mismo
-              para quien los copie.
-            </p>
+            <p className="eyebrow">{t.comoLoJuegas}</p>
+            <p className="mt-1.5 text-xs text-chalk-dim">{t.comoLoJuegasAyuda}</p>
           </div>
 
           <div className="grid gap-5 sm:grid-cols-2">
             <label className="flex flex-col gap-1.5">
               <span className="eyebrow flex items-center gap-2">
                 <ChalkShield className="size-5 text-chalk-dim" />
-                Dificultad
+                {t.dificultad}
               </span>
               <select
                 name="difficulty"
                 defaultValue={initial?.difficulty ?? ""}
                 className="field"
               >
-                <option value="">Sin especificar</option>
-                {DIFFICULTIES.map((difficulty) => (
+                <option value="">{t.sinEspecificar}</option>
+                {difficulties(locale).map((difficulty) => (
                   <option key={difficulty.value} value={difficulty.value}>
                     {difficulty.label}
                   </option>
@@ -278,24 +276,22 @@ export function SliderSetForm({
             <label className="flex flex-col gap-1.5">
               <span className="eyebrow flex items-center gap-2">
                 <ChalkStopwatch className="size-5 text-chalk-dim" />
-                Duración de cada tiempo
+                {t.duracionDeCadaTiempo}
               </span>
               <input
                 name="half_length"
                 defaultValue={initial?.halfLength}
-                placeholder="8"
+                placeholder={t.duracionPlaceholder}
                 inputMode="numeric"
                 className="field font-mono"
               />
-              <span className="text-xs text-chalk-dim">
-                En minutos. Si juegas con un rango, ponlo: 7-8.
-              </span>
+              <span className="text-xs text-chalk-dim">{t.duracionAyuda}</span>
             </label>
 
             <div className="flex flex-col gap-1.5 sm:col-span-2">
               <span className="eyebrow flex items-center gap-2">
                 <ChalkCamera className="size-5 text-chalk-dim" />
-                Cámara
+                {t.camara}
               </span>
               {/* En el móvil la altura y el zoom van juntos en una línea: son dos
                   cifras cortas y apiladas quedaban desparejadas. */}
@@ -305,8 +301,8 @@ export function SliderSetForm({
                   defaultValue={initial?.camera}
                   list="camaras"
                   maxLength={40}
-                  placeholder="Co-op"
-                  aria-label="Cámara"
+                  placeholder={t.camaraPlaceholder}
+                  aria-label={t.camara}
                   className="field sm:flex-1"
                 />
                 {/* Sugerencias, no una lista cerrada: quien tenga otra la
@@ -319,7 +315,7 @@ export function SliderSetForm({
 
                 <div className="flex gap-3">
                   <label className="flex flex-1 items-center gap-2 sm:flex-none">
-                    <span className="eyebrow shrink-0">Altura</span>
+                    <span className="eyebrow shrink-0">{t.altura}</span>
                     <input
                       name="camera_height"
                       defaultValue={initial?.cameraHeight}
@@ -333,7 +329,7 @@ export function SliderSetForm({
                   </label>
 
                   <label className="flex flex-1 items-center gap-2 sm:flex-none">
-                    <span className="eyebrow shrink-0">Zoom</span>
+                    <span className="eyebrow shrink-0">{t.zoom}</span>
                     <input
                       name="camera_zoom"
                       defaultValue={initial?.cameraZoom}
@@ -356,11 +352,8 @@ export function SliderSetForm({
       <section className="flex flex-col gap-8">
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
           <div>
-            <h2 className="display text-4xl">Valores</h2>
-            <p className="mt-2 text-xs text-chalk-dim">
-              {definitions.length} sliders. Lo que no toques se queda en su
-              valor por defecto.
-            </p>
+            <h2 className="display text-4xl">{t.valores}</h2>
+            <p className="mt-2 text-xs text-chalk-dim">{t.slidersSinTocar(definitions.length)}</p>
           </div>
           <div className="flex flex-wrap items-center gap-5">
             <ScaleLegend scopes={scopes} labels={scopeLabels(locale)} />
@@ -376,7 +369,7 @@ export function SliderSetForm({
               className="btn btn-quiet"
             >
               <ChalkChevrons className="size-4" expand={folded.size === blocks.length} />
-              {folded.size === blocks.length ? "Desplegar todo" : "Plegar todo"}
+              {folded.size === blocks.length ? t.desplegarTodo : t.plegarTodo}
             </button>
             <button
               type="button"
@@ -384,7 +377,7 @@ export function SliderSetForm({
               className="btn btn-quiet"
             >
               <ChalkUndo className="size-4" />
-              Restablecer
+              {t.restablecer}
             </button>
           </div>
         </div>
@@ -451,11 +444,7 @@ export function SliderSetForm({
                   hidden={isFolded}
                   className="border-b border-chalk-line/60 py-4"
                 >
-                  <p className="text-sm text-chalk-dim">
-                    Cómo se comporta la CPU. Los sliders de abajo sólo se usan
-                    en «Personalizado»; en los otros dos los ajusta el juego
-                    según los equipos.
-                  </p>
+                  <p className="text-sm text-chalk-dim">{t.comportamientoCpuAyuda}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {cpuBehaviours(locale).map((behaviour) => (
                       <button
@@ -510,20 +499,17 @@ export function SliderSetForm({
       {initial?.isPublished ? (
         <section className="panel flex flex-col gap-1.5 p-5 sm:p-6">
           <label className="eyebrow" htmlFor="version_note">
-            Qué has cambiado
+            {t.queHasCambiado}
           </label>
           <textarea
             id="version_note"
             name="version_note"
             rows={3}
             maxLength={500}
-            placeholder="Bajé la velocidad dos puntos: los contragolpes eran imposibles de defender."
+            placeholder={t.queHasCambiadoPlaceholder}
             className="field resize-y"
           />
-          <span className="text-xs text-chalk-dim">
-            Opcional. Si tocas algún valor, esto queda en el historial del set junto a lo que has
-            cambiado. Es lo que convierte una lista de números en algo que se entiende.
-          </span>
+          <span className="text-xs text-chalk-dim">{t.queHasCambiadoAyuda}</span>
         </section>
       ) : null}
 
@@ -544,7 +530,7 @@ export function SliderSetForm({
           className="btn btn-primary"
           disabled={pending}
         >
-          {pending ? "Guardando…" : submitLabel}
+          {pending ? t.guardando : submitLabel}
         </button>
         {!initial?.isPublished ? (
           <button
@@ -554,12 +540,10 @@ export function SliderSetForm({
             className="btn btn-ghost"
             disabled={pending}
           >
-            Guardar borrador
+            {t.guardarBorrador}
           </button>
         ) : null}
-        <p className="text-xs text-chalk-dim">
-          Un borrador sólo lo ves tú hasta que lo publiques.
-        </p>
+        <p className="text-xs text-chalk-dim">{t.borradorSoloTuLoVes}</p>
       </div>
     </form>
   );

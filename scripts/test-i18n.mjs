@@ -39,8 +39,27 @@ function check(label, ok, detail = '') {
 /**
  * Nombres propios — y el código «Error 404», que es el mismo rótulo en
  * cualquier idioma — que se quedan igual en los dos a propósito.
+ *
+ * También los placeholders de ejemplo que no son texto de interfaz sino
+ * datos: el nombre de usuario de muestra, un rango de minutos, el nombre de
+ * una cámara del juego (ver el comentario de CAMERAS en set-conditions.ts:
+ * son términos del menú, no traducción libre) y «Zoom», que en el menú de la
+ * cámara es la misma palabra en los dos idiomas.
  */
-const WHITELIST = new Set(['SlidersFC', 'EA SPORTS FC', 'X', 'Error 404']);
+const WHITELIST = new Set([
+  'SlidersFC',
+  'EA SPORTS FC',
+  'X',
+  'Error 404',
+  'Zoom',
+  'Co-op',
+  '8',
+  '7-8',
+  'Full Manual FG',
+  'fullmanualfg',
+  'FullManualFG',
+  '@FullManualFG',
+]);
 
 /** Quita comentarios de bloque y de línea, para que no se cuelen en el regex. */
 function stripComments(source) {

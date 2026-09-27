@@ -17,7 +17,7 @@ import { cpuBehaviours, scopeLabels } from '@/lib/constants';
 import { alternates } from '@/lib/i18n/alternates';
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import { localized } from '@/lib/paths';
-import { CAMERAS, DIFFICULTIES } from '@/lib/set-conditions';
+import { CAMERAS, difficulties } from '@/lib/set-conditions';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
@@ -87,7 +87,7 @@ export default async function GuidePage() {
         </p>
 
         <Field name="Dificultad" icon={ChalkShield}>
-          Las seis del juego: {DIFFICULTIES.map((d) => d.label).join(', ')}. Es lo que más cambia
+          Las seis del juego: {difficulties(locale).map((d) => d.label).join(', ')}. Es lo que más cambia
           el comportamiento de la CPU, muy por encima de cualquier slider suelto.
         </Field>
         <Field name="Duración de cada tiempo" icon={ChalkStopwatch}>

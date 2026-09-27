@@ -10,6 +10,9 @@
  * seguridad: que la foto no pueda apuntar a un servidor ajeno.
  */
 
+// Los mensajes del castellano, que son los que comprueba esta prueba.
+// `es.ts` no importa nada, así que node puede cargarlo quitándole los tipos.
+import { es } from '../src/lib/i18n/es.ts';
 import {
   normalizeTwitterHandle,
   normalizeUsername,
@@ -35,7 +38,7 @@ const base = {
   youtubeUrl: '',
 };
 const run = (input, options = {}) =>
-  validateProfile({ ...base, ...input }, { avatarPrefix: PREFIX, ...options });
+  validateProfile({ ...base, ...input }, { avatarPrefix: PREFIX, ...options }, es.perfilErrores);
 
 // --- Nombre de usuario ---------------------------------------------------
 check('minúsculas y sin acentos', normalizeUsername('José María') === 'jose_maria');

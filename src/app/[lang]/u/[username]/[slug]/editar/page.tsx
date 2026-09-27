@@ -1,30 +1,40 @@
 import type { Metadata } from 'next';
+import { lang } from 'next/root-params';
 import { notFound, redirect } from 'next/navigation';
 
 import { SliderSetForm } from '@/components/slider-set-form';
 import { updateSet } from '@/app/actions/sets';
-import { editSetPath, setPath } from '@/lib/paths';
+import { getDictionary } from '@/lib/i18n/dictionary';
+import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
+import { editSetPath, localized, setPath } from '@/lib/paths';
 import { getDefinitionsByGame, getGames, getSetDetail } from '@/lib/queries';
 import { getCurrentUser } from '@/lib/supabase/server';
 
-export const metadata: Metadata = {
-  title: 'Editar set',
-  robots: { index: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = ((await lang()) ?? DEFAULT_LOCALE) as Locale;
+  const t = getDictionary(locale).editarSet;
+
+  return { title: t.metaTitle, robots: { index: false } };
+}
 
 export default async function EditSetPage({
   params,
 }: {
   params: Promise<{ username: string; slug: string }>;
 }) {
-  const { username, slug } = await params;
+  const [{ username, slug }, localeParam] = await Promise.all([params, lang()]);
+  const locale = (localeParam ?? DEFAULT_LOCALE) as Locale;
+  const t = getDictionary(locale).editarSet;
+
   const user = await getCurrentUser();
 
-  if (!user) redirect(`/login?next=${encodeURIComponent(editSetPath(username, slug))}`);
+  if (!user) {
+    redirect(localized(locale, `/login?next=${encodeURIComponent(editSetPath(username, slug))}`));
+  }
 
   const detail = await getSetDetail({ username, slug });
   if (!detail) notFound();
-  if (detail.owner.id !== user.id) redirect(setPath(username, slug));
+  if (detail.owner.id !== user.id) redirect(localized(locale, setPath(username, slug)));
 
   const [games, definitionsByGame] = await Promise.all([getGames(), getDefinitionsByGame()]);
 
@@ -35,13 +45,11 @@ export default async function EditSetPage({
 
   return (
     <div className="mx-auto max-w-4xl px-5 py-10">
-      <p className="eyebrow">Editar set</p>
+      <p className="eyebrow">{t.eyebrow}</p>
       <h1 className="display mt-3 text-[clamp(2.25rem,7vw,4rem)]">{detail.set.title}</h1>
       {detail.set.is_published ? (
         <p className="mt-3 max-w-prose text-sm text-chalk-dim">
-          Este set ya está publicado. Si cambias algún valor, la versión pasará a v
-          {detail.set.version + 1} y los comentarios anteriores quedarán marcados como
-          &laquo;de la v{detail.set.version}&raquo;. La dirección del set no cambia.
+          {t.yaPublicado(detail.set.version + 1, detail.set.version)}
         </p>
       ) : null}
 
@@ -51,7 +59,6 @@ export default async function EditSetPage({
           games={games}
           definitionsByGame={definitionsByGame}
           lockGame
-          submitLabel={detail.set.is_published ? 'Guardar cambios' : 'Publicar set'}
           initial={{
             gameId: detail.set.game_id,
             title: detail.set.title,

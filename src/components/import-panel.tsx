@@ -12,10 +12,6 @@ type Props = {
   onApply: (values: Record<string, number>) => void;
 };
 
-const PLACEHOLDER = `Velocidad\t35\t35
-Aceleración\t48\t50
-Marcaje: usuario 65, CPU 70`;
-
 /**
  * Pegar un set escrito en cualquier sitio y que se rellene el formulario.
  *
@@ -24,7 +20,8 @@ Marcaje: usuario 65, CPU 70`;
  * entendido, porque el texto de origen no siempre dice lo que parece.
  */
 export function ImportPanel({ definitions, onApply }: Props) {
-  const { locale } = useI18n();
+  const { locale, t: dictionary } = useI18n();
+  const t = dictionary.importPanel;
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
 
@@ -41,7 +38,7 @@ export function ImportPanel({ definitions, onApply }: Props) {
   if (!open) {
     return (
       <button type="button" onClick={() => setOpen(true)} className="btn btn-quiet self-start">
-        Pegar un set escrito
+        {t.pegarUnSetEscrito}
       </button>
     );
   }
@@ -50,23 +47,20 @@ export function ImportPanel({ definitions, onApply }: Props) {
     <section className="panel flex flex-col gap-4 p-5 sm:p-6">
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between gap-3">
-          <h3 className="display text-2xl">Pegar un set escrito</h3>
+          <h3 className="display text-2xl">{t.pegarUnSetEscrito}</h3>
           <button type="button" onClick={() => setOpen(false)} className="btn btn-quiet shrink-0">
-            Cerrar
+            {t.cerrar}
           </button>
         </div>
-        <p className="text-xs text-chalk-dim">
-          De Notion, de un mensaje, de donde sea. Un slider por línea, con su nombre y uno o dos
-          valores. Si sólo pones un valor, va a los dos lados.
-        </p>
+        <p className="text-xs text-chalk-dim">{t.ayuda}</p>
       </div>
 
       <textarea
         value={text}
         onChange={(event) => setText(event.target.value)}
         rows={8}
-        placeholder={PLACEHOLDER}
-        aria-label="Texto del set"
+        placeholder={t.placeholder}
+        aria-label={t.textoDelSet}
         className="field resize-y font-mono text-xs"
       />
 
@@ -74,7 +68,7 @@ export function ImportPanel({ definitions, onApply }: Props) {
         <div className="flex flex-col gap-3">
           <p className="text-sm">
             <strong className="display text-xl text-ink-user">{report.rows.length}</strong>{' '}
-            <span className="text-chalk-dim">de {report.total} sliders reconocidos.</span>
+            <span className="text-chalk-dim">{t.reconocidos(report.total)}</span>
           </p>
 
           {report.rows.length > 0 ? (
@@ -102,15 +96,12 @@ export function ImportPanel({ definitions, onApply }: Props) {
           ) : null}
 
           {clamped ? (
-            <p className="text-xs text-chalk-dim">
-              {clamped} {clamped === 1 ? 'valor estaba' : 'valores estaban'} fuera del rango del
-              juego y se {clamped === 1 ? 'ha' : 'han'} recortado.
-            </p>
+            <p className="text-xs text-chalk-dim">{t.valoresFueraDeRango(clamped)}</p>
           ) : null}
 
           {report.unmatched.length > 0 ? (
             <div className="text-xs text-chalk-dim">
-              <p className="eyebrow">Sin reconocer</p>
+              <p className="eyebrow">{t.sinReconocer}</p>
               <ul className="mt-1 flex flex-col gap-0.5">
                 {report.unmatched.slice(0, 6).map((line, index) => (
                   <li key={index} className="truncate font-mono">
@@ -119,7 +110,7 @@ export function ImportPanel({ definitions, onApply }: Props) {
                 ))}
               </ul>
               {report.unmatched.length > 6 ? (
-                <p className="mt-1">y {report.unmatched.length - 6} línea(s) más.</p>
+                <p className="mt-1">{t.yLineasMas(report.unmatched.length - 6)}</p>
               ) : null}
             </div>
           ) : null}
@@ -135,14 +126,12 @@ export function ImportPanel({ definitions, onApply }: Props) {
               disabled={report.rows.length === 0}
               className="btn btn-primary"
             >
-              Rellenar con esto
+              {t.rellenarConEsto}
             </button>
             <button type="button" onClick={() => setText('')} className="btn btn-quiet">
-              Vaciar
+              {t.vaciar}
             </button>
-            <p className="text-xs text-chalk-dim">
-              Lo que no se reconozca se queda como está. Puedes retocarlo después.
-            </p>
+            <p className="text-xs text-chalk-dim">{t.loQueNoSeReconozca}</p>
           </div>
         </div>
       ) : null}

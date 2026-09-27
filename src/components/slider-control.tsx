@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { useI18n } from '@/components/i18n-provider';
 import { ScaleRail } from '@/components/slider-scale';
 
 type Props = {
@@ -44,6 +45,8 @@ export function SliderControl({
   ink,
   onChange,
 }: Props) {
+  const { t } = useI18n();
+
   // Mientras se teclea en la casilla, manda lo tecleado: si el valor volviera
   // a rebotar desde el estado en cada pulsación, borrar para escribir otro
   // número sería imposible.
@@ -78,7 +81,7 @@ export function SliderControl({
           if (raw !== '' && Number.isFinite(parsed)) onChange(clamp(parsed));
         }}
         onBlur={() => setDraft(null)}
-        aria-label={`${ariaLabel} (valor)`}
+        aria-label={t.sliderControl.valorAria(ariaLabel)}
         className="value-pill col-start-3 row-start-1 w-14 border border-chalk-line bg-board-deep px-1 py-1 text-center text-sm sm:col-start-5"
         style={{ color: ink }}
       />
@@ -88,7 +91,7 @@ export function SliderControl({
         className="step-btn col-start-1 row-start-2 sm:col-start-2 sm:row-start-1"
         onClick={() => commit(value - 1)}
         disabled={value <= min}
-        aria-label={`${ariaLabel}: uno menos`}
+        aria-label={t.sliderControl.unoMenos(ariaLabel)}
       >
         −
       </button>
@@ -114,7 +117,7 @@ export function SliderControl({
         className="step-btn col-start-3 row-start-2 sm:col-start-4 sm:row-start-1"
         onClick={() => commit(value + 1)}
         disabled={value >= max}
-        aria-label={`${ariaLabel}: uno más`}
+        aria-label={t.sliderControl.unoMas(ariaLabel)}
       >
         +
       </button>

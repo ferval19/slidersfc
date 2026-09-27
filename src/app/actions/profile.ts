@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { AVATAR_BUCKET, avatarFolder, avatarPublicPrefix } from '@/lib/avatar-storage';
+import { getDictionary } from '@/lib/i18n/dictionary';
+import { DEFAULT_LOCALE, isLocale, localePath, type Locale } from '@/lib/i18n/locale';
 import { profilePath } from '@/lib/paths';
 import { validateProfile } from '@/lib/profile';
 import { supabaseEnv } from '@/lib/supabase/env';
@@ -11,17 +13,24 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export type ProfileFormState = { error?: string };
 
+/** Ver el comentario de `localeFromFormData` en `app/actions/auth.ts`. */
+function localeFromFormData(formData: FormData): Locale {
+  const value = String(formData.get('locale') ?? '');
+  return isLocale(value) ? value : DEFAULT_LOCALE;
+}
+
 export async function updateProfile(
   _state: ProfileFormState,
   formData: FormData,
 ): Promise<ProfileFormState> {
+  const locale = localeFromFormData(formData);
   const supabase = await createSupabaseServerClient();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect('/login?next=/cuenta/perfil');
+  if (!user) redirect(localePath(locale, '/login?next=/cuenta/perfil'));
 
   // Se relee el perfil en vez de fiarse del formulario: la foto que ya estaba
   // guardada puede ser externa (la de X) y tiene que poder pasar tal cual.
@@ -44,6 +53,7 @@ export async function updateProfile(
       avatarPrefix: avatarPublicPrefix(supabaseEnv().url),
       currentAvatarUrl: current?.avatar_url ?? null,
     },
+    getDictionary(locale).perfilErrores,
   );
 
   if ('error' in parsed) return { error: parsed.error };

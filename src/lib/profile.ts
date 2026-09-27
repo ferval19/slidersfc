@@ -13,6 +13,18 @@
  * CHECK violado da un error feo y sin explicar qué hay que arreglar.
  */
 
+import type { Dictionary } from './i18n/dictionary';
+
+/**
+ * Los mensajes llegan de fuera y no se buscan aquí dentro.
+ *
+ * Este módulo tiene que seguir sin importar NADA que no sea un tipo: así
+ * `node` puede quitarle los tipos y `scripts/test-profile.mjs` lo prueba sin
+ * levantar Next. Traer el diccionario como valor lo rompía, y la prueba se
+ * caía con un «Cannot find module» que no decía nada del problema real.
+ */
+export type ProfileMessages = Dictionary['perfilErrores'];
+
 export const USERNAME_PATTERN = /^[a-z0-9_]{3,24}$/;
 export const USERNAME_MAX = 24;
 export const BIO_MAX = 280;
@@ -145,47 +157,44 @@ function emptyToNull(text: string) {
 export function validateProfile(
   input: ProfileInput,
   options: { avatarPrefix: string; currentAvatarUrl?: string | null },
+  t: ProfileMessages,
 ): { fields: ProfileFields } | { error: string } {
   const username = normalizeUsername(input.username);
 
   if (username.length < 3) {
-    return { error: 'El nombre de usuario necesita al menos 3 caracteres.' };
+    return { error: t.usernameCorto };
   }
   if (!USERNAME_PATTERN.test(username)) {
-    return {
-      error:
-        'El nombre de usuario sólo admite letras sin acentos, números y guión bajo, ' +
-        `y como mucho ${USERNAME_MAX} caracteres.`,
-    };
+    return { error: t.usernameInvalido(USERNAME_MAX) };
   }
 
   const displayName = emptyToNull(input.displayName);
   if (displayName && displayName.length > DISPLAY_NAME_MAX) {
-    return { error: `El nombre no puede pasar de ${DISPLAY_NAME_MAX} caracteres.` };
+    return { error: t.nombreLargo(DISPLAY_NAME_MAX) };
   }
 
   const bio = emptyToNull(input.bio);
   if (bio && bio.length > BIO_MAX) {
-    return { error: `La biografía no puede pasar de ${BIO_MAX} caracteres.` };
+    return { error: t.biografiaLarga(BIO_MAX) };
   }
 
   const twitterHandle = normalizeTwitterHandle(input.twitterHandle);
   if (twitterHandle && !/^[A-Za-z0-9_]{1,15}$/.test(twitterHandle)) {
-    return { error: 'La cuenta de X sólo admite letras, números y guión bajo (15 como mucho).' };
+    return { error: t.twitterInvalido(TWITTER_MAX) };
   }
 
   const youtubeUrl = normalizeYoutube(input.youtubeUrl);
   if (youtubeUrl === undefined) {
-    return { error: 'El canal de YouTube no se reconoce. Pega el enlace de tu canal o tu @nombre.' };
+    return { error: t.youtubeNoSeReconoce };
   }
   if (youtubeUrl && youtubeUrl.length > YOUTUBE_MAX) {
-    return { error: 'El enlace del canal es demasiado largo.' };
+    return { error: t.youtubeDemasiadoLargo };
   }
 
   const avatarUrl = emptyToNull(input.avatarUrl);
   const unchanged = avatarUrl !== null && avatarUrl === options.currentAvatarUrl;
   if (avatarUrl && !unchanged && !avatarUrl.startsWith(options.avatarPrefix)) {
-    return { error: 'La foto tiene que subirse desde aquí.' };
+    return { error: t.fotoDesdeAqui };
   }
 
   return {
