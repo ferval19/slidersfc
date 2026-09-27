@@ -4,8 +4,10 @@ import { useTransition } from 'react';
 
 import { signOut } from '@/app/actions/auth';
 import { ChalkExit } from '@/components/chalk';
+import { useI18n } from '@/components/i18n-provider';
 
 export function SignOutButton() {
+  const { locale, t } = useI18n();
   const [pending, startTransition] = useTransition();
 
   return (
@@ -13,10 +15,12 @@ export function SignOutButton() {
       type="button"
       className="btn btn-ghost"
       disabled={pending}
-      onClick={() => startTransition(async () => void (await signOut()))}
+      // No hay `<form>` aquí — se llama directo, sin FormData — así que el
+      // idioma viaja como argumento normal en vez de como campo oculto.
+      onClick={() => startTransition(async () => void (await signOut(locale)))}
     >
       <ChalkExit className="size-4" />
-      {pending ? 'Saliendo…' : 'Cerrar sesión'}
+      {pending ? t.signOut.saliendo : t.signOut.cerrarSesion}
     </button>
   );
 }

@@ -31,7 +31,7 @@ export async function generateMetadata({
   const locale = (localeParam ?? DEFAULT_LOCALE) as Locale;
   const profile = await getProfileByUsername(username);
 
-  if (!profile) return { title: 'Perfil no encontrado' };
+  if (!profile) return { title: getDictionary(locale).perfil.perfilNoEncontrado };
 
   const name = profile.display_name ?? profile.username;
 
@@ -138,7 +138,7 @@ export default async function ProfilePage({
           <div className="flex flex-wrap items-center gap-2">
             <Link href={localized(locale, editProfilePath())} className="btn btn-quiet">
               <ChalkPiece className="size-4" />
-              Editar perfil
+              {t.perfil.editarPerfil}
             </Link>
             <SignOutButton />
           </div>
@@ -147,19 +147,17 @@ export default async function ProfilePage({
 
       <section className="py-8">
         <h2 className="display text-3xl">
-          {published.length} {published.length === 1 ? 'set publicado' : 'sets publicados'}
+          {published.length} {t.perfil.setPublicado(published.length)}
         </h2>
 
         <div className="mt-5">
           {published.length === 0 ? (
             <EmptyState
-              title={isMe ? 'Aún no has publicado nada' : 'Este usuario no tiene sets públicos'}
-              body={
-                isMe
-                  ? 'Crea tu primer set con los valores que usas de verdad. Es lo que hace que alguien vuelva a tu perfil.'
-                  : 'Cuando publique un set aparecerá aquí.'
+              title={isMe ? t.perfil.aunNoHasPublicadoNada : t.perfil.esteUsuarioNoTieneSetsPublicos}
+              body={isMe ? t.perfil.creaTuPrimerSet : t.perfil.cuandoPubliqueUnSet}
+              action={
+                isMe ? { href: localized(locale, '/sets/nuevo'), label: t.perfil.crearMiPrimerSet } : undefined
               }
-              action={isMe ? { href: localized(locale, '/sets/nuevo'), label: 'Crear mi primer set' } : undefined}
             />
           ) : (
             <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -176,7 +174,7 @@ export default async function ProfilePage({
           <div className="chalk-rule" />
           <section className="py-9">
             <h2 className="display text-3xl">
-              Borradores <span className="text-chalk-dim">· sólo los ves tú</span>
+              {t.perfil.borradores} <span className="text-chalk-dim">· {t.perfil.soloLosVesTu}</span>
             </h2>
             <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {drafts.map((set) => (
@@ -194,15 +192,15 @@ export default async function ProfilePage({
           <div className="chalk-rule" />
           <section className="py-9">
             <h2 className="display text-3xl">
-              Favoritos <span className="text-chalk-dim">· {favorites.length}</span>
+              {t.perfil.favoritos} <span className="text-chalk-dim">· {favorites.length}</span>
             </h2>
 
             <div className="mt-5">
               {favorites.length === 0 ? (
                 <EmptyState
-                  title="Aún no has guardado nada"
-                  body="Cuando veas un set que te sirva de verdad, guárdalo desde su ficha. Aquí es donde vuelves a encontrarlo."
-                  action={{ href: localized(locale, '/'), label: 'Ver la portada' }}
+                  title={t.perfil.aunNoHasGuardadoNada}
+                  body={t.perfil.cuandoVeasUnSet}
+                  action={{ href: localized(locale, '/'), label: t.perfil.verLaPortada }}
                 />
               ) : (
                 <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

@@ -32,6 +32,16 @@ export function switchLocalePath(locale: Locale, pathWithPrefix: string): string
   return localePath(locale, sinPrefijo);
 }
 
+/**
+ * El idioma que indica una ruta ya con su prefijo. Para el código de cliente
+ * que queda fuera del `I18nProvider` — `auth-relay.tsx` vive por encima, en
+ * el layout raíz — y por tanto no puede pedirle el idioma a `useI18n()`.
+ */
+export function localeFromPathname(pathname: string): Locale {
+  const primerTramo = pathname.split('/')[1] ?? '';
+  return isLocale(primerTramo) ? primerTramo : DEFAULT_LOCALE;
+}
+
 /** El nombre del slider en el idioma que toca. Sin inglés, el castellano: feo pero se entiende. */
 export function sliderName(d: { name: string; name_en: string | null }, locale: Locale): string {
   if (locale === 'en' && d.name_en) return d.name_en;

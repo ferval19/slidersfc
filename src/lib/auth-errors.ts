@@ -4,111 +4,112 @@
  * Llegan en inglés y por tres vías distintas: como código (`error.code`), como
  * texto (`error.message`) y como parámetros en la URL de vuelta
  * (`?error_code=`, `#error_description=`). Aquí se normalizan las tres a un
- * mensaje en español que dice qué hacer, no sólo qué ha fallado.
+ * mensaje en el idioma de quien lee que dice qué hacer, no sólo qué ha fallado.
+ *
+ * El texto vive en el diccionario (`i18n/es.ts` / `i18n/en.ts`, zona
+ * `authErrores`) y este módulo sólo sabe qué código de Supabase corresponde a
+ * qué clave. No importa nada de servidor a propósito: lo usan tanto Server
+ * Actions como componentes de cliente (`auth-hash-handler.tsx`,
+ * `auth-relay.tsx`), y un import de servidor aquí rompería a los segundos.
  */
 
-const BY_CODE: Record<string, string> = {
-  // Enlaces y códigos
-  otp_expired:
-    'El enlace o el código ya se había usado o ha caducado. Son de un solo uso: pide uno nuevo.',
-  otp_disabled: 'El acceso por correo está desactivado en el proyecto.',
-  flow_state_expired: 'El proceso de acceso ha caducado. Empieza otra vez desde el principio.',
-  flow_state_not_found:
-    'No encontramos el proceso de acceso. Abre el enlace en el mismo navegador donde lo pediste, o usa el código de 6 dígitos.',
+import { getDictionary, type Dictionary } from '@/lib/i18n/dictionary';
+import type { Locale } from '@/lib/i18n/locale';
 
-  // Límites
-  over_email_send_rate_limit:
-    'Se han enviado demasiados correos seguidos. Espera unos minutos antes de pedir otro enlace.',
-  over_request_rate_limit: 'Demasiados intentos seguidos. Espera un momento y vuelve a probar.',
-  over_sms_send_rate_limit: 'Demasiados envíos seguidos. Espera un momento.',
+type AuthErrores = Dictionary['authErrores'];
 
-  // Cuenta
-  email_not_confirmed: 'Tienes que confirmar tu correo antes de entrar.',
-  email_address_invalid: 'Ese correo no es válido.',
-  email_address_not_authorized: 'Ese correo no está autorizado en este proyecto.',
-  user_not_found: 'No hay ninguna cuenta con ese correo.',
-  user_banned: 'Esta cuenta está bloqueada.',
-  signup_disabled: 'El registro está cerrado en este momento.',
-  invalid_credentials: 'Correo o contraseña incorrectos.',
-  weak_password: 'La contraseña es demasiado corta o demasiado fácil de adivinar.',
-  user_already_exists: 'Ya existe una cuenta con ese correo. Entra en vez de crearla.',
-  email_exists: 'Ya existe una cuenta con ese correo. Entra en vez de crearla.',
-  same_password: 'La contraseña nueva es la misma que la anterior.',
-  session_not_found: 'Tu sesión ha caducado. Pide otro enlace para cambiar la contraseña.',
-  provider_email_needs_verification: 'Verifica el correo de tu cuenta antes de entrar.',
+function porCodigo(t: AuthErrores): Record<string, string> {
+  return {
+    // Enlaces y códigos
+    otp_expired: t.otpExpired,
+    otp_disabled: t.otpDisabled,
+    flow_state_expired: t.flowStateExpired,
+    flow_state_not_found: t.flowStateNotFound,
 
-  // Proveedores
-  provider_disabled: 'Ese proveedor de acceso está desactivado en el proyecto.',
-  oauth_provider_not_supported: 'Ese proveedor de acceso no está disponible.',
+    // Límites
+    over_email_send_rate_limit: t.overEmailSendRateLimit,
+    over_request_rate_limit: t.overRequestRateLimit,
+    over_sms_send_rate_limit: t.overSmsSendRateLimit,
 
-  // Genéricos
-  access_denied: 'Se ha denegado el acceso. Pide un enlace nuevo e inténtalo otra vez.',
-  invalid_request: 'La petición de acceso venía incompleta. Pide un enlace nuevo.',
-  validation_failed: 'Los datos del acceso no son válidos. Pide un enlace nuevo.',
-  bad_json: 'La respuesta del servidor de acceso no era válida.',
-  bad_jwt: 'Tu sesión no es válida. Vuelve a entrar.',
-  session_expired: 'Tu sesión ha caducado. Vuelve a entrar.',
-  request_timeout: 'El servidor de acceso ha tardado demasiado. Inténtalo otra vez.',
-  captcha_failed: 'No se ha podido verificar el captcha.',
-  server_error: 'El servidor de acceso ha fallado. Inténtalo de nuevo en un momento.',
-  unexpected_failure: 'El servidor de acceso ha fallado. Inténtalo de nuevo en un momento.',
-};
+    // Cuenta
+    email_not_confirmed: t.emailNotConfirmed,
+    email_address_invalid: t.emailAddressInvalid,
+    email_address_not_authorized: t.emailAddressNotAuthorized,
+    user_not_found: t.userNotFound,
+    user_banned: t.userBanned,
+    signup_disabled: t.signupDisabled,
+    invalid_credentials: t.invalidCredentials,
+    weak_password: t.weakPassword,
+    user_already_exists: t.userAlreadyExists,
+    email_exists: t.userAlreadyExists,
+    same_password: t.samePassword,
+    session_not_found: t.sessionNotFound,
+    provider_email_needs_verification: t.providerEmailNeedsVerification,
+
+    // Proveedores
+    provider_disabled: t.providerDisabled,
+    oauth_provider_not_supported: t.oauthProviderNotSupported,
+
+    // Genéricos
+    access_denied: t.accessDenied,
+    invalid_request: t.invalidRequest,
+    validation_failed: t.validationFailed,
+    bad_json: t.badJson,
+    bad_jwt: t.badJwt,
+    session_expired: t.sessionExpired,
+    request_timeout: t.requestTimeout,
+    captcha_failed: t.captchaFailed,
+    server_error: t.serverError,
+    unexpected_failure: t.serverError,
+  };
+}
 
 /**
  * Algunos errores llegan sólo como texto, sin código. Se reconocen por un
- * fragmento estable del mensaje.
+ * fragmento estable del mensaje (siempre en inglés: es lo que manda Supabase).
  */
-const BY_TEXT: [RegExp, string][] = [
-  [
-    /pkce code verifier not found/i,
-    'Ese enlace sólo funciona en el navegador desde el que lo pediste. Ábrelo ahí, o usa el código de 6 dígitos.',
-  ],
-  [
-    /email link is invalid or has expired/i,
-    'El enlace del correo ya se había usado o ha caducado. Son de un solo uso: pide uno nuevo.',
-  ],
-  [/token has expired or is invalid/i, 'El código ya no vale. Pide uno nuevo.'],
-  [/invalid flow state/i, 'El proceso de acceso ha caducado. Empieza otra vez.'],
-  [/invalid login credentials/i, 'Correo o contraseña incorrectos.'],
-  [/password should be at least/i, 'La contraseña debe tener al menos 8 caracteres.'],
-  [/user already registered|already been registered/i,
-    'Ya existe una cuenta con ese correo. Entra en vez de crearla.'],
-  [/auth session missing/i,
-    'Tu sesión ha caducado. Pide otro enlace para cambiar la contraseña.'],
-  [/user already registered/i, 'Ya existe una cuenta con ese correo.'],
-  [/email rate limit exceeded/i,
-    'Se han enviado demasiados correos seguidos. Espera unos minutos antes de pedir otro enlace.'],
-  [/signups not allowed/i, 'El registro está cerrado en este momento.'],
-  [/email not confirmed/i, 'Tienes que confirmar tu correo antes de entrar.'],
-  [/network|fetch failed|failed to fetch/i,
-    'No se ha podido conectar con el servidor de acceso. Comprueba tu conexión.'],
-];
-
-const FALLBACK = 'No se ha podido completar el acceso. Pide un enlace nuevo e inténtalo otra vez.';
+function porTexto(t: AuthErrores): [RegExp, string][] {
+  return [
+    [/pkce code verifier not found/i, t.pkceSoloMismoNavegador],
+    [/email link is invalid or has expired/i, t.enlaceCorreoCaducado],
+    [/token has expired or is invalid/i, t.codigoYaNoVale],
+    [/invalid flow state/i, t.procesoAccesoCaducadoEmpiezaOtraVez],
+    [/invalid login credentials/i, t.invalidCredentials],
+    [/password should be at least/i, t.contrasenaMinimoOcho],
+    [/user already registered|already been registered/i, t.userAlreadyExists],
+    [/auth session missing/i, t.sessionNotFound],
+    [/email rate limit exceeded/i, t.overEmailSendRateLimit],
+    [/signups not allowed/i, t.signupDisabled],
+    [/email not confirmed/i, t.emailNotConfirmed],
+    [/network|fetch failed|failed to fetch/i, t.errorDeRed],
+  ];
+}
 
 /** «For security purposes, you can only request this after 47 seconds.» */
-function rateLimitWithSeconds(message: string) {
+function rateLimitWithSeconds(message: string, t: AuthErrores) {
   const match = /only request this after (\d+) second/i.exec(message);
   if (!match) return null;
 
-  const seconds = Number(match[1]);
-  return `Por seguridad hay que esperar ${seconds} segundo${seconds === 1 ? '' : 's'} antes de pedir otro enlace.`;
+  return t.esperarSegundos(Number(match[1]));
 }
 
 type UnknownAuthError = { message?: string | null; code?: string | null } | null | undefined;
 
-/** Traduce un error devuelto por el cliente de Supabase. */
-export function authErrorMessage(error: UnknownAuthError): string {
-  if (!error) return FALLBACK;
+/** Traduce un error devuelto por el cliente de Supabase, en el idioma que toca. */
+export function authErrorMessage(error: UnknownAuthError, locale: Locale): string {
+  const t = getDictionary(locale).authErrores;
+  const porCodigoT = porCodigo(t);
 
-  if (error.code && BY_CODE[error.code]) return BY_CODE[error.code];
+  if (!error) return t.fallback;
+
+  if (error.code && porCodigoT[error.code]) return porCodigoT[error.code];
 
   const message = error.message ?? '';
 
-  const waiting = rateLimitWithSeconds(message);
+  const waiting = rateLimitWithSeconds(message, t);
   if (waiting) return waiting;
 
-  for (const [pattern, translated] of BY_TEXT) {
+  for (const [pattern, translated] of porTexto(t)) {
     if (pattern.test(message)) return translated;
   }
 
@@ -120,7 +121,7 @@ export function authErrorMessage(error: UnknownAuthError): string {
     );
   }
 
-  return FALLBACK;
+  return t.fallback;
 }
 
 /**
@@ -132,17 +133,19 @@ export function authErrorMessage(error: UnknownAuthError): string {
  * pasar un mensaje ya traducido, y tratarlo como error de Supabase lo
  * sustituía por el genérico.
  */
-export function authErrorFrom(params: URLSearchParams): string | null {
+export function authErrorFrom(params: URLSearchParams, locale: Locale): string | null {
   const code = params.get('error_code');
   const description = params.get('error_description');
 
   if (!code && !description) return null;
 
-  if (code && BY_CODE[code]) return BY_CODE[code];
+  const porCodigoT = porCodigo(getDictionary(locale).authErrores);
+
+  if (code && porCodigoT[code]) return porCodigoT[code];
 
   const error = params.get('error');
-  if (error && BY_CODE[error]) return BY_CODE[error];
+  if (error && porCodigoT[error]) return porCodigoT[error];
 
   // Supabase codifica las descripciones con + en lugar de espacios.
-  return authErrorMessage({ message: description?.replace(/\+/g, ' ') ?? '' });
+  return authErrorMessage({ message: description?.replace(/\+/g, ' ') ?? '' }, locale);
 }

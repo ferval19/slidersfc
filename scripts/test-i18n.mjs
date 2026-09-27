@@ -36,8 +36,11 @@ function check(label, ok, detail = '') {
   if (!ok) failures += 1;
 }
 
-/** Nombres propios que se quedan igual en los dos idiomas a propósito. */
-const WHITELIST = new Set(['SlidersFC', 'EA SPORTS FC', 'X']);
+/**
+ * Nombres propios — y el código «Error 404», que es el mismo rótulo en
+ * cualquier idioma — que se quedan igual en los dos a propósito.
+ */
+const WHITELIST = new Set(['SlidersFC', 'EA SPORTS FC', 'X', 'Error 404']);
 
 /** Quita comentarios de bloque y de línea, para que no se cuelen en el regex. */
 function stripComments(source) {

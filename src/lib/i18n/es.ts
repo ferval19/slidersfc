@@ -173,4 +173,167 @@ export const es = {
     metidos: (completed: number, total: number) => `${completed} de ${total} metidos`,
     slidersYaMetidos: 'Sliders ya metidos',
   },
+  login: {
+    metaTitle: 'Entrar',
+    metaDescription: 'Entra en SlidersFC con tu cuenta de X o con tu email.',
+    heading: 'Entra y publica tus sliders',
+    subheading: 'Necesitas una cuenta para publicar sets y comentar los de los demás. Leer es libre.',
+    continuarConX: 'Continuar con X',
+    oConTuCorreo: 'o con tu correo',
+    pestanaEntrar: 'Entrar',
+    pestanaCrear: 'Crear cuenta',
+    correo: 'Correo',
+    correoPlaceholder: 'tu@email.com',
+    contrasena: 'Contraseña',
+    contrasenaPlaceholderMinimo: 'Mínimo 8 caracteres',
+    repiteLaContrasena: 'Repite la contraseña',
+    prefieroEnlacePorCorreo: 'Prefiero un enlace por correo',
+    olvidasteTuContrasena: '¿Olvidaste tu contraseña?',
+    unMomento: 'Un momento…',
+    crearMiCuenta: 'Crear mi cuenta',
+    entrar: 'Entrar',
+    enviando: 'Enviando…',
+    enviarmeUnEnlace: 'Enviarme un enlace',
+    volverALaContrasena: 'Volver a la contraseña',
+    revisaTuCorreo: 'Revisa tu correo',
+    confirmaTuCuenta: 'Confirma tu cuenta',
+    teLoHemosEnviado: 'Te lo hemos enviado',
+    confirmandoBodyInicio: 'Tu cuenta está creada. Abre el enlace que te hemos mandado a ',
+    confirmandoBodyFin: ' para poder entrar.',
+    noConfirmandoBodyInicio: 'A ',
+    noConfirmandoBodyFin: '. Abre el enlace en este mismo navegador y entrarás directo.',
+    elEnlaceNoFunciona: '¿El enlace no funciona?',
+    ayudaCodigo:
+      'Escribe aquí el código de 6 dígitos del correo. Funciona desde cualquier navegador o dispositivo, y no se gasta si tu gestor de correo abre el enlace por su cuenta.',
+    codigo: 'Código',
+    comprobando: 'Comprobando…',
+    entrarConElCodigo: 'Entrar con el código',
+  },
+  recuperar: {
+    metaTitle: 'Recuperar contraseña',
+    heading: '¿Contraseña olvidada?',
+    subheading: 'Escribe tu correo y te mandamos un enlace para ponerte una nueva.',
+    enviado: 'Enviado',
+    miraTuCorreo: 'Mira tu correo',
+    siHayUnaCuentaConInicio: 'Si hay una cuenta con ',
+    siHayUnaCuentaConFin: ', te llega un enlace para poner una contraseña nueva.',
+    volverAEntrar: 'Volver a entrar',
+    correo: 'Correo',
+    correoPlaceholder: 'tu@email.com',
+    enviando: 'Enviando…',
+    mandarmeElEnlace: 'Mandarme el enlace',
+  },
+  cuentaContrasena: {
+    metaTitle: 'Nueva contraseña',
+    heading: 'Pon una contraseña nueva',
+    subheading: 'A partir de ahora entrarás con ella. Mínimo 8 caracteres.',
+    contrasenaNueva: 'Contraseña nueva',
+    contrasenaNuevaPlaceholder: 'Mínimo 8 caracteres',
+    repitela: 'Repítela',
+    guardando: 'Guardando…',
+    guardarYEntrar: 'Guardar y entrar',
+  },
+  authFinalizar: {
+    metaTitle: 'Entrando',
+    iniciandoSesion: 'Iniciando sesión…',
+    noSeHaPodidoEntrar: 'No se ha podido entrar',
+    pedirOtroEnlace: 'Pedir otro enlace',
+    enlaceSinDatosDeSesion:
+      'El enlace no traía datos de sesión. Suele pasar cuando se abre en otro navegador o cuando ya ha caducado: pide uno nuevo.',
+  },
+  perfil: {
+    perfilNoEncontrado: 'Perfil no encontrado',
+    editarPerfil: 'Editar perfil',
+    setPublicado: (n: number): string => (n === 1 ? 'set publicado' : 'sets publicados'),
+    aunNoHasPublicadoNada: 'Aún no has publicado nada',
+    esteUsuarioNoTieneSetsPublicos: 'Este usuario no tiene sets públicos',
+    creaTuPrimerSet:
+      'Crea tu primer set con los valores que usas de verdad. Es lo que hace que alguien vuelva a tu perfil.',
+    cuandoPubliqueUnSet: 'Cuando publique un set aparecerá aquí.',
+    crearMiPrimerSet: 'Crear mi primer set',
+    borradores: 'Borradores',
+    soloLosVesTu: 'sólo los ves tú',
+    favoritos: 'Favoritos',
+    aunNoHasGuardadoNada: 'Aún no has guardado nada',
+    cuandoVeasUnSet:
+      'Cuando veas un set que te sirva de verdad, guárdalo desde su ficha. Aquí es donde vuelves a encontrarlo.',
+    verLaPortada: 'Ver la portada',
+  },
+  notFound: {
+    error404: 'Error 404',
+    estoNoExiste: 'Esto no existe',
+    body: 'El set puede haberse borrado, o ser un borrador que sólo ve su autor.',
+    volverAlFeed: 'Volver al feed',
+  },
+  signOut: {
+    saliendo: 'Saliendo…',
+    cerrarSesion: 'Cerrar sesión',
+  },
+  auth: {
+    escribeUnEmailValido: 'Escribe un email válido.',
+    contrasenaMinimo: (n: number) => `La contraseña debe tener al menos ${n} caracteres.`,
+    lasDosContrasenasNoCoinciden: 'Las dos contraseñas no coinciden.',
+    faltaElCorreoDelCodigo: 'Falta el correo al que se envió el código.',
+    elCodigoTieneSeisDigitos: 'El código tiene 6 dígitos.',
+    xNoActivadoTodavia: 'El acceso con X no está activado todavía. Entra con tu correo mientras tanto.',
+    xNoSeHaPodidoIniciar: 'No se ha podido iniciar el acceso con X.',
+  },
+  authErrores: {
+    // Enlaces y códigos
+    otpExpired: 'El enlace o el código ya se había usado o ha caducado. Son de un solo uso: pide uno nuevo.',
+    otpDisabled: 'El acceso por correo está desactivado en el proyecto.',
+    flowStateExpired: 'El proceso de acceso ha caducado. Empieza otra vez desde el principio.',
+    flowStateNotFound:
+      'No encontramos el proceso de acceso. Abre el enlace en el mismo navegador donde lo pediste, o usa el código de 6 dígitos.',
+
+    // Límites
+    overEmailSendRateLimit:
+      'Se han enviado demasiados correos seguidos. Espera unos minutos antes de pedir otro enlace.',
+    overRequestRateLimit: 'Demasiados intentos seguidos. Espera un momento y vuelve a probar.',
+    overSmsSendRateLimit: 'Demasiados envíos seguidos. Espera un momento.',
+
+    // Cuenta
+    emailNotConfirmed: 'Tienes que confirmar tu correo antes de entrar.',
+    emailAddressInvalid: 'Ese correo no es válido.',
+    emailAddressNotAuthorized: 'Ese correo no está autorizado en este proyecto.',
+    userNotFound: 'No hay ninguna cuenta con ese correo.',
+    userBanned: 'Esta cuenta está bloqueada.',
+    signupDisabled: 'El registro está cerrado en este momento.',
+    invalidCredentials: 'Correo o contraseña incorrectos.',
+    weakPassword: 'La contraseña es demasiado corta o demasiado fácil de adivinar.',
+    userAlreadyExists: 'Ya existe una cuenta con ese correo. Entra en vez de crearla.',
+    samePassword: 'La contraseña nueva es la misma que la anterior.',
+    sessionNotFound: 'Tu sesión ha caducado. Pide otro enlace para cambiar la contraseña.',
+    providerEmailNeedsVerification: 'Verifica el correo de tu cuenta antes de entrar.',
+
+    // Proveedores
+    providerDisabled: 'Ese proveedor de acceso está desactivado en el proyecto.',
+    oauthProviderNotSupported: 'Ese proveedor de acceso no está disponible.',
+
+    // Genéricos
+    accessDenied: 'Se ha denegado el acceso. Pide un enlace nuevo e inténtalo otra vez.',
+    invalidRequest: 'La petición de acceso venía incompleta. Pide un enlace nuevo.',
+    validationFailed: 'Los datos del acceso no son válidos. Pide un enlace nuevo.',
+    badJson: 'La respuesta del servidor de acceso no era válida.',
+    badJwt: 'Tu sesión no es válida. Vuelve a entrar.',
+    sessionExpired: 'Tu sesión ha caducado. Vuelve a entrar.',
+    requestTimeout: 'El servidor de acceso ha tardado demasiado. Inténtalo otra vez.',
+    captchaFailed: 'No se ha podido verificar el captcha.',
+    serverError: 'El servidor de acceso ha fallado. Inténtalo de nuevo en un momento.',
+
+    fallback: 'No se ha podido completar el acceso. Pide un enlace nuevo e inténtalo otra vez.',
+
+    // Sólo llegan como texto, sin código (ver BY_TEXT en auth-errors.ts)
+    pkceSoloMismoNavegador:
+      'Ese enlace sólo funciona en el navegador desde el que lo pediste. Ábrelo ahí, o usa el código de 6 dígitos.',
+    enlaceCorreoCaducado:
+      'El enlace del correo ya se había usado o ha caducado. Son de un solo uso: pide uno nuevo.',
+    codigoYaNoVale: 'El código ya no vale. Pide uno nuevo.',
+    procesoAccesoCaducadoEmpiezaOtraVez: 'El proceso de acceso ha caducado. Empieza otra vez.',
+    contrasenaMinimoOcho: 'La contraseña debe tener al menos 8 caracteres.',
+    errorDeRed: 'No se ha podido conectar con el servidor de acceso. Comprueba tu conexión.',
+
+    esperarSegundos: (seconds: number) =>
+      `Por seguridad hay que esperar ${seconds} segundo${seconds === 1 ? '' : 's'} antes de pedir otro enlace.`,
+  },
 };
