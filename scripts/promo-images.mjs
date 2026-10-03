@@ -45,7 +45,14 @@ const RIVAL = '#ff5c7a';
 
 const INK = { user: USER, cpu_teammate: MATE, cpu_opponent: RIVAL, cpu: RIVAL };
 
-const URL = 'slidersfc.vercel.app';
+// El dominio sale del entorno, no escrito a mano: estas láminas se publican
+// en X y llevan la dirección pintada encima. Con el dominio a fuego, el día
+// que cambie se generan imágenes que mandan a la dirección vieja y nadie se
+// entera hasta que alguien la teclea.
+const URL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://slidersfc.vercel.app')
+  .trim()
+  .replace(/^https?:\/\//, '')
+  .replace(/\/$/, '');
 
 /**
  * Sólo para `08-ven-a-romperla`. Es una foto del estado de la web, y el script
