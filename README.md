@@ -1089,6 +1089,29 @@ inglés llevaban destapadas desde el día que se publicaron. Las dos cosas se
 arreglan generando una entrada por idioma, y el sitemap declara además sus
 `hreflang`, que Google pide en los dos sitios o en ninguno.
 
+### 03/10 · Un feed, que es el aviso que no ata
+
+`/feed.xml` y `/en/feed.xml`: los últimos treinta sets publicados, en RSS.
+
+El motivo no es la moda. La hoja de ruta descarta las **notificaciones por
+correo** y tiene razón: cada una te ata a mantener una lista, un envío y una
+baja. Pero el problema que resolvían sigue ahí — cómo se entera alguien de que
+hay un set nuevo sin volver a mirar cada día. Un feed lo contesta sin pedir
+nada: lo sirve el servidor, no lo mantiene nadie, y si el proyecto se enfría
+sigue en pie. Es literalmente la tercera regla del encuadre.
+
+Uno por idioma, con los mismos sets dentro: cambia el envoltorio y a qué
+versión de la ficha apunta cada enlace. Los títulos y las descripciones son de
+quien los escribe y no se traducen, igual que en la web.
+
+Dos detalles que no se ven. El texto va **escapado**: lo escribe cualquiera, y
+un `&` suelto no rompe un set, rompe el feed entero — el lector deja de
+enseñarlo. Y el enlace de autodescubrimiento se declara en `alternates()` y no
+en el layout, porque Next **sustituye** ese bloque cuando una página trae el
+suyo en vez de fusionarlo: puesto arriba, cualquier página con canónica propia
+lo borraba, y el feed existía sin que lo descubriera ningún lector. Se vio
+pidiendo la página, no compilando.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

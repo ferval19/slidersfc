@@ -16,6 +16,11 @@ const en: Dictionary = {
     miPerfil: 'My profile',
     entrar: 'Sign in',
   },
+  feed: {
+    titulo: 'SlidersFC — new sets',
+    descripcion: 'The latest slider sets published on SlidersFC, for EA SPORTS FC.',
+    porAutor: (autor: string, juego: string) => `${juego} · by ${autor}`,
+  },
   footer: {
     queLlevaUnSet: 'What goes into a set',
     disclaimer: 'A community project. Not affiliated with EA SPORTS or Electronic Arts Inc.',

@@ -16,6 +16,11 @@ export const es = {
     miPerfil: 'Mi perfil',
     entrar: 'Entrar',
   },
+  feed: {
+    titulo: 'SlidersFC — sets nuevos',
+    descripcion: 'Los últimos sets de sliders publicados en SlidersFC, para EA SPORTS FC.',
+    porAutor: (autor: string, juego: string) => `${juego} · por ${autor}`,
+  },
   footer: {
     queLlevaUnSet: 'Qué lleva un set',
     disclaimer: 'Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.',

@@ -12,6 +12,7 @@ import { SiteHeader } from '@/components/site-header';
 import { SITE_NAME, siteTagline, siteTitle } from '@/lib/constants';
 import { lang } from 'next/root-params';
 
+import { alternates } from '@/lib/i18n/alternates';
 import { DEFAULT_LOCALE, type Locale } from '@/lib/i18n/locale';
 import { jsonLd } from '@/lib/json-ld';
 import { publicSiteUrl } from '@/lib/site-url';
@@ -66,6 +67,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: siteTagline(locale),
       locale: OG_LOCALE[locale],
     },
+    alternates: alternates(locale, '/'),
     twitter: {
       card: 'summary_large_image',
       title: siteTitle(locale),
