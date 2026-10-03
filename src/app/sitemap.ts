@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 
+import { DEFAULT_LOCALE, LOCALES, localePath } from '@/lib/i18n/locale';
 import { setPath, profilePath } from '@/lib/paths';
 import { publicSiteUrl } from '@/lib/site-url';
 import { createSupabaseAnonClient } from '@/lib/supabase/anon';
@@ -9,13 +10,36 @@ const siteUrl = publicSiteUrl();
 export const revalidate = 3600;
 
 /**
+ * Una entrada por idioma, y cada una declarando a la otra.
+ *
+ * El `languages` de aquí es el mismo `hreflang` que llevan las páginas, pero
+ * en el sitemap: Google pide que vayan en los dos sitios o en ninguno. Faltaba
+ * entero —el sitemap sólo traía el castellano— así que la mitad inglesa de la
+ * web no se estaba ofreciendo a nadie.
+ */
+function enDosIdiomas(
+  path: string,
+  resto: Omit<MetadataRoute.Sitemap[number], 'url' | 'alternates'>,
+): MetadataRoute.Sitemap {
+  const languages = Object.fromEntries(
+    LOCALES.map((locale) => [locale, `${siteUrl}${localePath(locale, path)}`]),
+  );
+
+  return LOCALES.map((locale) => ({
+    ...resto,
+    url: `${siteUrl}${localePath(locale, path)}`,
+    alternates: { languages: { ...languages, 'x-default': `${siteUrl}${localePath(DEFAULT_LOCALE, path)}` } },
+  }));
+}
+
+/**
  * Usa el cliente anónimo a propósito: sin `cookies()` la ruta se puede cachear
  * y revalidar cada hora, en vez de regenerarse en cada petición de un bot.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const home: MetadataRoute.Sitemap = [
-    { url: `${siteUrl}/`, changeFrequency: 'daily', priority: 1 },
-    { url: `${siteUrl}/guia`, changeFrequency: 'monthly', priority: 0.6 },
+    ...enDosIdiomas('/', { changeFrequency: 'daily', priority: 1 }),
+    ...enDosIdiomas('/guia', { changeFrequency: 'monthly', priority: 0.6 }),
   ];
 
   let games: { slug: string }[] = [];
@@ -49,23 +73,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...home,
-    ...games.map((game) => ({
-      url: `${siteUrl}/juegos/${game.slug}`,
-      changeFrequency: 'daily' as const,
-      priority: 0.8,
-    })),
+    ...games.flatMap((game) =>
+      enDosIdiomas(`/juegos/${game.slug}`, { changeFrequency: 'daily', priority: 0.8 }),
+    ),
     ...sets
       .filter((set) => set.profiles)
-      .map((set) => ({
-        url: `${siteUrl}${setPath(set.profiles!.username, set.slug)}`,
-        lastModified: new Date(set.updated_at),
-        changeFrequency: 'weekly' as const,
-        priority: 0.7,
-      })),
-    ...[...authors].map((username) => ({
-      url: `${siteUrl}${profilePath(username)}`,
-      changeFrequency: 'weekly' as const,
-      priority: 0.5,
-    })),
+      .flatMap((set) =>
+        enDosIdiomas(setPath(set.profiles!.username, set.slug), {
+          lastModified: new Date(set.updated_at),
+          changeFrequency: 'weekly',
+          priority: 0.7,
+        }),
+      ),
+    ...[...authors].flatMap((username) =>
+      enDosIdiomas(profilePath(username), { changeFrequency: 'weekly', priority: 0.5 }),
+    ),
   ];
 }

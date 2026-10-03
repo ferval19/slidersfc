@@ -119,9 +119,9 @@ En **Authentication → URL Configuration**, añade a *Redirect URLs*:
 http://localhost:3000/auth/callback
 http://localhost:3000/auth/confirm
 http://localhost:3000/auth/finalizar
-https://<tu-dominio>/auth/callback
-https://<tu-dominio>/auth/confirm
-https://<tu-dominio>/auth/finalizar
+https://www.slidersfc.com/auth/callback
+https://www.slidersfc.com/auth/confirm
+https://www.slidersfc.com/auth/finalizar
 ```
 
 #### Plantilla del email de acceso (importante)
@@ -441,7 +441,7 @@ significan lo mismo.
 La página se ordena alrededor de una **ficha en vivo**: arriba, tal como te
 van a ver, con la foto que se cambia pinchándola y el nombre y la biografía
 actualizándose mientras escribes. Debajo, los campos. El nombre de usuario se
-escribe dentro de su propia URL —`slidersfc.vercel.app/u/…`— y se normaliza al
+escribe dentro de su propia URL —`www.slidersfc.com/u/…`— y se normaliza al
 vuelo: «Pepé García» se queda en `pepe_garcia` según lo tecleas, en vez de
 rechazártelo al guardar.
 
@@ -654,7 +654,7 @@ No es un carrusel a propósito. Sin flechas y sin temporizador: se elige en el
 servidor, se queda quieto y cambia al recargar. Un carrusel que se mueve solo
 obliga a leer a su ritmo.
 
-Y hay una página nueva, **[/guia](https://slidersfc.vercel.app/guia)**, que
+Y hay una página nueva, **[/guia](https://www.slidersfc.com/guia)**, que
 explica campo por campo todo lo que se puede contar de un set y por qué importa
 cada cosa: lo básico, las condiciones de juego, los valores —con una escala de
 muestra donde se ve la marca de fábrica trabajando—, el comportamiento de la
@@ -1063,6 +1063,31 @@ querer. Y sería el único elemento a color de una web que es tiza sobre pizarra
 Comprobado a 375 px con Playwright, que ya estaba instalado para los tests de
 punta a punta: entra sin desbordar, con la mitad activa en tiza y la otra
 apagada.
+
+### 03/10 · Dominio propio
+
+`www.slidersfc.com`. El estudio de SEO del 26 lo señalaba como la palanca más
+grande que quedaba para una marca literal, y migrar ahora salió gratis: Google
+todavía no había indexado nada que perder.
+
+El código no se tocó para esto, y ésa es la gracia: todo el origen —canonical,
+`hreflang`, sitemap, robots, las tarjetas de OpenGraph y las vueltas de
+Supabase— sale de `publicSiteUrl()`, que lee **una variable**. Sólo había un
+sitio con el dominio escrito a mano, las láminas de promoción, y ahora también
+lo lee del entorno.
+
+El dominio de Vercel **no se retira**: sigue sirviendo la web y declarando como
+canónica la nueva dirección, así que los enlaces que llevan semanas circulando
+por X y por grupos siguen funcionando. Es la misma razón por la que existe
+`username_history`.
+
+**Y al comprobar la migración salieron dos agujeros del inglés.** El sitemap
+traía doce direcciones y ninguna en inglés: la mitad de la web no se le estaba
+ofreciendo a nadie. Y `robots.txt` tapaba `/login` pero no `/en/login`, porque
+compara prefijos literales y no entiende de idiomas — las páginas privadas en
+inglés llevaban destapadas desde el día que se publicaron. Las dos cosas se
+arreglan generando una entrada por idioma, y el sitemap declara además sus
+`hreflang`, que Google pide en los dos sitios o en ninguno.
 
 ---
 
