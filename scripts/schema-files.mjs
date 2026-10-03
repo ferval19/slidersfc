@@ -35,3 +35,5 @@ export const MIGRATIONS_DESPUES = [
 
 export const STARTER_SET = 'supabase/seed/02_set_full_manual_fg.sql';
 export const FC27_SET = 'supabase/seed/03_set_fc27_realista.sql';
+/** Set de la comunidad de Operation Sports, publicado con crédito a @Matt10L. */
+export const OS_SET = 'supabase/seed/04_set_os_community_beta3.sql';

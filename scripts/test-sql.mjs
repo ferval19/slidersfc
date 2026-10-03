@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url';
 import {
   CATALOG,
   FC27_SET,
+  OS_SET,
   MIGRATIONS_ANTES,
   MIGRATIONS_DESPUES,
   STARTER_SET,
@@ -151,6 +152,31 @@ const count = async (db, sql) => (await db.query(sql)).rows[0].n;
          join slider_sets s on s.id = v.slider_set_id
          where s.title = 'Jugabilidad realista de FC27'`,
       )),
+  );
+
+  // El set de la comunidad de OS. Sólo toca 48 de los 65 sliders: los 16 de
+  // comportamiento de la CPU no los usa —va en Táctico— y la barra de potencia
+  // no sale en la captura de la que se leyó.
+  await db.exec(read(OS_SET));
+
+  check(
+    'el set de OS queda publicado con sus 96 valores',
+    96 ===
+      (await count(
+        db,
+        `select count(*)::int as n from slider_set_values v
+         join slider_sets s on s.id = v.slider_set_id
+         where s.slug = 'os-community-sliders-beta-3'`,
+      )),
+  );
+
+  check(
+    'y con sus condiciones: Leyenda, 6-15 minutos y la CPU en táctico',
+    'legendary|6-15|tactical' ===
+      (await db.query(
+        `select difficulty || '|' || half_length || '|' || cpu_behaviour as n
+         from slider_sets where slug = 'os-community-sliders-beta-3'`,
+      )).rows[0].n,
   );
 
   const fc27Gaps = await db.query(`
