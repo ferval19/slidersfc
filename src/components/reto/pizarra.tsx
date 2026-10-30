@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { traducirRol } from '../../lib/retos/roles';
 import type { Jugador, Plan } from '../../lib/retos/tipos';
 
 import { Icono } from './iconos';
@@ -15,12 +16,32 @@ type Ultimo = { x: number; y: number; rol: string };
 
 /** Los roles largos no caben bajo la ficha del campo. */
 function rolCorto(rol: string): string {
-  if (rol.includes('Mediocampista creador')) return 'Creador';
-  return rol
-    .replace(/\s*\(.*\)$/, '')
-    .replace('Attacking Wingback', 'Att. Wingback')
-    .replace('Ball-Playing Defender', 'Ball-Playing Def.')
-    .replace('Deep-Lying Playmaker', 'Deep-Lying PM');
+  return traducirRol(rol).corto;
+}
+
+/** «Falsa 9, Ofensivo»: lo que lee un lector de pantalla en la ficha. */
+function rolLeido(rol: string): string {
+  const { nombre, enfoque } = traducirRol(rol);
+  return enfoque ? `${nombre}, ${enfoque}` : nombre;
+}
+
+/**
+ * El rol en castellano y, debajo y en pequeño, el inglés: hay quien juega con
+ * el menú en inglés, y los vídeos de donde salen los planes lo dan así.
+ */
+function RolCelda({ rol }: { rol: string }) {
+  const { nombre, enfoque, original } = traducirRol(rol);
+  const leido = enfoque ? `${nombre} · ${enfoque}` : nombre;
+  return (
+    <>
+      {leido}
+      {original.replace(/[«»]/g, '') !== (enfoque ? `${nombre} (${enfoque})` : nombre) ? (
+        <small className={styles.roleEn} lang="en">
+          {original}
+        </small>
+      ) : null}
+    </>
+  );
 }
 
 function posiciones(plan: Plan): Record<string, Ultimo> {
@@ -123,7 +144,7 @@ export function Pizarra({ planes, jugadores }: { planes: Plan[]; jugadores: Fich
                 type="button"
                 className={clases}
                 style={{ left: `${x}%`, top: `${y}%` }}
-                aria-label={titular ? `${nombre(id)}, ${titular.pos}, ${titular.rol}` : nombre(id)}
+                aria-label={titular ? `${nombre(id)}, ${titular.pos}, ${rolLeido(titular.rol)}` : nombre(id)}
                 tabIndex={titular ? 0 : -1}
                 onClick={() => setSeleccionado(id)}
               >
@@ -168,7 +189,7 @@ export function Pizarra({ planes, jugadores }: { planes: Plan[]; jugadores: Fich
                 <tr>
                   <th>Pos.</th>
                   <th>Jugador</th>
-                  <th>Rol (foco)</th>
+                  <th>Rol · enfoque</th>
                   <th>Tarea</th>
                 </tr>
               </thead>
@@ -181,7 +202,9 @@ export function Pizarra({ planes, jugadores }: { planes: Plan[]; jugadores: Fich
                   >
                     <td>{t.pos}</td>
                     <td>{nombre(t.jugador)}</td>
-                    <td className={styles.role}>{t.rol}</td>
+                    <td className={styles.role}>
+                      <RolCelda rol={t.rol} />
+                    </td>
                     <td>{t.tarea}</td>
                   </tr>
                 ))}

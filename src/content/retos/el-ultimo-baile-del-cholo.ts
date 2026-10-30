@@ -249,7 +249,7 @@ export const reto: Reto = {
         nav: 'Pizarra',
         icono: 'pizarra',
         entradilla:
-          'Cuatro planes para guardar en el juego. Cambia de plan y mira cómo se mueven los jugadores; pulsa uno para ver su tarea. Los roles van con su nombre en inglés del juego, salvo donde el vídeo usa el nombre en español.',
+          'Cuatro planes para guardar en el juego. Cambia de plan y mira cómo se mueven los jugadores; pulsa uno para ver su tarea. Los roles van con su nombre en castellano del juego y, debajo, el inglés, por si juegas con el menú en ese idioma.',
       },
       planes: [
         {

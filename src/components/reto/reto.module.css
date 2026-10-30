@@ -988,6 +988,14 @@
   color: var(--primario);
   white-space: nowrap;
 }
+/* El nombre inglés, debajo: para quien tiene el menú del juego en inglés. */
+.roleEn {
+  display: block;
+  font-family: var(--body);
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--muted);
+}
 .planSrc {
   margin-top: 10px;
 }

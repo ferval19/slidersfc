@@ -18,6 +18,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 import { BANDERAS } from '../src/components/reto/banderas.ts';
+import { ENFOQUES, ROLES } from '../src/lib/retos/roles.ts';
 
 const carpeta = fileURLToPath(new URL('../src/content/retos/', import.meta.url));
 const ficheros = readdirSync(carpeta).filter((f) => f.endsWith('.ts') && f !== 'index.ts');
@@ -79,6 +80,17 @@ for (const { fichero, reto } of retos) {
 
       const repetidos = plan.once.length - new Set(plan.once.map((t) => t.jugador)).size;
       check(`${etiqueta}: nadie repetido`, repetidos === 0);
+
+      // Cada rol, en el catálogo de traducciones: uno escrito con una errata
+      // («Wing back») se pintaría en inglés sin que nadie se enterara.
+      const sinCatalogo = plan.once
+        .map((t) => t.rol.match(/^(.*?)\s*(?:\((.*)\))?$/))
+        .filter(([, rol, foco]) => {
+          const enfoqueConocido = foco === undefined || Object.hasOwn(ENFOQUES, foco.replace('Ball Winning', 'Ball-Winning'));
+          return !Object.hasOwn(ROLES, rol) || (!rol.startsWith('«') && !enfoqueConocido);
+        })
+        .map(([texto]) => texto);
+      check(`${etiqueta}: todos los roles están en el catálogo`, sinCatalogo.length === 0, sinCatalogo.join(', '));
     }
   }
 

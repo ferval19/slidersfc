@@ -780,6 +780,14 @@ Decisiones que no se ven en el código:
   `setRecomendado` (`{ usuario, slug }`) la portada enseña una tarjetita que
   enlaza a `/u/<usuario>/<slug>` (ningún reto lo usa todavía).
 
+**Los roles se guardan en inglés y se traducen al pintar.** El `once` de la
+pizarra lleva «False 9 (Attack)», como lo dan las fuentes, y
+`src/lib/retos/roles.ts` lo pasa al castellano del menú de FC 27 (los nombres
+de FutMind, que copia el juego, con su género: «Falsa 9», «Carrilera»). Los
+roles y enfoques sin nombre castellano contrastado van a `null` y se pintan en
+inglés; no se inventan, porque uno inventado no se encuentra en el menú.
+`test:retos` falla si un rol no está en el catálogo.
+
 **La cabecera de SlidersFC no es fija en modo carrera.** Las páginas llevan
 `data-modo-carrera` y `globals.css` le quita el `sticky` con
 `body:has([data-modo-carrera]) .site-header`: dos barras fijas apiladas se
