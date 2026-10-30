@@ -1,8 +1,8 @@
 import type { MetadataRoute } from 'next';
 
 import { DEFAULT_LOCALE, LOCALES, localePath } from '@/lib/i18n/locale';
-import { GUIAS_MODO_CARRERA } from '@/lib/modo-carrera';
 import { setPath, profilePath } from '@/lib/paths';
+import { retosOrdenados } from '@/lib/retos';
 import { publicSiteUrl } from '@/lib/site-url';
 import { createSupabaseAnonClient } from '@/lib/supabase/anon';
 
@@ -43,9 +43,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...enDosIdiomas('/guia', { changeFrequency: 'monthly', priority: 0.6 }),
     ...enDosIdiomas('/modo-carrera', { changeFrequency: 'weekly', priority: 0.6 }),
     // Sólo la castellana: la inglesa es el mismo texto y declara a esta como canónica.
-    ...GUIAS_MODO_CARRERA.map((guia) => ({
-      url: `${siteUrl}/modo-carrera/${guia.slug}`,
-      lastModified: new Date(guia.publicada),
+    ...retosOrdenados().map((reto) => ({
+      url: `${siteUrl}/modo-carrera/${reto.slug}`,
+      lastModified: new Date(reto.publicada),
       changeFrequency: 'monthly' as const,
       priority: 0.6,
     })),

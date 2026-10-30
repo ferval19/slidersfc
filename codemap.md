@@ -28,14 +28,14 @@ src/app/
   auth/finalizar/                vuelta por fragmento (cliente)
   perfil/                        resuelve la sesión a /u/<username>
   guia/                          qué lleva un set, explicado campo por campo
-  modo-carrera/                  índice de guías de modo carrera
-  modo-carrera/[slug]/route.ts   cada guía: HTML autónomo servido tal cual
+  modo-carrera/                  índice de retos de modo carrera
+  modo-carrera/[slug]/page.tsx   cada reto: <RetoPagina> + metadatos
   modo-carrera/[slug]/opengraph-image.tsx   su tarjeta para redes
   icon.tsx apple-icon.tsx        favicon SFC generado
   opengraph-image.tsx            tarjeta por defecto del resto de la web
   actions/                       auth.ts · sets.ts · comments.ts · favorites.ts
 
-src/content/modo-carrera/        el HTML de cada guía (`<slug>.html`)
+src/content/retos/               un fichero de datos por reto + `index.ts` (registro)
 src/components/                  UI. Los de cliente llevan 'use client'
 src/lib/                         lógica sin UI (ver abajo)
 src/proxy.ts                     refresco de sesión y rutas protegidas
@@ -708,25 +708,74 @@ nada de esta conversación; lo que no vaya en el encargo, se lo inventa.
 Lo que **no** se delega: aplicar SQL sobre la base real, tocar el catálogo,
 cualquier cosa de autenticación o RLS, y dar un cambio por bueno.
 
-## Guías de modo carrera
+## Retos de modo carrera
 
-Cada guía es un HTML **entero y autónomo** (`src/content/modo-carrera/<slug>.html`)
-con su propio diseño. Se sirve desde un **route handler**, no desde una página:
-su CSS toca `body` y `h1`, y dentro del layout de la pizarra los dos diseños se
-pisarían. El handler sólo le inyecta canónica, metaetiquetas, favicon y una
-franja de vuelta al índice.
+Un reto es un **documento hecho de datos**: portada, desafío de Manager Live,
+ocho secciones y fuentes. El tipo es `src/lib/retos/tipos.ts` (`Reto`), cada
+reto es un fichero `src/content/retos/<slug>.ts` que exporta `const reto: Reto`,
+y una sola maquinaria lo pinta: `src/components/reto/`. Antes cada guía era un
+HTML a mano; ahora un reto para otro equipo es **un fichero de datos más una
+línea en `src/content/retos/index.ts`** (`RETOS`). Índice, ruta, sitemap e
+imagen para compartir salen de esa lista, vía `retosOrdenados()` /
+`retoPorSlug()` de `src/lib/retos/index.ts`. Lo comprueba `npm run test:retos`
+(slugs únicos, `once` contra la plantilla, once titulares dentro del campo,
+bandera para cada `pais`, colores `#rrggbb`).
 
-Se prerenderiza en el build (`generateStaticParams` + `dynamicParams = false`):
-el `readFile` corre al compilar, así que no depende de que el fichero viaje al
-servidor. Añadir una guía = soltar el HTML y una entrada en
-`src/lib/modo-carrera.ts`; índice, ruta y sitemap salen de esa lista.
+```
+src/lib/retos/tipos.ts            el contrato: sólo datos serializables
+src/lib/retos/index.ts            retosOrdenados() · retoPorSlug()
+src/content/retos/<slug>.ts       los datos de un reto
+src/components/reto/
+  reto.tsx                        raíz: tema → variables CSS, nav, portada,
+                                  desafío, secciones numeradas, pie
+  reto.module.css                 TODO el CSS (módulo, ver abajo)
+  marco.tsx                       caja + cabecera numerada de cada sección
+  seccion-<tipo>.tsx              un componente por tipo de sección
+  pizarra.tsx   (cliente)         pestañas de plan, fichas que se mueven
+  plantilla.tsx (cliente)         filtro por línea y orden
+  copiar.tsx    (cliente)         botón de copiar (desafío y códigos de táctica)
+  texto.tsx                       mini-markdown → nodos de React
+  iconos.tsx · banderas.ts        sprite SVG y banderas (cuerpos de SVG, sin imports)
+  camiseta.ts                     patrón de camiseta → valor de `background`
+src/components/reto-share-card.tsx  imagen para compartir (lee `tema` y `portada`)
+```
 
-Las guías están en castellano. `/en/modo-carrera/<slug>` sirve el mismo texto
-con la canónica en la castellana, y el sitemap sólo declara esa. Desde el
-índice se enlazan con `<a>` y no con `<Link>`: la navegación de cliente no sabe
-pintar una respuesta que no es RSC.
+Decisiones que no se ven en el código:
 
-La imagen para compartir es `[slug]/opengraph-image.tsx` (dibujada en
-`guia-share-card.tsx` con los datos de `portada` del registro). Como la guía no
-es una página, Next **no la enlaza solo**: las `og:`/`twitter:` las escribe a
-mano `route.ts`, siempre con la URL castellana.
+- **CSS en un módulo, no global.** La web ya define `.chip`, `.eyebrow`,
+  `.panel` y `.btn`; el CSS original del reto usaba esos mismos nombres y se
+  pisaban. El preflight de Tailwind (global) además pone a cero márgenes,
+  viñetas, títulos y botones, así que el módulo repone lo que el diseño daba
+  por supuesto (márgenes de `p`, viñetas, color y subrayado de los enlaces,
+  `line-height` de los botones). Los selectores de elemento van con
+  `:where(.reto)` para no cambiar su especificidad.
+- **Los colores llegan como variables.** `reto.tsx` pone `--primario`,
+  `--acento`… en la raíz desde `tema`, y los tintes (fondos suaves, rótulos
+  sobre oscuro) salen de `color-mix`. Los patrones de camiseta se resuelven en
+  TypeScript (`camiseta.ts`) y llegan como `--cam-4`, `--cam-y14`…, de modo
+  que el CSS no sabe si el club juega a rayas, a aros o liso. El sello de la
+  portada se dibuja por patrón dentro de su `clipPath`.
+- **Sólo datos en el tipo.** Nada de JSX ni funciones en un `Reto`: así pasa
+  tal cual a una columna `jsonb` si algún día publican retos otras personas.
+  Por eso el texto largo es un markdown mínimo (`**negrita**`, `*cursiva*`,
+  `[enlace](https://…)`) que `texto.tsx` convierte en nodos, sin
+  `dangerouslySetInnerHTML` y con sólo enlaces `http(s)`. La única inyección
+  de HTML son los cuerpos de las banderas, que son constantes del código.
+- **Las cifras de la plantilla se calculan** (media del once del primer plan,
+  media de la plantilla, mejor y mejor de campo, más margen). `notaMejor` sólo
+  matiza el texto. La pizarra enlaza por `id` de jugador: el once no repite
+  nombres, apunta a la plantilla.
+- **El chrome del reto va en castellano**, también en `/en`: «Ordenar»,
+  «Potencial», «Copiar»… no pasan por el diccionario. El reto lleva
+  `lang="es"` en su raíz. La canónica es siempre la castellana y el sitemap
+  sólo declara esa.
+- **Se pinta dentro del layout del sitio.** La barra de secciones es
+  `sticky` con `top: var(--header-h)` para quedar pegada debajo de la cabecera
+  fija, y las secciones llevan `scroll-margin-top` de las dos barras, para que
+  `#tacticas` y compañía no queden tapadas. Los números de sección (01…) y las
+  alternancias de fondo salen del orden; las anclas, del tipo (`pizarra` →
+  `#tacticas`, `saga` → `#lore`), para que los enlaces antiguos sigan vivos.
+- **Metadatos y `opengraph-image.tsx`.** Al ser una página, Next enlaza la
+  imagen solo; `openGraph` no declara `images`, que la taparía. Con
+  `setRecomendado` (`{ usuario, slug }`) la portada enseña una tarjetita que
+  enlaza a `/u/<usuario>/<slug>` (ningún reto lo usa todavía).

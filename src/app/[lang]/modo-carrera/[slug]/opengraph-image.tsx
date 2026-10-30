@@ -1,27 +1,28 @@
 import { ImageResponse } from 'next/og';
 
-import { GuiaShareCard } from '@/components/guia-share-card';
+import { RetoShareCard } from '@/components/reto-share-card';
 import { SHARE_CARD_SIZE } from '@/components/share-card';
 import { displayFont, monoFont } from '@/lib/og-fonts';
-import { guiaPorSlug } from '@/lib/modo-carrera';
+import { retoPorSlug } from '@/lib/retos';
 
 export const size = SHARE_CARD_SIZE;
 export const contentType = 'image/png';
-export const alt = 'Guía de modo carrera — SlidersFC';
+export const alt = 'Reto de modo carrera — SlidersFC';
 
 /**
- * La imagen para compartir de cada guía. La guía es un route handler y no una
- * página, así que Next no enlaza esta imagen solo: las etiquetas `og:image`
- * las escribe a mano `route.ts`, apuntando aquí.
+ * La imagen para compartir de cada reto. Ojo: Next **no** la enlaza sola aquí.
+ * Por convención la enlazaría con el prefijo de idioma (`/en/…/opengraph-image`),
+ * y la canónica del reto es siempre la castellana; así que `page.tsx` declara
+ * `openGraph.images` a mano, apuntando a la ruta sin prefijo.
  */
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const guia = guiaPorSlug(slug);
-  if (!guia) return new Response('Not found', { status: 404 });
+  const reto = retoPorSlug(slug);
+  if (!reto) return new Response('Not found', { status: 404 });
 
   const [display, mono] = await Promise.all([displayFont(), monoFont()]);
 
-  return new ImageResponse(<GuiaShareCard guia={guia} />, {
+  return new ImageResponse(<RetoShareCard reto={reto} />, {
     ...size,
     fonts: [
       { name: 'Display', data: display, weight: 900, style: 'normal' },

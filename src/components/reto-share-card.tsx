@@ -1,27 +1,67 @@
+import { fondoCamiseta } from '@/components/reto/camiseta';
 import { SHARE_CARD_SIZE } from '@/components/share-card';
-import type { GuiaModoCarrera } from '@/lib/modo-carrera';
+import type { Reto } from '@/lib/retos/tipos';
 
 /**
- * Imagen para compartir de una guía de modo carrera.
+ * Imagen para compartir de un reto de modo carrera.
  *
- * No lleva la pizarra verde de SlidersFC: copia la portada de la propia guía
- * (fondo, rayas del club, titular partido, sello y marcadores) porque es lo
- * que se va a abrir al pinchar. La marca de la web queda en una esquina.
+ * No lleva la pizarra verde de SlidersFC: copia la portada del propio reto
+ * (colores del tema, camiseta del club, titular partido, sello y marcadores)
+ * porque es lo que se va a abrir al pinchar. La marca de la web queda en una
+ * esquina.
  *
  * Satori: `display: flex` explícito en todo `div` con más de un hijo, y
- * anchos fijos. Las rayas son `div`s y no un `repeating-linear-gradient`,
- * que Satori no pinta igual en todas las versiones.
+ * anchos fijos. Las rayas y los aros son `div`s y no un
+ * `repeating-linear-gradient`, que Satori no pinta igual en todas las
+ * versiones; el resto de patrones (mitades, banda, liso) son un degradado de
+ * paradas duras o un color, que sí salen bien.
  */
 
 const W = SHARE_CARD_SIZE.width;
 const H = SHARE_CARD_SIZE.height;
 const RAYAS = 9;
 const ANCHO_RAYAS = 470;
-const BANDA = 132;
+const BANDA = 146;
 
-export function GuiaShareCard({ guia }: { guia: GuiaModoCarrera }) {
-  const { fondo, fondoProfundo, titular, antetitulo, sello, marcadores } = guia.portada;
-  const [rojo, blanco] = guia.colores;
+/** La camiseta del club como bloque de `ancho` × `alto`, a la manera de cada patrón. */
+function Camiseta({ camiseta, ancho, alto }: { camiseta: Reto['tema']['camiseta']; ancho: number; alto: number }) {
+  const [a, b] = camiseta.colores;
+
+  if (camiseta.patron === 'rayas' || camiseta.patron === 'aros') {
+    const vertical = camiseta.patron === 'rayas';
+    return (
+      <div
+        style={{
+          width: ancho,
+          height: alto,
+          display: 'flex',
+          flexDirection: vertical ? 'row' : 'column',
+        }}
+      >
+        {Array.from({ length: RAYAS }, (_, i) => (
+          <div
+            key={i}
+            style={{
+              width: vertical ? ancho / RAYAS : '100%',
+              height: vertical ? '100%' : alto / RAYAS,
+              backgroundColor: i % 2 ? b : a,
+            }}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  return <div style={{ width: ancho, height: alto, display: 'flex', backgroundImage: fondoCamiseta(camiseta) }} />;
+}
+
+export function RetoShareCard({ reto }: { reto: Reto }) {
+  const { tema, portada, resumen } = reto;
+  const { titular, antetitulo, sello, marcadores } = portada;
+  const fondo = tema.primario;
+  const fondoProfundo = tema.primarioProfundo;
+  const rojo = tema.acento;
+  const blanco = '#ffffff';
   const largo = Math.max(titular[0].length, titular[1].length);
   const cuerpo = largo > 17 ? 92 : largo > 14 ? 108 : 120;
 
@@ -37,7 +77,7 @@ export function GuiaShareCard({ guia }: { guia: GuiaModoCarrera }) {
         fontFamily: 'Plex',
       }}
     >
-      {/* Rayas del club a la derecha, fundidas hacia el fondo. */}
+      {/* La camiseta del club a la derecha, fundida hacia el fondo. */}
       <div
         style={{
           position: 'absolute',
@@ -48,12 +88,7 @@ export function GuiaShareCard({ guia }: { guia: GuiaModoCarrera }) {
           display: 'flex',
         }}
       >
-        {Array.from({ length: RAYAS }, (_, i) => (
-          <div
-            key={i}
-            style={{ width: ANCHO_RAYAS / RAYAS, height: '100%', backgroundColor: i % 2 ? blanco : rojo }}
-          />
-        ))}
+        <Camiseta camiseta={tema.camiseta} ancho={ANCHO_RAYAS} alto={H - BANDA} />
       </div>
       <div
         style={{
@@ -182,7 +217,7 @@ export function GuiaShareCard({ guia }: { guia: GuiaModoCarrera }) {
             color: '#dfe4f5',
           }}
         >
-          {guia.resumen}
+          {resumen}
         </div>
       </div>
 

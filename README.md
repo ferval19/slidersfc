@@ -1124,6 +1124,23 @@ se sirve tal cual en vez de reescribirla en componentes: rehacerla costaría
 más que hacerla y la perdería. El índice sí vive en la pizarra de la web, y
 cada tarjeta toma las rayas del club como única nota de color.
 
+### 30/10 · Los retos pasan a plantilla
+
+La guía del Cholo era un HTML hecho a mano, y la idea era que no fuese la
+última: un reto para otro equipo no puede costar rehacer mil líneas de HTML y
+CSS. Ahora un reto es **un fichero de datos** (`src/content/retos/<slug>.ts`,
+tipado en `src/lib/retos/tipos.ts`) más una línea en el registro, y una sola
+maquinaria de componentes lo pinta: portada, desafío, pizarra, plantilla,
+mercado, saga y reglas. La camiseta (rayas, aros, mitades…) y los colores del
+club salen del tema, así que el mismo diseño vale para cualquier equipo.
+
+La URL y el aspecto son los de antes —se compararon las alturas de cada sección
+en escritorio y en 375 px, y salen iguales—, pero la página ya vive dentro del
+layout de la web: cabecera y pie del sitio, la barra de secciones pegada justo
+debajo, y Next enlaza solo la imagen para compartir. Dos cosas para no
+estropearlo: el CSS es un módulo porque la web ya tiene `.chip` y `.eyebrow`,
+y el tipo sólo admite datos, para que mañana pueda ser una columna `jsonb`.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.
