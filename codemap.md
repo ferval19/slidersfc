@@ -779,3 +779,11 @@ Decisiones que no se ven en el código:
   imagen solo; `openGraph` no declara `images`, que la taparía. Con
   `setRecomendado` (`{ usuario, slug }`) la portada enseña una tarjetita que
   enlaza a `/u/<usuario>/<slug>` (ningún reto lo usa todavía).
+
+**La cabecera de SlidersFC no es fija en modo carrera.** Las páginas llevan
+`data-modo-carrera` y `globals.css` le quita el `sticky` con
+`body:has([data-modo-carrera]) .site-header`: dos barras fijas apiladas se
+comían 130 px para leer un documento largo. La barra del reto se pega arriba
+del todo (`--arriba: 0px`) y lleva la marca de la serie, **El Banquillo**, con el
+escudo pintado con la camiseta del club; enlaza al índice porque es la única
+salida que queda a la vista.

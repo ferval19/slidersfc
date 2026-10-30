@@ -87,6 +87,16 @@ body::after {
   --header-h: 73px;
 }
 
+/*
+ * En las páginas de modo carrera la cabecera del sitio se va con el scroll.
+ * El reto trae su propia barra pegada arriba, y dos barras fijas apiladas se
+ * comían 130 px de pantalla —en el móvil, un sexto— para leer un documento
+ * largo. Fuera de capa a propósito: tiene que ganarle a la utilidad `sticky`.
+ */
+body:has([data-modo-carrera]) .site-header {
+  position: relative;
+}
+
 @layer components {
   /* --- Tipografía ---------------------------------------------------- */
 

@@ -32,8 +32,9 @@
   --display: var(--font-big-shoulders), 'Arial Narrow', Impact, sans-serif;
   --cond: var(--font-barlow-condensed), 'Arial Narrow', sans-serif;
   --body: var(--font-barlow), 'Helvetica Neue', Arial, sans-serif;
-  /* Lo que mide la cabecera fija del sitio (definido en globals.css). */
-  --arriba: var(--header-h, 0px);
+  /* En los retos la cabecera del sitio no se queda fija (ver globals.css):
+     la barra del reto se pega arriba del todo. */
+  --arriba: 0px;
 
   color-scheme: light;
   background: var(--papel);
@@ -108,6 +109,19 @@
   white-space: nowrap;
   color: #fff;
   text-decoration: none;
+}
+.brand .txt {
+  display: flex;
+  flex-direction: column;
+  line-height: 0.95;
+}
+.brand .txt small {
+  font-family: var(--cond);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: #c9d0ea;
+  margin-top: 3px;
 }
 .brandFlag {
   width: 22px;

@@ -264,6 +264,7 @@ export function RetoPagina({ reto, locale = DEFAULT_LOCALE }: { reto: Reto; loca
   return (
     <div
       lang="es"
+      data-modo-carrera=""
       className={`${styles.reto} ${barlow.variable} ${barlowCondensed.variable}`}
       style={variablesDelTema(tema)}
     >
@@ -271,12 +272,18 @@ export function RetoPagina({ reto, locale = DEFAULT_LOCALE }: { reto: Reto; loca
 
       <nav className={styles.nav} aria-label="Secciones">
         <div className={`${styles.wrap} ${styles.navDentro}`}>
-          <a className={styles.brand} href="#inicio">
+          {/* La marca de la serie, no la del reto: el nombre del reto ya va en
+              grande en la portada, y repetirlo arriba obligaba a inventar un
+              rótulo corto para cada equipo. El escudo sí es del club: lleva
+              su camiseta. Lleva al índice, porque la cabecera de SlidersFC se
+              ha ido con el scroll y esta es la única salida a la vista. */}
+          <Link className={styles.brand} href={localized(locale, '/modo-carrera')} aria-label="El Banquillo, retos de modo carrera">
             <span className={styles.brandFlag} aria-hidden="true" />
             <span className={styles.txt}>
-              {portada.sello.grande} · {portada.sello.pequeno}
+              El Banquillo
+              <small>Retos de modo carrera</small>
             </span>
-          </a>
+          </Link>
           <ul>
             {enlaces.map((enlace) => (
               <li key={enlace.id}>

@@ -17,7 +17,7 @@ export async function SiteHeader() {
   const t = dict.header;
 
   return (
-    <header className="sticky top-0 z-30 bg-board/92 backdrop-blur">
+    <header className="site-header sticky top-0 z-30 bg-board/92 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-5 py-3">
         <Link href={localized(locale, '/')} className="flex items-baseline gap-2.5">
           <Logo />

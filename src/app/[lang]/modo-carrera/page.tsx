@@ -29,7 +29,7 @@ export default async function ModoCarreraPage() {
   const retos = retosOrdenados();
 
   return (
-    <div className="mx-auto max-w-4xl px-5 py-12">
+    <div data-modo-carrera="" className="mx-auto max-w-4xl px-5 py-12">
       <header className="flex flex-col gap-6 pb-10 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="eyebrow">{t.eyebrow}</p>
