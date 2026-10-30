@@ -5,6 +5,7 @@ import { DEFAULT_LOCALE, isLocale, LOCALES, localePath, type Locale } from '@/li
 import { getDictionary } from '@/lib/i18n/dictionary';
 import { guiaPorSlug, GUIAS_MODO_CARRERA } from '@/lib/modo-carrera';
 import { publicSiteUrl } from '@/lib/site-url';
+import { SHARE_CARD_SIZE } from '@/components/share-card';
 
 /**
  * Una guía de modo carrera, servida como el HTML autónomo que es.
@@ -44,6 +45,10 @@ export async function GET(
   // La guía está en castellano: la canónica es siempre la castellana.
   const canonica = `${siteUrl}/modo-carrera/${guia.slug}`;
   const indice = localePath(locale, '/modo-carrera');
+  // La imagen de `opengraph-image.tsx`, también en su versión castellana. El
+  // título lleva la marca porque `og:title` viaja solo, sin el nombre del sitio.
+  const imagen = `${canonica}/opengraph-image`;
+  const titulo = `${guia.titulo} · ${guia.equipo} · Modo carrera ${guia.juego}`;
 
   const html = await readFile(
     path.join(process.cwd(), 'src/content/modo-carrera', `${guia.slug}.html`),
@@ -57,11 +62,22 @@ export async function GET(
 <link rel="apple-touch-icon" href="/apple-icon">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="SlidersFC">
+<meta property="og:locale" content="es_ES">
 <meta property="og:url" content="${canonica}">
-<meta property="og:title" content="${attr(guia.titulo)}">
+<meta property="og:title" content="${attr(titulo)}">
 <meta property="og:description" content="${attr(guia.resumen)}">
-<meta property="og:image" content="${siteUrl}/opengraph-image">
+<meta property="og:image" content="${imagen}">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="${SHARE_CARD_SIZE.width}">
+<meta property="og:image:height" content="${SHARE_CARD_SIZE.height}">
+<meta property="og:image:alt" content="${attr(titulo)}">
+<meta property="article:published_time" content="${guia.publicada}">
+<meta property="article:section" content="Modo carrera">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${attr(titulo)}">
+<meta name="twitter:description" content="${attr(guia.resumen)}">
+<meta name="twitter:image" content="${imagen}">
+<meta name="twitter:image:alt" content="${attr(titulo)}">
 <style>
 .sfc-vuelta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 16px;background:#06170f;color:#f2efe4;font:500 11px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase}
 .sfc-vuelta a{color:#f2efe4;text-decoration:none}

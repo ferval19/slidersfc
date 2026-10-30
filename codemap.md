@@ -30,6 +30,7 @@ src/app/
   guia/                          qué lleva un set, explicado campo por campo
   modo-carrera/                  índice de guías de modo carrera
   modo-carrera/[slug]/route.ts   cada guía: HTML autónomo servido tal cual
+  modo-carrera/[slug]/opengraph-image.tsx   su tarjeta para redes
   icon.tsx apple-icon.tsx        favicon SFC generado
   opengraph-image.tsx            tarjeta por defecto del resto de la web
   actions/                       auth.ts · sets.ts · comments.ts · favorites.ts
@@ -724,3 +725,8 @@ Las guías están en castellano. `/en/modo-carrera/<slug>` sirve el mismo texto
 con la canónica en la castellana, y el sitemap sólo declara esa. Desde el
 índice se enlazan con `<a>` y no con `<Link>`: la navegación de cliente no sabe
 pintar una respuesta que no es RSC.
+
+La imagen para compartir es `[slug]/opengraph-image.tsx` (dibujada en
+`guia-share-card.tsx` con los datos de `portada` del registro). Como la guía no
+es una página, Next **no la enlaza solo**: las `og:`/`twitter:` las escribe a
+mano `route.ts`, siempre con la URL castellana.

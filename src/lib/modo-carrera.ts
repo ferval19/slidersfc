@@ -24,6 +24,20 @@ export type GuiaModoCarrera = {
   publicada: string;
   /** Los colores del club, para las rayas de la tarjeta del índice. */
   colores: [string, string];
+  /**
+   * Lo que pinta la imagen para compartir. Copia la portada de la guía —su
+   * fondo, su titular partido en dos y sus marcadores— para que el enlace
+   * pegado en X o en WhatsApp ya se parezca a lo que se va a abrir.
+   */
+  portada: {
+    fondo: string;
+    fondoProfundo: string;
+    /** La segunda línea va resaltada, como en la guía. */
+    titular: [string, string];
+    antetitulo: string;
+    sello: { grande: string; pequeno: string };
+    marcadores: { etiqueta: string; valor: string; detalle: string }[];
+  };
 };
 
 export const GUIAS_MODO_CARRERA: GuiaModoCarrera[] = [
@@ -37,6 +51,19 @@ export const GUIAS_MODO_CARRERA: GuiaModoCarrera[] = [
     temporadas: '2026 — 2030',
     publicada: '2026-10-30',
     colores: ['#cc2e24', '#ffffff'],
+    portada: {
+      fondo: '#1b2a5c',
+      fondoProfundo: '#0f1a3d',
+      titular: ['El último baile', 'del Cholo'],
+      antetitulo: 'Modo carrera · EA Sports FC 27 · Atlético de Madrid',
+      sello: { grande: 'Cholo', pequeno: 'FC 27' },
+      marcadores: [
+        { etiqueta: 'Banquillo', valor: '16.ª', detalle: 'temporada de Simeone' },
+        { etiqueta: 'Contrato', valor: '30·06·27', detalle: 'fin del vínculo' },
+        { etiqueta: 'Pizarra', valor: '4', detalle: 'planes tácticos' },
+        { etiqueta: 'La partida', valor: '2026—30', detalle: 'cuatro temporadas' },
+      ],
+    },
   },
 ];
 
