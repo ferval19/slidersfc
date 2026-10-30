@@ -280,6 +280,21 @@ section.alt .rule{background:var(--paper)}
 .rule p{margin:0;font-size:15.5px}
 .rule::after{counter-increment:r;content:counter(r);position:absolute;top:14px;right:18px;font-family:var(--display);font-weight:900;font-size:34px;color:var(--line)}
 
+/* DESAFÍO MANAGER LIVE */
+.challenge{margin:8px 0 40px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:22px 28px;background:var(--navy-deep);color:#fff;border-radius:14px;padding:22px 26px;border-left:10px solid transparent;border-image:repeating-linear-gradient(180deg,var(--red) 0 10px,#fff 10px 20px) 0 0 0 10;box-shadow:0 14px 30px rgba(15,26,61,.25)}
+.challenge .ic{width:52px;height:52px;border-radius:12px;background:var(--red);display:grid;place-items:center;font-size:26px}
+.challenge small{display:block;font-family:var(--cond);font-weight:600;font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:#ff8b80}
+.challenge p{margin:4px 0 0;color:#c9d0ea;font-size:15.5px;max-width:34em}
+.challenge .cbox{display:flex;align-items:center;gap:10px}
+/* Monoespaciada y con el cero tachado: en la letra de titulares el 0 y la O son iguales, y «LO0K» se leía «LOOK». */
+.challenge code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace;font-variant-numeric:slashed-zero;font-feature-settings:'zero' 1;font-weight:700;font-size:clamp(22px,3vw,30px);letter-spacing:.04em;line-height:1;background:#fff;color:var(--navy-deep);padding:10px 16px 8px;border-radius:8px;white-space:nowrap;user-select:all}
+.challenge button{display:inline-flex;align-items:center;gap:6px;font-family:var(--cond);font-weight:700;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:transparent;border:1.5px solid rgba(255,255,255,.4);border-radius:999px;padding:9px 14px;cursor:pointer}
+.challenge button:hover{border-color:#fff}
+.challenge button[data-ok]{background:var(--good);border-color:var(--good)}
+@media (max-width:760px){
+  .challenge{grid-template-columns:auto minmax(0,1fr);padding:18px}
+  .challenge .cbox{grid-column:1/-1;flex-wrap:wrap}
+}
 
 /* FOOTER */
 footer{background:var(--navy-deep);color:#c3cae6;padding:56px 0 40px;border-top:6px solid var(--red)}
@@ -440,6 +455,8 @@ footer a{color:#e3e8fb}
   <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M12 21v-9M12 12c0-4-3-6-7-6 0 4 3 6 7 6zM12 14c0-4 3-6 7-6 0 4-3 6-7 6z"/></symbol>
   <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9a3 3 0 00-3-1.5c-1.7 0-3 .9-3 2.2 0 3 6 1.6 6 4.6 0 1.3-1.3 2.2-3 2.2A3.3 3.3 0 019 15M12 6v1.5M12 16.5V18"/></symbol>
   <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17.5h.01"/></symbol>
+  <symbol id="i-gamepad" viewBox="0 0 24 24"><path d="M6 8h12a4 4 0 014 4v2a3 3 0 01-5.2 2L15 14H9l-1.8 2A3 3 0 012 14v-2a4 4 0 014-4z"/><path d="M7 11v3M5.5 12.5h3M16 12h.01M18 13.5h.01"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/></symbol>
   <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
 </svg>
 
@@ -447,6 +464,7 @@ footer a{color:#e3e8fb}
   <div class="wrap">
     <a class="brand" href="#inicio"><span class="flag" aria-hidden="true"></span><span class="txt">Cholo · FC 27</span></a>
     <ul>
+      <li><a class="lnk" href="#desafio">Desafío</a></li>
       <li><a class="lnk" href="#contexto">Contexto</a></li>
       <li><a class="lnk" href="#adn">ADN</a></li>
       <li><a class="lnk" href="#videos">Vídeos</a></li>
@@ -505,7 +523,19 @@ footer a{color:#e3e8fb}
   </div>
   <div class="ticker" aria-hidden="true"><div class="track"><span>Modo carrera</span><span>EA Sports FC 27</span><span>Temporada 16 del Cholo</span><span>Contrato hasta el 30·06·2027</span><span>Objetivo: un título</span><span>2026 — 2030</span><span>Cuatro planes</span><span>El último baile</span><span>Modo carrera</span><span>EA Sports FC 27</span><span>Temporada 16 del Cholo</span><span>Contrato hasta el 30·06·2027</span><span>Objetivo: un título</span><span>2026 — 2030</span><span>Cuatro planes</span><span>El último baile</span></div></div>
 </header>
-<div class="wrap"><p class="note">Datos reales a 30 de octubre de 2026. Proyecto de aficionado, sin relación con el club ni con EA Sports.</p></div>
+<div class="wrap"><p class="note">Datos reales a 30 de octubre de 2026. Proyecto de aficionado, sin relación con el club ni con EA Sports.</p>
+  <aside id="desafio" class="challenge" aria-label="Desafío de Manager Live">
+    <div class="ic"><svg class="icon"><use href="#i-gamepad"/></svg></div>
+    <div>
+      <small>Desafío de Manager Live</small>
+      <p>Mete este código en los desafíos de Manager Live y juega la partida desde el mismo punto de partida que cuenta esta guía.</p>
+    </div>
+    <div class="cbox">
+      <code id="challenge-code">KI3F-W7QT-LO0K</code>
+      <button type="button" id="challenge-copy"><svg class="icon"><use href="#i-copy"/></svg><span>Copiar</span></button>
+    </div>
+  </aside>
+</div>
 
 <main>
 
@@ -859,6 +889,19 @@ footer a{color:#e3e8fb}
 </footer>
 
 <script>
+(function(){
+  const btn = document.getElementById('challenge-copy');
+  if (btn) btn.addEventListener('click', async () => {
+    const label = btn.querySelector('span');
+    try {
+      await navigator.clipboard.writeText(document.getElementById('challenge-code').textContent.trim());
+      btn.setAttribute('data-ok', ''); label.textContent = 'Copiado';
+    } catch (e) {
+      label.textContent = 'Selecciónalo';
+    }
+    setTimeout(() => { btn.removeAttribute('data-ok'); label.textContent = 'Copiar'; }, 2000);
+  });
+})();
 (function(){
   const players = {
     oblak:{n:'Oblak',gk:true}, llorente:{n:'Llorente'}, romero:{n:'Cuti Romero'}, hancko:{n:'Hancko'},
