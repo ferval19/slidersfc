@@ -28,10 +28,13 @@ src/app/
   auth/finalizar/                vuelta por fragmento (cliente)
   perfil/                        resuelve la sesión a /u/<username>
   guia/                          qué lleva un set, explicado campo por campo
+  modo-carrera/                  índice de guías de modo carrera
+  modo-carrera/[slug]/route.ts   cada guía: HTML autónomo servido tal cual
   icon.tsx apple-icon.tsx        favicon SFC generado
   opengraph-image.tsx            tarjeta por defecto del resto de la web
   actions/                       auth.ts · sets.ts · comments.ts · favorites.ts
 
+src/content/modo-carrera/        el HTML de cada guía (`<slug>.html`)
 src/components/                  UI. Los de cliente llevan 'use client'
 src/lib/                         lógica sin UI (ver abajo)
 src/proxy.ts                     refresco de sesión y rutas protegidas
@@ -703,3 +706,21 @@ nada de esta conversación; lo que no vaya en el encargo, se lo inventa.
 
 Lo que **no** se delega: aplicar SQL sobre la base real, tocar el catálogo,
 cualquier cosa de autenticación o RLS, y dar un cambio por bueno.
+
+## Guías de modo carrera
+
+Cada guía es un HTML **entero y autónomo** (`src/content/modo-carrera/<slug>.html`)
+con su propio diseño. Se sirve desde un **route handler**, no desde una página:
+su CSS toca `body` y `h1`, y dentro del layout de la pizarra los dos diseños se
+pisarían. El handler sólo le inyecta canónica, metaetiquetas, favicon y una
+franja de vuelta al índice.
+
+Se prerenderiza en el build (`generateStaticParams` + `dynamicParams = false`):
+el `readFile` corre al compilar, así que no depende de que el fichero viaje al
+servidor. Añadir una guía = soltar el HTML y una entrada en
+`src/lib/modo-carrera.ts`; índice, ruta y sitemap salen de esa lista.
+
+Las guías están en castellano. `/en/modo-carrera/<slug>` sirve el mismo texto
+con la canónica en la castellana, y el sitemap sólo declara esa. Desde el
+índice se enlazan con `<a>` y no con `<Link>`: la navegación de cliente no sabe
+pintar una respuesta que no es RSC.

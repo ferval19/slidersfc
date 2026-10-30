@@ -1112,6 +1112,18 @@ suyo en vez de fusionarlo: puesto arriba, cualquier página con canónica propia
 lo borraba, y el feed existía sin que lo descubriera ningún lector. Se vio
 pidiendo la página, no compilando.
 
+### 30/10 · Guías de modo carrera
+
+`/modo-carrera`: un índice de guías para empezar una partida de modo carrera,
+y la primera, *El último baile del Cholo* (Atlético de Madrid, FC 27). Los
+sliders deciden cómo se juega un partido; una partida larga necesita además un
+plan y una historia, y eso es lo que traen.
+
+Cada guía llega como una página HTML ya diseñada, con su identidad propia, y
+se sirve tal cual en vez de reescribirla en componentes: rehacerla costaría
+más que hacerla y la perdería. El índice sí vive en la pizarra de la web, y
+cada tarjeta toma las rayas del club como única nota de color.
+
 ---
 
 Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.

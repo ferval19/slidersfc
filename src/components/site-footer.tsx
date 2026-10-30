@@ -26,6 +26,12 @@ export async function SiteFooter() {
           >
             {t.queLlevaUnSet}
           </Link>
+          <Link
+            href={localized(locale, '/modo-carrera')}
+            className="eyebrow text-chalk underline underline-offset-4 hover:text-ink-user"
+          >
+            {t.modoCarrera}
+          </Link>
         </div>
         <p className="max-w-sm text-xs text-chalk-dim">{t.disclaimer}</p>
       </div>

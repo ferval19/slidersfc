@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 import { DEFAULT_LOCALE, LOCALES, localePath } from '@/lib/i18n/locale';
+import { GUIAS_MODO_CARRERA } from '@/lib/modo-carrera';
 import { setPath, profilePath } from '@/lib/paths';
 import { publicSiteUrl } from '@/lib/site-url';
 import { createSupabaseAnonClient } from '@/lib/supabase/anon';
@@ -40,6 +41,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const home: MetadataRoute.Sitemap = [
     ...enDosIdiomas('/', { changeFrequency: 'daily', priority: 1 }),
     ...enDosIdiomas('/guia', { changeFrequency: 'monthly', priority: 0.6 }),
+    ...enDosIdiomas('/modo-carrera', { changeFrequency: 'weekly', priority: 0.6 }),
+    // Sólo la castellana: la inglesa es el mismo texto y declara a esta como canónica.
+    ...GUIAS_MODO_CARRERA.map((guia) => ({
+      url: `${siteUrl}/modo-carrera/${guia.slug}`,
+      lastModified: new Date(guia.publicada),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    })),
   ];
 
   let games: { slug: string }[] = [];

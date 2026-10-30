@@ -23,9 +23,22 @@ const en: Dictionary = {
   },
   footer: {
     queLlevaUnSet: 'What goes into a set',
+    modoCarrera: 'Career mode',
     disclaimer: 'A community project. Not affiliated with EA SPORTS or Electronic Arts Inc.',
     idioma: 'Language',
     cambiarIdioma: 'Switch language',
+  },
+  modoCarrera: {
+    eyebrow: 'Save-file guides',
+    titulo: 'Career mode',
+    metaDescription:
+      'Career mode guides for EA SPORTS FC: real-world tactics translated into the game, every player\'s role, transfers and a story to play season by season.',
+    intro:
+      'Sliders decide how a match plays; a career mode save also needs a story. These are full guides to start one: the tactical plan, the squad, the transfer market and a set of rules to make it last several seasons.',
+    soloCastellano: 'The guides are written in Spanish.',
+    guias: (n: number) => `${n} ${n === 1 ? 'guide' : 'guides'}`,
+    leerGuia: 'Read the guide',
+    verSets: 'Browse slider sets',
   },
   comun: {
     cerrar: 'Close',

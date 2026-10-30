@@ -23,9 +23,22 @@ export const es = {
   },
   footer: {
     queLlevaUnSet: 'Qué lleva un set',
+    modoCarrera: 'Modo carrera',
     disclaimer: 'Proyecto de comunidad. Sin relación con EA SPORTS ni con Electronic Arts Inc.',
     idioma: 'Idioma',
     cambiarIdioma: 'Cambiar idioma',
+  },
+  modoCarrera: {
+    eyebrow: 'Guías de partida',
+    titulo: 'Modo carrera',
+    metaDescription:
+      'Guías de modo carrera para EA SPORTS FC: tácticas reales pasadas al juego, el papel de cada jugador, fichajes y una historia que jugar temporada a temporada.',
+    intro:
+      'Los sliders deciden cómo se juega un partido; una partida de modo carrera necesita además una historia. Aquí van guías enteras para empezar una: el plan táctico, la plantilla, el mercado y unas reglas para que dure varias temporadas.',
+    soloCastellano: 'Las guías están escritas en castellano.',
+    guias: (n: number) => `${n} ${n === 1 ? 'guía' : 'guías'}`,
+    leerGuia: 'Leer la guía',
+    verSets: 'Ver sets de sliders',
   },
   comun: {
     cerrar: 'Cerrar',
